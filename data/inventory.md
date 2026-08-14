@@ -1,4 +1,4 @@
-# Process Inventory — v6 (characterised)
+# Process Inventory — v9 (fully characterised)
 
 _Drafted 2026-08-14. **v2** added the two strategic-plan drafts, the
 `makerspace_dashboard` sections and chart builders, and the entrepreneurship
@@ -239,19 +239,32 @@ sources plus the dashboards to find the second half of the list.
 
 **186 processes across 13 groups.**
 
-| | v4 (guessed) | v5 (round 1) | v6 (round 2) |
-|---|---:|---:|---:|
-| `stable` | 40 | 86 | **116** |
-| `degraded` | 28 | 31 | 27 |
-| `watch` | 12 | 13 | 13 |
-| `changing` | 8 | 11 | 14 |
-| `planned` | — | — | **14** |
-| `undefined` | 56 | 31 | **2** |
-| `unknown` | 42 | 14 | **0** |
+| | v4 (guessed) | round 1 | round 2 | round 3 |
+|---|---:|---:|---:|---:|
+| `stable` | 40 | 86 | 116 | **118** |
+| `degraded` | 28 | 31 | 27 | 27 |
+| `watch` | 12 | 13 | 13 | 13 |
+| `changing` | 8 | 11 | 14 | 14 |
+| `planned` | — | — | 14 | 14 |
+| `undefined` | 56 | 31 | 2 | **1** |
+| `unknown` | 42 | 14 | 0 | **0** |
 
-**Uncharacterised went 98 → 45 → 2.** The two that remain are genuinely
-undefined and confirmed as such rather than assumed: the **facilitator six-month
-renewal** and **succession planning**. Rows with no automation score went 23 → 1.
+**Uncharacterised went 98 → 45 → 2 → 1.** Both of the last two turned out to be
+*mis-scored rather than unknown*, which is the pattern that has held throughout:
+
+- **Facilitator six-month renewal** is genuinely running. `webform_10645` shows
+  two clean campaigns a year — Feb 2025 (40), Jul–Aug 2025 (33), Jan 2026 (31),
+  Jul–Aug 2026 (38) — against 54 facilitators. What is missing is not the
+  process but **a field to hold a term date**, which is the concrete reason it
+  cannot be automated.
+- **Board succession** is defined in the bylaws: director resignation, removal,
+  vacancies, one-year officer terms with interim vacancies fillable until the
+  next annual meeting, and staggered three-year director terms.
+
+What survived was hiding inside the second one: **executive succession and
+emergency authority**. The bylaws cover governance continuity; nothing covers
+operational continuity. That row is now the single highest-impact undefined
+process in the registry, and splitting it out is what made it visible.
 
 **A new state, `planned`, carries 14 rows.** These are intentions we have not
 started — an ambassador programme, planned giving, peer benchmarking — which
@@ -331,7 +344,7 @@ of this page, and it was JR's triage that made it possible.
 | Badge grant from quiz | 4 | 1 | 4 | stable | Auto-grants at 100% ⟐ EDU O#3 S#3 · GROW |
 | Badge checkout appointment | 4 | 1 | 4 | stable | 60-min regression fixed 07-14 |
 | Facilitator scheduling | 4 | 1 | 3 | stable | — ‖ [Facilitator Training](https://docs.google.com/presentation/d/1jBctIZ_C1ntcK_Azp6i2lBER0UCNn4xTbYhdh0QxIME/edit) |
-| Facilitator 6-month renewal | 1 | 1 | 3 | undefined | Policy-only, two overlapping webforms, by hand twice a year ‖ [Community Facilitator Program](https://www.makehaven.org/community-animator-program) · [Facilitator Training](https://docs.google.com/presentation/d/1jBctIZ_C1ntcK_Azp6i2lBER0UCNn4xTbYhdh0QxIME/edit) |
+| Facilitator 6-month renewal | 2 | 1 | 3 | stable | **Corrected from `undefined` — it runs, and the data proves the cadence.** `webform_10645` "Current Facilitator Application Update" shows two clear campaigns a year: Feb 2025 (40), Jul–Aug 2025 (33), Jan 2026 (31), Jul–Aug 2026 (38) — against 54 facilitators, roughly a 60–75 per cent response each cycle. The six-month term is real and is actually being run. **What is missing is not the process but somewhere to put the answer: the coordinator profile has no term start or end field** (availability, capacity, email, focus, hours, on-request, requirements, scheduled hours — and nothing else), which is the concrete reason renewal cannot be reminded, rostered or offboarded automatically. Two dead forms should be archived: `webform_1680` "Current Facilitator Reapplication", last used Feb 2019, and `webform_8242` "Facilitator Evaluation", last used Aug 2023. *(Verified against the database, 2026-08-14)* ⟐ GOV O#2 S#1 · GROW ‖ [Community Facilitator Program](https://www.makehaven.org/community-animator-program) · [Facilitator Training](https://docs.google.com/presentation/d/1jBctIZ_C1ntcK_Azp6i2lBER0UCNn4xTbYhdh0QxIME/edit) |
 | On-request badger matching | 3 | 1 | 2 | stable | Shipped 08-02 |
 | Youth & school custodial partnerships | 2 | 2 | 5 | stable | **Materially lower risk than v3 assumed.** Minors attend as guests of their own guardians, or through school partnerships where **the school's instructor supervises — MakeHaven is not the custodian**. Youth safety policies are published. Standards module B still applies, but the screening burden largely sits with partners ⟐ EDU O#4 S#3 · GROW ‖ [Youth safety policies](https://www.makehaven.org/makehaven-youth-safety-policies) · [TurnBridge Youth Access MOU](https://docs.google.com/document/d/1VSmWqgyx-czRHzeCf12hh9PErIc7562RzAh3gTa2qGg/edit) · [BOE Sewing Program MOU](https://docs.google.com/document/d/1hCqDZTXjwF2nU_9cUZ2FKgiq0FLQilyYjH4AgiJa2Qc/edit) |
 | Peer benchmarking (annual) | 1 | 0 | 2 | planned | Confirmed by JR as an intention we have not started — a roadmap item, not a broken process. *(JR, round 2)* ⟐ EDU O#2 S#1 · PLAN |
@@ -544,7 +557,8 @@ where almost nothing is defined._
 | Governance policy annual review | 2 | 2 | 5 | stable | Conflict-of-interest policy published; the policy set is indexed in the operations doc ⟐ GOV O#3 S#1 · REFINE ‖ [Conflict of interest](https://www.makehaven.org/conflict-interest-policy) · [Operations index](https://www.makehaven.org/operations) · [Bylaws](https://docs.google.com/document/d/1yhU7K5EpKeP6KRXCDboMOiFOrT6bd5vA5Dcippb694g/edit) · [Whistleblower Policy](https://docs.google.com/document/d/1XF4N91TwuxkHUsOLHZ7QZEn8t755kPxO6qtczERSiyU/edit) |
 | Committee charters & effectiveness | 2 | 1 | 3 | stable | **Correction: the DEI committee is active and meeting** — v2's "no active members" is stale. Committee structure is published. **Real remaining gap, in JR's words: no reliable way to track who is actually on each committee** — the clearest use case for Governance-Dance ‖ [Committee structure](https://www.makehaven.org/volunteer-leadership-structure) |
 | Governance archive / institutional memory | 1 | 1 | 3 | planned | Partly served by Google Drive and the operations index today, but nothing purpose-built. JR wants something stronger — possibly Governance-Dance, possibly a dedicated continuity tool. *(JR, round 2)* ⟐ GOV O#3 S#3 · DEVELOP |
-| Succession planning (board + staff) | 1 | 0 | 5 | undefined | **Confirmed by JR: "not really, we should work on this."** Now the highest-impact genuinely-undefined row on the page ⟐ GOV O#3 S#2 · PLAN |
+| Board officer & director succession | 2 | 2 | 4 | stable | **Split out of the old succession row — and it turns out to be defined, in the bylaws.** Section 2.4 covers director resignation, 2.5 removal, 2.6 vacancies (fillable by the directors at any meeting), and 3.7 officer resignation and removal. Officers serve one-year terms and **"interim vacancies may be filled by the Board of Directors to serve until the next annual meeting"**. Directors serve staggered three-year terms with roughly a third expiring each year, so continuity is structural rather than ad hoc. *(Verified against the bylaws, 2026-08-14)* ⟐ GOV O#3 S#2 · PLAN ‖ [Bylaws](https://docs.google.com/document/d/1yhU7K5EpKeP6KRXCDboMOiFOrT6bd5vA5Dcippb694g/edit) |
+| Executive succession & emergency authority | 1 | 0 | 5 | undefined | **The real gap, now isolated.** The bylaws handle *governance* continuity; nothing handles *operational* continuity. If the executive director were suddenly unavailable there is no documented answer to who signs, who approves payments, who holds the vendor and landlord relationships, or who assumes day-to-day authority — JR: "not really, we should work on this." The partial mitigations are real but incidental: system access is distributed and recoverable through the org email account, and a **MakeHaven System and Data Access Agreement** form has captured 21 submissions since May 2025. Standards S009 asks for succession and emergency authority to be documented **and tested** — we have neither. **This is now the highest-impact undefined process in the registry.** ⟐ GOV O#3 S#2 · PLAN |
 | Staff onboarding / offboarding | 1 | 1 | 3 | stable | **Reframed.** The same four staff have been in post for years, so this rarely fires; when it does, the executive director spends substantial one-to-one time. **JR's own redirect is the useful finding: the real onboarding gap is instructors and volunteers, not staff** — and those are far higher-volume. *(JR, round 2)* ‖ [Personnel Policy](https://docs.google.com/document/d/1G70oyO5qSCDrjqVkLztEoLJyAbQzYs85QZJx_h3Snt0/edit) · [Staff Responsibilities Map](https://docs.google.com/drawings/d/1w8iB6siS0NJh0tNlZ0A3myBtsTayvzGYybzU_qRA8OQ/edit) |
 | Staff development, benefits & wellbeing | 2 | 2 | 3 | stable | Annual evaluations happen and job descriptions are reviewed at the same time; both live in Google Drive ⟐ INF O#1 S#4 · REFINE ‖ [Employee Evaluation](https://docs.google.com/document/d/1hm2Tl-jVQSOHfMhyDOjz4SCHxcOkS-BgGO7vZW4gR50/edit) · [Personnel Policy](https://docs.google.com/document/d/1G70oyO5qSCDrjqVkLztEoLJyAbQzYs85QZJx_h3Snt0/edit) |
 | Staffing plan & role clarity | 1 | 1 | 4 | degraded | JR: "not really formally… I feel like we have it but not in one place." Individual job descriptions exist and are reviewed at annual evaluations; the org-level plan does not exist as a single artefact. *(JR, round 2)* ‖ [Staff Responsibilities Map](https://docs.google.com/drawings/d/1w8iB6siS0NJh0tNlZ0A3myBtsTayvzGYybzU_qRA8OQ/edit) |
@@ -572,7 +586,7 @@ _How we change everything else._
 | Weekly pulse triage | 3 | 2 | 2 | stable | — |
 | Cycle review | 2 | 2 | 3 | stable | Replaced a 950-line improvement pipeline that was fully specified and never ran once |
 | Backup & disaster recovery | 3 | 2 | 5 | stable | Three systems hold essentially everything: **Google Drive** (Google for Education) for documents, **Pantheon** for the website with its own robust backups, and **GitHub** for code — which has repeatedly been the actual recovery tool. UniFi cameras are a fourth, lesser store. Each vendor carries its own recovery documentation, and JR has performed real restores. What is missing is a MakeHaven-side runbook saying which to restore in what order. *(JR, round 2)* ⟐ INF O#3 S#1 · DEVELOP |
-| Admin access & systems register | 2 | 1 | 4 | changing | **Upgraded from `degraded` — a register has been started.** Access is genuinely distributed (Pantheon with Terence and Yan, Chargebee/Stripe with Kate, Xero with the treasurer, Home Assistant with Vincent, Corey and Lior, Firebase under an org account, domain under org email) and everything is recoverable by taking control of the ED's work email. Finishing the started document closes the largest remaining bus-factor gap. *(JR, round 2)* ⟐ INF O#3 S#1 · DEVELOP ‖ [Systems register (draft)](https://docs.google.com/document/d/18B7Oxe8kvQCvrex1dLNuhUiMWqXN-r7yzE-QwXHxe2Q/edit) |
+| Admin access & systems register | 2 | 1 | 4 | changing | **Upgraded from `degraded` — a register has been started.** Access is genuinely distributed (Pantheon with Terence and Yan, Chargebee/Stripe with Kate, Xero with the treasurer, Home Assistant with Vincent, Corey and Lior, Firebase under an org account, domain under org email) and everything is recoverable by taking control of the ED's work email. Finishing the started document closes the largest remaining bus-factor gap. *(JR, round 2)* A **MakeHaven System and Data Access Agreement** webform has also been capturing who holds what since May 2025 (21 submissions) — a better foundation than the draft document alone suggested. ⟐ INF O#3 S#1 · DEVELOP ‖ [Systems register (draft)](https://docs.google.com/document/d/18B7Oxe8kvQCvrex1dLNuhUiMWqXN-r7yzE-QwXHxe2Q/edit) |
 | Local development environment | 2 | 2 | 2 | stable | Documented and repeatedly repaired |
 | Preview / staff testing | 4 | 2 | 2 | stable | Sandbox site for extended staff testing |
 | Policy & procedure document index | 1 | 1 | 4 | changing | The operations doc is the current answer and it is drifting. JR wants something stronger — possibly folded into Governance-Dance, possibly its own continuity tool. **That decision is now live rather than hypothetical**, because this registry is starting to do part of the job. *(JR, round 2)* ‖ [Operations index](https://www.makehaven.org/operations) · [Staff tools hub (staff)](https://www.makehaven.org/staff-tools) |
