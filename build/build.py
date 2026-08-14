@@ -5,6 +5,7 @@ import re, html, collections, pathlib
 SRC = pathlib.Path(__file__).resolve().parents[1] / "data" / "inventory.md"
 TPL = pathlib.Path(__file__).with_name("shell.html")
 OUT = pathlib.Path(__file__).resolve().parents[1] / "public" / "index.html"
+REPO = "https://github.com/makehaven/makehaven-website/tree/master"
 
 SKIP_H2 = ("How to read", "The strategic plan", "What v2", "What v3",
            "What the seed", "The resource layer", "Where this draft",
@@ -100,19 +101,53 @@ SEV = {"a": {"1": "crit", "2": "warn", "3": "mid", "4": "good", "5": "good"},
 def score_cell(axis, v):
     return f'<td class="s sc-{SEV[axis].get(v, "q")}">{html.escape(v)}</td>'
 
+# Optional fields, each introduced by its own sigil so the note stays one cell
+# and rows that omit a field cost nothing. Order in the source is by convention
+# description ⚑owner ◷reviewed ⚙code ⟐strategy ‖docs, but parsing does not
+# depend on that order.
+SIGILS = {"⚑": "owner", "◷": "reviewed", "⚙": "code", "⟐": "strategy", "‖": "docs"}
+
+def parse_note(raw):
+    """Split a note cell into its prose and whichever optional fields it carries."""
+    parts, cur, buf = {}, "note", []
+    for ch in raw:
+        if ch in SIGILS:
+            parts[cur] = "".join(buf).strip()
+            cur, buf = SIGILS[ch], []
+        else:
+            buf.append(ch)
+    parts[cur] = "".join(buf).strip()
+    parts["note"] = strip_history(parts.get("note", ""))
+    return parts
+
 def plain_note(raw):
-    """Just the prose: no strategy tail, no doc links, no drafting history."""
-    return strip_history(raw.split("‖")[0].split("⟐")[0].strip())
+    """Just the prose: no optional fields, no drafting history."""
+    return parse_note(raw)["note"]
+
+def code_links(spec):
+    """Module names -> links to the module directory on GitHub."""
+    out = []
+    for m in [x.strip() for x in spec.split(",") if x.strip()]:
+        out.append(f'<a href="{REPO}/web/modules/custom/{m}" target="_blank" '
+                   f'rel="noopener"><code>{html.escape(m)}</code></a>')
+    return " · ".join(out)
 
 def note_cell(raw):
-    """note [⟐ strategies] [‖ docs] — each rendered as its own labelled line."""
-    body, _, docs = raw.partition("‖")
-    note, _, strat = body.partition("⟐")
-    out = md(strip_history(note.strip()))
-    if strat.strip():
-        out += f'<span class="res strat"><b>Strategy</b>{md(strat.strip())}</span>'
-    if docs.strip():
-        out += f'<span class="res"><b>Docs</b>{md(docs.strip())}</span>'
+    """Prose first, then each optional field as its own labelled line."""
+    p = parse_note(raw)
+    out = md(p["note"])
+    if p.get("code"):
+        out += f'<span class="res code"><b>Code</b>{code_links(p["code"])}</span>'
+    if p.get("strategy"):
+        out += f'<span class="res strat"><b>Strategy</b>{md(p["strategy"])}</span>'
+    if p.get("docs"):
+        out += f'<span class="res"><b>Docs</b>{md(p["docs"])}</span>'
+    meta = []
+    if p.get("owner"):
+        meta.append(f'<b>Owner</b> {md(p["owner"])}')
+    meta.append(f'<b>Reviewed</b> {md(p["reviewed"])}' if p.get("reviewed")
+                else '<b>Reviewed</b> <i class="never">never</i>')
+    out += f'<span class="res meta">{" · ".join(meta)}</span>'
     return out
 
 # ---- automation ranking ----------------------------------------------------
@@ -206,13 +241,20 @@ n_manual = sum(1 for r in rows if r["a"].isdigit() and int(r["a"]) <= 2)
 n_manual_undoc = sum(1 for r in rows if r["a"].isdigit() and int(r["a"]) <= 2
                      and r["d"].isdigit() and int(r["d"]) <= 1)
 n_d3 = sum(1 for r in rows if r["d"] == "3")
+fields = [parse_note(r["note"]) for r in rows]
+n_owner    = sum(1 for f in fields if f.get("owner"))
+n_reviewed = sum(1 for f in fields if f.get("reviewed"))
+n_code     = sum(1 for f in fields if f.get("code"))
+n_never    = N - n_reviewed
 
 page = TPL.read_text()
 for key, val in [("TILES", tiles), ("LEGEND", legend), ("BOARD", "\n".join(board)),
                  ("NRES", str(nres)), ("NGROUPS", str(len(by_group))),
                  ("NAUTO", str(n_auto)), ("NMANUAL", str(n_manual)),
                  ("NMANUALUNDOC", str(n_manual_undoc)), ("ND3", str(n_d3)),
-                 ("NFLOORED", str(n_floored)),
+                 ("NFLOORED", str(n_floored)), ("NOWNER", str(n_owner)),
+                 ("NREVIEWED", str(n_reviewed)), ("NCODE", str(n_code)),
+                 ("NNEVER", str(n_never)),
                  ("RANK", "\n".join(rank_html)), ("TABLES", "\n".join(tables)),
                  ("UNRANK", unrank_html), ("INFLUX", influx), ("N", str(N)),
                  ("NCHANGING", str(st_tot["changing"])), ("NWATCH", str(st_tot["watch"])),
@@ -226,4 +268,5 @@ if left:
 OUT.parent.mkdir(parents=True, exist_ok=True)
 OUT.write_text(page)
 print(f"resource-linked rows: {nres}; D2 floor applied to {n_floored} code-run rows")
+print(f"coverage — owner {n_owner}/{N}, reviewed {n_reviewed}/{N}, code {n_code}/{N}")
 print(f"wrote {OUT} — {N} processes, {len(tables)} groups, change load {change_load}, can't-say {cant_say}")

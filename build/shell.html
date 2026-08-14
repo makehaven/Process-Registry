@@ -172,6 +172,17 @@
   td.s.sc-low  { color:var(--ink-3); }
   td.s.sc-q    { color:var(--s-unknown); }
 
+  .coverage { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1px;
+              margin:0 0 30px; background:var(--rule); border:1px solid var(--rule);
+              border-radius:2px; overflow:hidden; }
+  .coverage > div { background:var(--surface); padding:16px 18px; }
+  .coverage .cn { display:block; font-family:var(--mono); font-size:26px; font-weight:700;
+                  letter-spacing:-.02em; font-variant-numeric:tabular-nums; line-height:1; }
+  .coverage .cn small { font-size:14px; font-weight:500; color:var(--ink-3); }
+  .coverage .cl { display:block; margin-top:8px; font-family:var(--mono); font-size:10px;
+                  letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); font-weight:600; }
+  .coverage .cs { display:block; margin-top:6px; font-size:12.5px; color:var(--ink-2); line-height:1.5; }
+
   .statedef { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1px;
               margin:0 0 30px; background:var(--rule); border:1px solid var(--rule);
               border-radius:2px; overflow:hidden; }
@@ -188,6 +199,11 @@
          font-size:12px; line-height:1.7; }
   .res.strat b { color:var(--crimson); }
   .res.strat { border-top-style:solid; }
+  .res.code b { color:var(--s-changing); }
+  /* Owner / reviewed: provenance, deliberately quieter than the content above it. */
+  .res.meta { border-top:0; margin-top:5px; padding-top:0; font-size:11px; color:var(--ink-3); }
+  .res.meta b { margin-right:5px; }
+  .res.meta .never { font-style:normal; color:var(--s-watch); font-weight:600; }
   .res b { font-family:var(--mono); font-size:9.5px; letter-spacing:.11em; text-transform:uppercase;
            color:var(--ink-3); font-weight:600; margin-right:8px; }
   td.n code { font-family:var(--mono); font-size:11.5px; background:var(--sunken); padding:1px 4px;
@@ -382,7 +398,23 @@
 
 <div class="panel" id="p-inventory" role="tabpanel" aria-labelledby="t-inventory" hidden>
 
-  <p class="lead">The full reference. If the <strong>A</strong>, <strong>D</strong> and <strong>I</strong> columns are unfamiliar, the scoring key comes first.</p>
+  <p class="lead">The full reference. If the <strong>Auto</strong>, <strong>Doc</strong> and
+  <strong>Impact</strong> columns are unfamiliar, the scoring key comes first.</p>
+
+  <div class="coverage">
+    <div><span class="cn">{{NREVIEWED}}<small>/{{N}}</small></span>
+      <span class="cl">Verified by a person</span>
+      <span class="cs">The rest were inferred and never confirmed. {{NNEVER}} rows show
+      <em>Reviewed never</em> — that is the registry's own staleness, kept visible on purpose.</span></div>
+    <div><span class="cn">{{NCODE}}<small>/{{N}}</small></span>
+      <span class="cl">Linked to code</span>
+      <span class="cs">Rows naming the module that implements them, so a change in the website
+      repo can be traced to the processes it touches.</span></div>
+    <div><span class="cn">{{NOWNER}}<small>/{{N}}</small></span>
+      <span class="cl">Have an owner</span>
+      <span class="cs">The field exists and nothing fills it yet. Until it does, no row can
+      tell you who to ask.</span></div>
+  </div>
 
   <section>
     <h2>How the scoring works</h2>
@@ -568,8 +600,8 @@
         <thead><tr><th style="width:44%">The operations doc</th><th>The registry</th></tr></thead>
         <tbody>
           <tr><td class="p">A flat list of documents</td><td class="n">Documents attached to the process that uses them</td></tr>
-          <tr><td class="p">No dates — cannot tell current from abandoned</td><td class="n">A <code>reviewed</code> date, plus staleness derived from the file itself</td></tr>
-          <tr><td class="p">No owner per document</td><td class="n">An owner and a backup per process</td></tr>
+          <tr><td class="p">No dates — cannot tell current from abandoned</td><td class="n">A <code>reviewed</code> date per row — <strong>{{NREVIEWED}} of {{N}} carry one</strong>, so the registry's own staleness is visible rather than hidden</td></tr>
+          <tr><td class="p">No owner per document</td><td class="n">An <code>owner</code> field per process — <strong>supported, and currently empty on every row.</strong> Filling it is the biggest improvement still available here</td></tr>
           <tr><td class="p">At least one broken link</td><td class="n">Link-checkable in the build</td></tr>
           <tr><td class="p">Back half is an unrelated field-trip photo log</td><td class="n">Scoped to operations</td></tr>
           <tr><td class="p">Nothing says whether the document is <em>followed</em></td><td class="n">The A, D and I scores say exactly that</td></tr>
