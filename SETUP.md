@@ -8,26 +8,16 @@ Rough time: 20–30 minutes, most of it waiting for DNS.
 
 ---
 
-## 1. Push to GitHub
+## 1. Push to GitHub — ✅ done
 
-The repo has three commits and no remote yet. Create it under the MakeHaven org
-so it isn't tied to a personal account:
+`origin` is `github.com/makehaven/Process-Registry`, default branch **`master`**
+(the deploy workflow has been corrected to match — thanks).
+
+Just push whatever is local:
 
 ```bash
 cd ~/development/Process-Registry
-gh repo create MakeHaven/Process-Registry --public --source=. --remote=origin --push
-```
-
-Use `--private` instead if you'd rather hold it back until the board has seen
-it. The published *site* is public either way — repo visibility is a separate
-decision, and the only argument for public is that the Standards of Excellence
-work with the CT Makerspace Network is meant to be shareable.
-
-Verify:
-
-```bash
-git remote -v
-git log --oneline
+git push -u origin master
 ```
 
 ---
@@ -104,7 +94,7 @@ Test it:
 
 ```bash
 git commit --allow-empty -m "Test deploy"
-git push
+git push origin master
 ```
 
 Watch the run under the repo's **Actions** tab.
