@@ -86,6 +86,33 @@ builds and redeploys in about a minute.
 
 Public, read-only, no auth.
 
+## How it stays current
+
+Updating this is a **side effect of loops that already run**, never a separate
+discipline. That is the whole design: two earlier attempts at this same idea
+died because they needed someone to remember them.
+
+| Loop | What it does here | When |
+|---|---|---|
+| **pantheon-deploy** — close-out | Mark affected processes `changing`; add rows for processes the work revealed | Staging a feature |
+| **pantheon-deploy** — after live | Flip shipped processes to `watch` with what to watch for | Every release |
+| **weekly-triage** | Mark `degraded` when the pulse finds something; close watches whose window passed clean | Weekly, only on real signal |
+| **cycle-review** | Resolve expired watches, add processes the cycle revealed, re-check the `degraded` list, sanity-check change load | Biweekly |
+| **flow-check** | A flow walk maps one-to-one onto processes — mark or close accordingly | Per flow |
+| **security-audit** | Confirmed findings that leave a process unreliable → `degraded`, pointing at the ledger | Quarterly |
+
+All of them defer to the **`process-registry` skill** in the website repo
+(`.claude/skills/process-registry/`) rather than restating the how-to.
+
+**The bar for touching it: did this work change how a process runs, or reveal
+something about one?** If not, say so and move on. A registry edit on every
+loop regardless of signal is exactly the ritual that killed the predecessors.
+
+Expect the inventory to keep growing. The initial rounds mapped what could be
+seen from the codebase, the strategic plan, the dashboards and two rounds of
+questions; the processes nobody thought to mention surface later, usually
+through triage or a flow walk.
+
 ## Conventions
 
 - **Answers are the documentation.** Each process carries a description of two
