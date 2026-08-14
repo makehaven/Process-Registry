@@ -209,88 +209,90 @@
   footer p { margin:0; font-family:var(--mono); font-size:11.5px; color:var(--ink-3);
              letter-spacing:.04em; line-height:1.7; }
   footer code { color:var(--ink-2); }
+
+  /* ---- tabs ------------------------------------------------------------ */
+  .tabbar { position:sticky; top:0; z-index:20; background:var(--paper);
+            border-bottom:1px solid var(--rule); margin-bottom:34px; }
+  .tabbar .wrap { display:flex; gap:2px; overflow-x:auto; scrollbar-width:none; }
+  .tabbar .wrap::-webkit-scrollbar { display:none; }
+  .tabbar button { appearance:none; background:none; border:0; cursor:pointer;
+      font:inherit; font-size:.82rem; font-weight:600; letter-spacing:.01em;
+      color:var(--ink-2); padding:15px 2px 13px; margin-right:26px;
+      border-bottom:2px solid transparent; white-space:nowrap; }
+  .tabbar button:last-child { margin-right:0; }
+  .tabbar button:hover { color:var(--ink); }
+  .tabbar button[aria-selected="true"] { color:var(--ink); border-bottom-color:var(--accent); }
+  .tabbar button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; border-radius:3px; }
+  .tabbar button .c { color:var(--ink-3); font-weight:500; margin-left:6px; font-variant-numeric:tabular-nums; }
+  .tabbar button[aria-selected="true"] .c { color:var(--accent); }
+  .panel[hidden] { display:none; }
+  .panel > section:first-child { margin-top:0; }
+  .panel > section:first-child > h2 { margin-top:0; }
+
+  /* Panel lead — one line telling a newcomer what this tab answers. */
+  .lead { font-size:1.02rem; line-height:1.62; color:var(--ink-2);
+          max-width:64ch; margin:0 0 30px; }
+  .lead strong { color:var(--ink); font-weight:600; }
+
+  /* ---- inventory filter ------------------------------------------------ */
+  .filter { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:0 0 26px; }
+  .filter input { font:inherit; font-size:.9rem; padding:9px 13px; min-width:260px; flex:1 1 260px;
+      background:var(--surface); color:var(--ink);
+      border:1px solid var(--rule); border-radius:7px; }
+  .filter input:focus { outline:none; border-color:var(--accent); }
+  .filter input::placeholder { color:var(--ink-3); }
+  .filter .hits { font-size:.8rem; color:var(--ink-3); font-variant-numeric:tabular-nums; }
+  tr[hidden], .tblwrap[hidden] { display:none; }
+
+  /* ---- print: no tabs, everything visible ------------------------------ */
+  @media print {
+    .tabbar, .filter { display:none; }
+    .panel[hidden] { display:block !important; }
+  }
 </style>
 
 <header class="masthead">
   <div class="wrap">
-    <div class="eyebrow">MakeHaven · v9 · fully characterised</div>
+    <div class="eyebrow">MakeHaven · Operations</div>
     <h1>Process Stabilization Registry</h1>
     <p class="standfirst">
-      Every operational process at MakeHaven on one page — scored for how manual it is,
-      how well documented, how much it costs us when it breaks, and whether it is moving
-      right now. The point is not to stop changing. It is to make the change countable.
+      Every operational process at MakeHaven, scored for how manual it is, how well
+      documented, how much it costs us when it breaks, and whether it is moving right
+      now. The point is not to stop changing. It is to make the change countable.
     </p>
     <div class="meta-line">
-      <span>Seeded 2026-08-14 · v9</span>
-      <span>{{N}} processes · 13 groups</span>
-      <span>github: Process-Registry</span>
+      <span>{{N}} processes · {{NGROUPS}} groups</span>
+      <span>{{STABLE}} running normally · {{DEGRADED}} need attention</span>
+      <span>Draft — not yet staff-reviewed</span>
     </div>
   </div>
 </header>
 
+<nav class="tabbar">
+  <div class="wrap" role="tablist" aria-label="Registry sections">
+    <button role="tab" id="t-overview" aria-controls="p-overview" aria-selected="true">Overview</button>
+    <button role="tab" id="t-flux" aria-controls="p-flux" aria-selected="false" tabindex="-1">What&rsquo;s moving<span class="c">{{CHANGELOAD}}</span></button>
+    <button role="tab" id="t-inventory" aria-controls="p-inventory" aria-selected="false" tabindex="-1">Inventory<span class="c">{{N}}</span></button>
+    <button role="tab" id="t-method" aria-controls="p-method" aria-selected="false" tabindex="-1">Method &amp; caveats</button>
+  </div>
+</nav>
+
 <div class="wrap">
 
-  <div class="placard">
-    <div class="tag">Draft</div>
-    <div>
-      <p><strong>Three rounds of questions took this from a guess to a map.</strong> The
-      uncharacterised count went 98 → 45 → 2 → <strong>1</strong>. Both of the last two turned out to be
-      mis-scored rather than unknown: the facilitator six-month renewal is genuinely running — the
-      submission data shows two clean campaigns a year — and board succession is defined in the bylaws.
-      What survived is the part that was hiding inside the second one: <strong>executive succession and
-      emergency authority</strong>, which really is undefined, and is now the single highest-impact
-      undefined process here.</p>
-      <p><strong>The picture that emerged is better than the first draft implied.</strong> 116
-      of 186 processes run normally. Almost everything that moved out of "unknown" went
-      straight to <em>stable</em> — it existed, it worked, it simply wasn't written anywhere a
-      new person could find it. <strong>The gap at MakeHaven is legibility, not competence.</strong>
-      That is a different and far more tractable problem, and it is what this registry now fixes
-      directly: the answers gathered while scoring have become the process descriptions, so the
-      map and the documentation are the same artefact.</p>
-    </div>
-  </div>
+
+<div class="panel" id="p-overview" role="tabpanel" aria-labelledby="t-overview">
+
+  <p class="lead">
+    <strong>Most of MakeHaven works. Very little of it is written down.</strong>
+    {{STABLE}} of the {{N}} processes here run normally — they exist, they work, they
+    simply aren&rsquo;t recorded anywhere a new person could find them. The gap here is
+    legibility, not competence, which is a far more tractable problem.
+  </p>
 
   <section>
     <h2>Where we stand</h2>
-    <p class="sec-note">Four numbers, all of which should move over the next year.</p>
+    <p class="sec-note">Five numbers, all of which should move over the next year.</p>
     <div class="tiles">{{TILES}}
-    </div>
-  </section>
-
-  <section>
-    <h2>Where this sits in the plan</h2>
-    <p class="sec-note">
-      The strategic plan makes this registry's case in its own words — including, in a margin
-      comment, asking for it by name as a precondition for the AI-efficiency work. The plan is
-      a live draft and its numbers are still moving; what is stable, and what the registry
-      builds on, is the <strong>set of strategies and their priorities</strong>.
-    </p>
-    <div class="quotes">
-      <blockquote>Systematize, stabilize […]: website, systems, operations to lay the groundwork
-        for growth, innovation, responsiveness [move past start-up style]
-        <cite>Lever strategy #1</cite></blockquote>
-      <blockquote>Establish and conduct a regular, consistent process for reviewing, improving,
-        and stabilizing operational systems and procedures.
-        <cite>Facilities &amp; Operations · Year 1 Strategy #5 · 200 hours budgeted</cite></blockquote>
-      <blockquote>It might be worth doing an audit of the current systems first to make sure
-        they're actually efficient before bringing in AI. That way, we're improving the process
-        itself, not just automating around any existing issues.
-        <cite>Margin comment on Infrastructure O#1 S#4</cite></blockquote>
-    </div>
-    <div class="placard q" style="margin-top:24px">
-      <div class="tag">Strategy<br>link</div>
-      <div>
-        <p><strong>{{WITHSTRAT}} processes now carry the strategy that acts on them</strong> — the ID,
-        its priority, and its work type from the five-year sequence sheet. <strong>{{NP1}} carry a
-        ★ elevated-priority strategy.</strong> The registry does not replace that sheet: it is edited by
-        committees, it holds owners and year-by-year sequencing, and it should stay where it is.</p>
-        <p>What the link buys is two questions neither system answers alone: <em>which processes does
-        this strategy actually touch?</em> and — the more useful one — <em>which of our degraded
-        processes has no strategy pointed at it at all?</em> The sequence sheet is entirely
-        forward-looking; every one of its states describes work someone intends to do. It has no way
-        to say <strong>this is broken right now and nobody is on it</strong>, which is what the
-        registry supplies.</p>
-      </div>
     </div>
   </section>
 
@@ -299,19 +301,19 @@
     <p class="sec-note">
       The board's question — <em>is change under control?</em> — is this chart, tracked over time.
       One caution: <strong>track the count in flux ({{CHANGELOAD}}), not the percentage.</strong>
-      The inventory nearly doubled between v1 and v2, so the ratio moved for reasons that had
-      nothing to do with how much was actually changing.
+      The inventory itself is still growing, so the ratio moves for reasons that have nothing
+      to do with how much is actually changing.
     </p>
     <div class="legend">{{LEGEND}}</div>
     <div class="board">
 {{BOARD}}
     </div>
     <p class="sec-note" style="margin-top:22px">
-      <strong>The grey has gone.</strong> Three rounds of answers replaced it, and the bars now
-      show something more useful than ignorance: 27 processes that need attention, 27 in flux, and 14
-      marked <span class="pill planned" style="padding:1px 5px">planned</span> — intentions we have not
-      started, which the earlier drafts were unfairly counting as failures. Separating those two was the
-      single biggest improvement to how fair this page is.
+      Read the bars as three separate problems, not one: <strong>{{DEGRADED}} processes need
+      attention</strong>, {{CHANGELOAD}} are in flux, and {{PLANNED}} are marked
+      <span class="pill planned" style="padding:1px 5px">planned</span> — intentions we have not
+      started yet. Planned is not a failure, and keeping it out of the degraded count is what makes
+      this chart fair to read.
     </p>
     <div class="placard" style="margin-top:24px;background:var(--s-degraded-bg);border-color:var(--s-degraded)">
       <div class="tag" style="color:var(--s-degraded)">Top<br>finding</div>
@@ -342,6 +344,11 @@
       </div>
     </div>
   </section>
+</div>
+
+<div class="panel" id="p-flux" role="tabpanel" aria-labelledby="t-flux" hidden>
+
+  <p class="lead">The <strong>{{CHANGELOAD}} processes that are not sitting still</strong>, and where the next automation effort is best spent.</p>
 
   <section>
     <h2>In flux right now</h2>
@@ -367,14 +374,13 @@
     <div class="rank">
 {{RANK}}
     </div>
-    <div class="unranked">
-      <h3>Four processes that cannot be ranked at all</h3>
-      <p>These carry the highest impact rating on the page — safety, legal, or existential — and
-      <strong>no one has scored how manual they are, because no one has described them.</strong>
-      An unrankable I5 is worse news than anything in the ranked list above.</p>
-      <ul>{{UNRANK}}</ul>
-    </div>
+{{UNRANK}}
   </section>
+</div>
+
+<div class="panel" id="p-inventory" role="tabpanel" aria-labelledby="t-inventory" hidden>
+
+  <p class="lead">The full reference. If the <strong>A</strong>, <strong>D</strong> and <strong>I</strong> columns are unfamiliar, the scoring key comes first.</p>
 
   <section>
     <h2>How the scoring works</h2>
@@ -410,6 +416,67 @@
       silently. Both were A4 processes everyone believed were A5. "Runs itself" and "tells us when
       it stops" are different products.
     </p>
+  </section>
+
+  <section>
+    <h2>The inventory</h2>
+    <p class="sec-note">
+      All {{N}} rows, grouped operationally and mapped to the strategic plan's six goals.
+      <strong>?</strong> means genuinely unknown — please do not guess it in review, ask the person
+      who does it. Owners are omitted throughout because we do not have any; assigning them is the
+      main output of the session.
+    </p>
+    <div class="filter">
+      <input id="inv-filter" type="search" autocomplete="off"
+             placeholder="Filter processes — name, note, state…"
+             aria-label="Filter the inventory">
+      <span class="hits" id="inv-hits" role="status" aria-live="polite"></span>
+    </div>
+    <div class="group-stack">
+{{TABLES}}
+    </div>
+  </section>
+</div>
+
+<div class="panel" id="p-method" role="tabpanel" aria-labelledby="t-method" hidden>
+
+  <p class="lead">How this was built, what it was checked against, and — importantly — where it is still weakest. Read this before treating any un-annotated number as fact.</p>
+
+  <section id="s-plan">
+    <h2>Where this sits in the plan</h2>
+    <p class="sec-note">
+      The strategic plan makes this registry's case in its own words — including, in a margin
+      comment, asking for it by name as a precondition for the AI-efficiency work. The plan is
+      a live draft and its numbers are still moving; what is stable, and what the registry
+      builds on, is the <strong>set of strategies and their priorities</strong>.
+    </p>
+    <div class="quotes">
+      <blockquote>Systematize, stabilize […]: website, systems, operations to lay the groundwork
+        for growth, innovation, responsiveness [move past start-up style]
+        <cite>Lever strategy #1</cite></blockquote>
+      <blockquote>Establish and conduct a regular, consistent process for reviewing, improving,
+        and stabilizing operational systems and procedures.
+        <cite>Facilities &amp; Operations · Year 1 Strategy #5 · 200 hours budgeted</cite></blockquote>
+      <blockquote>It might be worth doing an audit of the current systems first to make sure
+        they're actually efficient before bringing in AI. That way, we're improving the process
+        itself, not just automating around any existing issues.
+        <cite>Margin comment on Infrastructure O#1 S#4</cite></blockquote>
+    </div>
+    <div class="placard q" style="margin-top:24px">
+      <div class="tag">Strategy<br>link</div>
+      <div>
+        <p><strong>{{WITHSTRAT}} processes now carry the strategy that acts on them</strong> — the ID,
+        its priority, and its work type from the five-year sequence sheet. <strong>{{NP1}} carry a
+        ★ elevated-priority strategy.</strong> The registry does not replace that sheet: it is edited by
+        committees, it holds owners and year-by-year sequencing, and it should stay where it is.</p>
+        <p>What the link buys is two questions neither system answers alone: <em>which processes does
+        this strategy actually touch?</em> and — the more useful one — <em>which of our degraded
+        processes has no strategy pointed at it at all?</em> The sequence sheet is entirely
+        forward-looking; every one of its states describes work someone intends to do. It has no way
+        to say <strong>this is broken right now and nobody is on it</strong>, which is what the
+        registry supplies.</p>
+      </div>
+    </div>
   </section>
 
   <section>
@@ -471,7 +538,7 @@
       <a href="https://makehaven.org/operations" target="_blank" rel="noopener">makehaven.org/operations</a>,
       which opens "a compilation of key organizational documents… a reference for future staff
       of the organization" and holds about seventy real policy, procedure and job-description
-      links. <strong>Forty rows below now carry those links under a <span class="pill unknown"
+      links. <strong>{{NRES}} rows in the inventory now carry those links under a <span class="pill unknown"
       style="padding:1px 5px">Docs</span> line.</strong>
     </p>
     <div class="tblwrap">
@@ -527,24 +594,12 @@
   </section>
 
   <section>
-    <h2>The inventory</h2>
-    <p class="sec-note">
-      All {{N}} rows, grouped operationally and mapped to the strategic plan's six goals.
-      <strong>?</strong> means genuinely unknown — please do not guess it in review, ask the person
-      who does it. Owners are omitted throughout because we do not have any; assigning them is the
-      main output of the session.
-    </p>
-    <div class="group-stack">
-{{TABLES}}
-    </div>
-  </section>
-
-  <section>
     <h2>Where this draft is weakest</h2>
     <div class="caveats">
       <div class="caveat"><h3>Facilities and Governance are inferred</h3>
-        <p>v2 knows what the strategic plan wants those processes to be. It does not know what
-        actually happens. A plan saying "conduct annual drills" is not evidence that drills happen.</p></div>
+        <p>This draft knows what the strategic plan wants those processes to be. It does not know
+        what actually happens. A plan saying "conduct annual drills" is not evidence that drills
+        happen.</p></div>
       <div class="caveat"><h3>Aspiration is mixed with operation</h3>
         <p>"Planned giving programme" and "Made at MakeHaven marketplace" are intentions with no
         current operation. <code>undefined</code> currently conflates <em>running badly</em> with
@@ -563,7 +618,7 @@
     <p class="sec-note">Two and a half hours. The goal is a corrected map with owners on it,
     not a completed scoring exercise.</p>
     <div class="agenda">
-      <div class="ag"><div class="t">15 min</div><div class="b"><strong>Argue with the groups</strong><span>Thirteen groups, {{N}} rows. Confirm the mapping to the plan's six goals — that is what makes the board view work.</span></div></div>
+      <div class="ag"><div class="t">15 min</div><div class="b"><strong>Argue with the groups</strong><span>{{NGROUPS}} groups, {{N}} rows. Confirm the mapping to the plan's six goals — that is what makes the board view work.</span></div></div>
       <div class="ag"><div class="t">20 min</div><div class="b"><strong>Separate aspiration from operation</strong><span>Walk the undefined rows and split them: should be running and isn't, versus not started and that's fine.</span></div></div>
       <div class="ag"><div class="t">45 min</div><div class="b"><strong>Fill Facilities and Governance from life</strong><span>What actually happens when a tool breaks, when the building floods, when a board seat opens. Only staff can supply this.</span></div></div>
       <div class="ag"><div class="t">30 min</div><div class="b"><strong>Calibrate on ten rows</strong><span>Score them together. Where two people disagree, fix the wording of the scale — not the score.</span></div></div>
@@ -571,15 +626,72 @@
       <div class="ag"><div class="t">After</div><div class="b"><strong>Owners score their own rows</strong><span>Do not attempt {{N}} in the room. The AI pass keeps the derived fields current afterward.</span></div></div>
     </div>
   </section>
+</div>
+
 
 </div>
 
 <footer>
   <div class="wrap">
     <p>
-      Seed draft v2 · 2026-08-14 · not yet staff-reviewed<br>
-      Generated from <code>seed-inventory.md</code> — {{N}} processes, {{STABLE}} stable, {{DEGRADED}} degraded, {{CANTSAY}} uncharacterised<br>
+      Draft · not yet staff-reviewed<br>
+      Generated from <code>data/inventory.md</code> — {{N}} processes, {{STABLE}} stable, {{DEGRADED}} degraded, {{CANTSAY}} uncharacterised<br>
       Plan, schema and phases: <code>conductor/tracks/process_stabilization_20260814/plan.md</code>
     </p>
   </div>
 </footer>
+
+<script>
+(function () {
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  if (!tabs.length) return;
+
+  function select(tab, focus) {
+    tabs.forEach(function (t) {
+      var on = t === tab;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+    });
+    if (focus) tab.focus();
+    history.replaceState(null, '', '#' + tab.id.slice(2));
+  }
+
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener('click', function () { select(tab); window.scrollTo(0, 0); });
+    tab.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (d) { e.preventDefault(); select(tabs[(i + d + tabs.length) % tabs.length], true); }
+      else if (e.key === 'Home') { e.preventDefault(); select(tabs[0], true); }
+      else if (e.key === 'End') { e.preventDefault(); select(tabs[tabs.length - 1], true); }
+    });
+  });
+
+  // Deep links: #flux, #inventory, #method open the matching tab on load.
+  var want = document.getElementById('t' + location.hash.replace('#', '-'));
+  if (want) select(want);
+
+  // Inventory filter — hides non-matching rows, then any table left empty.
+  var box = document.getElementById('inv-filter'), hits = document.getElementById('inv-hits');
+  if (!box) return;
+  var tables = Array.prototype.slice.call(
+    document.querySelectorAll('#p-inventory .group-stack .tblwrap'));
+  var total = document.querySelectorAll('#p-inventory .group-stack tbody tr').length;
+
+  function apply() {
+    var q = box.value.trim().toLowerCase(), shown = 0;
+    tables.forEach(function (w) {
+      var any = false;
+      Array.prototype.forEach.call(w.querySelectorAll('tbody tr'), function (tr) {
+        var hit = !q || tr.textContent.toLowerCase().indexOf(q) !== -1;
+        tr.hidden = !hit;
+        if (hit) { any = true; shown++; }
+      });
+      w.hidden = !any;
+    });
+    hits.textContent = q ? shown + ' of ' + total + ' processes' : total + ' processes';
+  }
+  box.addEventListener('input', apply);
+  apply();
+})();
+</script>

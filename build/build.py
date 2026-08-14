@@ -100,7 +100,7 @@ tiles = f"""
       <div class="tile bad"><span class="num">{st_tot['degraded']}</span><span class="lbl">Need attention</span><span class="sub">Known broken or unreliable, nobody currently fixing</span></div>
       <div class="tile accent"><span class="num">{change_load}</span><span class="lbl">In flux</span><span class="sub">{st_tot['watch']} being watched, {st_tot['changing']} actively changing</span></div>
       <div class="tile plan"><span class="num">{planned}</span><span class="lbl">Planned, not started</span><span class="sub">Intentions on the roadmap — not failures</span></div>
-      <div class="tile gap"><span class="num">{cant_say}</span><span class="lbl">Still unknown</span><span class="sub">Down from 98 two rounds ago</span></div>"""
+      <div class="tile gap"><span class="num">{cant_say}</span><span class="lbl">Still unknown</span><span class="sub">No agreed shape yet — ask the person who runs it</span></div>"""
 
 legend = "".join(
     f'<span><i class="swatch" style="background:var(--s-{s})"></i>{s.title()} {st_tot[s]}</span>'
@@ -144,10 +144,28 @@ for g, rs in by_group.items():
         </table>
       </div>""")
 
-unrank_html = "".join(f"<li><b>{md(r['name'])}</b> — {md(r['note'])}</li>" for r in unrankable)
+# Rendered only when there is something to show — an empty list under a headline
+# claiming unrankable I5 processes exist is worse than no section at all.
+if unrankable:
+    n_un = len(unrankable)
+    word = {1: "One process", 2: "Two processes", 3: "Three processes",
+            4: "Four processes"}.get(n_un, f"{n_un} processes")
+    items = "".join(f"<li><b>{md(r['name'])}</b> — {md(r['note'])}</li>" for r in unrankable)
+    unrank_html = f"""    <div class="unranked">
+      <h3>{word} that cannot be ranked at all</h3>
+      <p>These carry the highest impact rating on the page — safety, legal, or existential — and
+      <strong>no one has scored how manual they are, because no one has described them.</strong>
+      An unrankable I5 is worse news than anything in the ranked list above.</p>
+      <ul>{items}</ul>
+    </div>"""
+else:
+    unrank_html = ""
+
+nres = sum(1 for r in rows if "‖" in r["note"])
 
 page = TPL.read_text()
 for key, val in [("TILES", tiles), ("LEGEND", legend), ("BOARD", "\n".join(board)),
+                 ("NRES", str(nres)), ("NGROUPS", str(len(by_group))),
                  ("RANK", "\n".join(rank_html)), ("TABLES", "\n".join(tables)),
                  ("UNRANK", unrank_html), ("INFLUX", influx), ("N", str(N)),
                  ("NCHANGING", str(st_tot["changing"])), ("NWATCH", str(st_tot["watch"])),
@@ -155,8 +173,10 @@ for key, val in [("TILES", tiles), ("LEGEND", legend), ("BOARD", "\n".join(board
                  ("DEGRADED", str(st_tot["degraded"])), ("UNDEF", str(st_tot["undefined"])),
                  ("STABLE", str(st_tot["stable"])), ("PLANNED", str(planned)), ("WITHSTRAT", str(with_strat)), ("NP1", str(len(p1_rows)))]:
     page = page.replace("{{" + key + "}}", val)
+left = re.findall(r"\{\{[A-Z]+\}\}", page)
+if left:
+    raise SystemExit(f"unrendered placeholders: {sorted(set(left))}")
 OUT.parent.mkdir(parents=True, exist_ok=True)
 OUT.write_text(page)
-nres = sum(1 for r in rows if "\u2016" in r["note"])
 print(f"resource-linked rows: {nres}")
 print(f"wrote {OUT} — {N} processes, {len(tables)} groups, change load {change_load}, can't-say {cant_say}")
