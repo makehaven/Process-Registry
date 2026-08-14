@@ -1,0 +1,620 @@
+# Process Inventory — v6 (characterised)
+
+_Drafted 2026-08-14. **v2** added the two strategic-plan drafts, the
+`makerspace_dashboard` sections and chart builders, and the entrepreneurship
+stack. **v3** added the sibling app repos, the resource layer absorbed from
+`makehaven.org/operations`, and four corrections from JR. **v4** adds eight
+processes found by testing the inventory against the CT Makerspace Network
+**Standards of Excellence** self-assessment. **v5 applies JR's answers to the
+round-1 question set — 69 rows re-scored, two major corrections verified against
+the database.** Still not reviewed by staff beyond JR._
+
+**Roughly half the inventory is now answered rather than guessed.** Rows carrying
+"Corrected from" in their notes come from JR directly; the rest are still
+inferred from the codebase, dashboards, strategic plans, app repos, operations
+doc and Standards of Excellence. Read "Where this draft is weakest" before
+trusting an un-annotated number.
+
+## How to read it
+
+- **A** = automation, A1 tribal → A5 autonomous + monitored
+- **D** = documentation, D0 none → D3 proven by someone other than the owner
+- **I** = impact when it fails, I1 annoyance → I5 safety/legal/existential
+- **State** = `stable` · `changing` · `watch` · `degraded` · `undefined` · `unknown`
+- **?** in a score column = genuinely unknown. Do not guess it in review — ask the
+  person who does it. `undefined` means the *process* has no defined shape;
+  `unknown` means it runs but we cannot currently characterise it.
+
+Full scale definitions are in `plan.md`. Owners are omitted throughout because
+we do not have them; assigning them is the main output of the Phase 0 session.
+
+---
+
+## The strategic plan already asked for this
+
+The two working-draft strategic plans make this track's case better than the
+track does. Three passages, quoted:
+
+> **Lever strategy #1:** "Systematize, stabilize, and […]: website, systems,
+> operations to lay the groundwork for growth, innovation, responsiveness
+> [move past start-up style]"
+
+> **Facilities & Operations, Year 1 Strategy #5 — 200 hours budgeted:**
+> "Establish and conduct a regular, consistent process for reviewing,
+> improving, and stabilizing operational systems and procedures."
+
+> **Governance O#3 S#2:** "Document key staff processes and responsibilities to
+> support operational stability during leadership changes."
+
+And, in a margin comment on the AI-automation strategy, a reviewer wrote:
+
+> "It might be worth doing an audit of the current systems first to make sure
+> they're actually efficient before bringing in AI. That way, we're improving
+> the process itself, not just automating around any existing issues."
+
+That comment is this registry, requested by name, before it existed. This track
+is not a side project — it is Year 1 Strategy #5, and it is the prerequisite the
+reviewer put on Infrastructure O#1 S#4 (the AI-efficiency strategy).
+
+### The number that makes the ranking matter
+
+**Corrected 2026-08-14 against the live planning sheet.** I previously put the
+Year 1 ask at "roughly 3,300 hours" by summing inline estimates in the narrative
+plan. The working Hours sheet is authoritative and lower:
+
+| | hours |
+|---|---:|
+| 4.0 FTE × 40h × 52w | 8,320 |
+| Less 90% keeping the lights on | −7,520 |
+| **Available for strategy, Year 1** | **800** |
+| **Estimated for the Year 1 strategy list** | **1,480** |
+| **To postpone, reduce, delete or hire against** | **680** |
+
+So the real figure is **1.85× oversubscribed with 680 hours to find**, not 4×.
+That is a materially more solvable problem, and the sheet is already solving it —
+strategies 8, 10, 11, 16 and 17 are struck as redundant, 18b is cut from 100
+hours to 50, and the safety programme carries the note "remove if no hours?".
+
+The registry's job here is narrow and useful: **when something has to be cut, an
+impact × manual-effort ranking over a real inventory is a better basis than
+whichever strategy has the loudest advocate.** The 680 hours has to come from
+somewhere.
+
+### Alignment with the strategy sequence sheet
+
+The strategy sheet carries a work-type lifecycle staff already use. The registry
+should adopt that vocabulary rather than invent a parallel one:
+
+| Strategy sheet work type | Registry state |
+|---|---|
+| PLAN | `planned` |
+| DEVELOP | `changing` |
+| GROW | `changing` |
+| REFINE | `watch` |
+| MAINTAIN | `stable` |
+| — *(no equivalent)* | **`degraded`** |
+
+**That last row is the point.** The strategy sheet is entirely forward-looking:
+every state describes work someone intends to do. It has no way to say *this is
+broken right now and nobody is on it* — which is 27 of our 186 processes. The
+two systems are complementary rather than duplicative, and that gap is the
+clearest justification for the registry existing alongside the plan.
+
+Each process therefore carries `strategy_ids` (e.g. `GOV O#3 S#2`) rather than
+absorbing the strategy sheet. That makes two questions answerable that neither
+system can answer alone: *which processes does this strategy touch?* and — more
+useful for the 680-hour problem — *which of our degraded processes has no
+strategy pointed at it?*
+
+### Group → strategic goal mapping
+
+Each process carries a `strategic_goal` field so the board can read the registry
+rolled up by the plan's structure while staff read it by operational group.
+DEI is a cross-cutting **tag**, not a group — matching the plan's own note that
+"DEI strategies [are] integrated in other sections."
+
+| Registry group | Strategic goal | Committee / dashboard |
+|---|---|---|
+| Education & Instruction | 1 Program | Education |
+| Entrepreneurship | 1 Program | Entrepreneurship |
+| Facilities & Equipment | 2 Facilities & Operations | Infrastructure |
+| Access & Safety | 2 Facilities & Operations | Infrastructure |
+| Lending, Storage & Store | 2 Facilities & Ops / 5 Financial | Operations |
+| Membership & Billing | 3 Membership | Retention / Finance |
+| Member Experience & Retention | 3 Membership | Retention |
+| Outreach & Recruitment | 4 Visibility & Outreach | Outreach |
+| Communications | 4 Visibility & Outreach | Outreach |
+| Finance & Accounting | 5 Financial strength | Finance |
+| Development & Fundraising | 5 Financial strength | Development |
+| Governance & People | 6 Organizational effectiveness | Governance |
+| Platform & Meta | 6 Organizational effectiveness | Infrastructure |
+
+---
+
+## The resource layer — answering the bus-factor question
+
+**Yes, the registry should carry links, and there is already a document doing
+this job to absorb rather than replace.** `makehaven.org/operations` redirects
+to a Google Doc that opens: *"a compilation of key organizational documents…
+1) A reference for future staff of the organization 2) a convenient way to
+share."* It holds **~70 real policy, procedure, agreement and job-description
+links** — bylaws, conflict of interest, whistleblower, safety program, hazard
+bands, membership agreement, member warning and termination, storage ticketing,
+donation acknowledgement, LAI scoring sheet, every staff job description.
+
+That is the existing answer to the bus-factor question and the direct ancestor
+of this registry. It is also `degraded`, for reasons the registry structurally
+fixes:
+
+| The operations doc | The registry |
+|---|---|
+| A flat list of documents | Documents attached to the process that uses them |
+| No dates — cannot tell current from abandoned | `reviewed` date and doc staleness derived from file mtime |
+| No owner per document | Owner and backup per process |
+| At least one broken link (Workspace Use Agreement) | Link-checkable in the build |
+| Back half is an unrelated makerspace field-trip photo log | Scoped to operations |
+| Nothing says whether the document is *followed* | A/D/I scores say exactly that |
+
+**40 of the 186 rows now carry `Docs` links** pulled from it. The remaining
+~30 operations-doc links are background, reference material, or belong to
+processes the session will add. Two things fell out of doing this that no
+other source surfaced: **member conduct & discipline** (warning and termination
+procedures exist as documents; whether they are followed or logged is unknown)
+and **harassment & conduct complaints** (public policy, invisible intake). Both
+are I5. Both were missing from v2 entirely.
+
+The schema field is `resources:` — a list of `{label, url}` — and the honest
+version of D0–D3 depends on it: *"a current SOP exists"* is a claim you can only
+check against a link.
+
+---
+
+## What v3 changed
+
+Four corrections and one new source, all from JR:
+
+1. **UniFi is an add-on to access control, not its own system.** Its row is
+   gone; the fact now lives as a note on access-control hardware operations,
+   with the standing reminder that UniFi sync errors are not a door outage.
+2. **Access control is split in two, and tool access is the bigger problem.**
+   *Door access control* (building entry) and **tool access control
+   (interlocks)** are now separate rows. Tool access is `degraded` at I5 — per
+   JR, the biggest thing not working, with repeated bug-and-redeploy cycles.
+   Both share a root cause the architecture plan already names: every tap
+   depends on Drupal being reachable, and *"we have repeatedly hit this failure
+   mode."* The local-primary rearchitecture is drafted and pre-implementation —
+   which makes it the highest-value item in the whole inventory.
+3. **Incident reporting is not undefined.** The intake exists at
+   `/safety-concern-and-accident-report-form` and covers injuries, illnesses and
+   near misses. The gap is the back half: reviewed by "a committee of the board
+   and potentially others," with no response time, no escalation, and no
+   notification to the reporter. Re-scored A3/D1, `degraded` — a genuinely
+   different and more actionable finding than "we have no process."
+4. **The sibling app repos added five processes** — see below.
+
+### What the app repos revealed
+
+| App | Added / changed |
+|---|---|
+| Voicemail-Tool + `makerspace_voice` | **Inbound phone & voicemail triage** — live but inert (mock mode, no number bought). Who answers the phone today is undocumented |
+| Phonebank-Tool + `makerspace_phonebank` | **Member phonebank campaigns** — a built tool whose operating cadence is undocumented |
+| Inventory-App | **Physical inventory count** — SPA exists, README is literally "Readme TODO later", no count cadence |
+| `time-report` | **ED time reporting to board** — new Aug 2026. Also the only real source for the `effort_hrs_month` field this registry lacks |
+| Grant-Researcher | Sharpens an existing row: a full discovery-and-scoring app is deployed **and 0 grants were submitted YTD against a goal of 12.** The tool is not the bottleneck |
+| Governance-Dance | A board-governance app — agendas, committee chairs, attendance, board demographics for grants, self-assessment — covering perhaps six of the `undefined` Governance rows. Whether it is *in use at MakeHaven* is the question for the session |
+
+The Governance-Dance find is the sharpest of these: several Governance rows may
+be closer to solved than the registry says, or may be a built tool nobody
+adopted. Those are opposite conclusions and only staff can say which.
+
+---
+
+## What v2 changed
+
+The v1 seed had 94 processes and four near-empty groups. Adding the strategic
+plan and the dashboards roughly doubled it, and the additions are not evenly
+spread:
+
+- **Two entirely new groups** — Entrepreneurship (11) and Development &
+  Fundraising (11) — neither of which appeared in v1 at all, despite
+  Entrepreneurship having four custom modules and a dashboard section, and
+  Development having its own committee, dashboard, and five strategic objectives.
+- **Governance & People went from 6 rows to 17.** Board recruitment,
+  nomination, onboarding, self-assessment, minutes retention, policy review,
+  succession, the governance archive, volunteer role tracking, staff
+  onboarding — all real, all recurring, essentially none of them defined.
+- **Outreach went from 0 rows to 13.** v1 folded outreach into Communications
+  and lost the entire conversion funnel: tours, guest waivers, workshop
+  participants, referrals, ambassadors.
+- **Facilities gained the things members actually complain about** — building
+  maintenance and landlord liaison, tool downtime tracking, the safety program.
+
+The pattern in v1 holds and got sharper: **the repo sees code, the strategic
+plan sees intent, and neither sees the recurring human work.** It took both
+sources plus the dashboards to find the second half of the list.
+
+---
+
+## What the seed shows
+
+**186 processes across 13 groups.**
+
+| | v4 (guessed) | v5 (round 1) | v6 (round 2) |
+|---|---:|---:|---:|
+| `stable` | 40 | 86 | **116** |
+| `degraded` | 28 | 31 | 27 |
+| `watch` | 12 | 13 | 13 |
+| `changing` | 8 | 11 | 14 |
+| `planned` | — | — | **14** |
+| `undefined` | 56 | 31 | **2** |
+| `unknown` | 42 | 14 | **0** |
+
+**Uncharacterised went 98 → 45 → 2.** The two that remain are genuinely
+undefined and confirmed as such rather than assumed: the **facilitator six-month
+renewal** and **succession planning**. Rows with no automation score went 23 → 1.
+
+**A new state, `planned`, carries 14 rows.** These are intentions we have not
+started — an ambassador programme, planned giving, peer benchmarking — which
+earlier drafts were unfairly counting as broken processes. Separating *not
+started* from *running badly* is the single biggest improvement to the fairness
+of this page, and it was JR's triage that made it possible.
+
+- **Most of what looked missing was documentation, not practice.** 116 of 186
+  processes run normally. Almost everything that moved out of `undefined` went
+  straight to `stable` — it existed, it worked, it just wasn't written anywhere
+  a new person could find it. **The gap at MakeHaven is legibility, not
+  competence** — a different and far more tractable problem than the v4 page
+  implied.
+- **The registry now contains the documentation, not just a score for it.**
+  Answers gathered while scoring became the `description` on each row, with
+  `description_source` recording who said it and when. For most processes that
+  paragraph *is* the D2 artefact.
+- **Biggest single artefact produced:** the renewal, insurance and compliance
+  calendar — nine recurring items with months, brokers, carriers and filing
+  numbers — now at `docs/ops/RENEWAL_CALENDAR.md`. It lived entirely in one
+  person's head until 2026-08-14.
+- **Change load is 24 processes, not a percentage.** The percentage fell from v1 only
+  because the denominator doubled. Until the inventory stabilises, **track the
+  count, not the ratio** — the ratio keeps moving for reasons that have nothing
+  to do with how much is actually changing.
+- **`degraded` more than doubled, 13 → 28.** Almost nothing broke; Outreach,
+  Development and Governance were simply invisible in v1.
+- **23 rows have no automation score**, and 16 are I5 (safety, legal, or
+  existential). Three are both — unrankable and highest-impact: youth & school
+  custodial partnerships, insurance/lease/compliance renewals, and backup &
+  disaster recovery. (Incident reporting left this list in v3 — see below.)
+- **Tool access control is now the single most consequential degraded row**:
+  I5, actively broken, and sharing a root cause with the door.
+- **Roughly half the strategic plan's Year 1 strategies are requests to build a
+  process that does not exist yet.** The registry's `undefined` rows and the
+  plan's Year 1 list are substantially the same list, viewed from opposite ends.
+  That is the strongest structural argument for the registry: it is the
+  strategic plan's operational ledger, not a parallel document.
+- **The KPI baselines confirm the gaps rather than contradicting them.**
+  Equipment uptime baseline: `na` — not measured. Grants submitted YTD: `0`
+  against a goal of 12. Incubator occupancy and active ventures: `TBD`.
+  Entrepreneurship events: 23 participants against a goal of 300. Where the
+  registry says `undefined`, the KPI table usually says `na`, `TBD`, or `0`.
+- **Guest waiver → member conversion is 2.4%** against a 5% goal, on 218 waivers
+  a year. Tours convert at 32%. Nobody owns the gap between those two numbers,
+  and the automated follow-up that would close it is a Year 1 strategy.
+- **Tool downtime tracking has already been tried and failed.** From JR's own
+  margin note: *"I tried putting together an entire tracking system for when
+  tools were down and it did not get traction, there were a lot of exceptions."*
+  That is the single most useful row in the inventory — a documented failed
+  attempt with a stated cause. Any new attempt starts from it.
+- **The DEI committee has no active members**, per a margin exchange, while DEI
+  objectives are cross-referenced from five other sections. A cross-cutting
+  concern with no one to cut across.
+
+---
+
+## Education & Instruction
+
+| Process | A | D | I | State | Notes |
+|---|---|---|---|---|---|
+| Instructor recruitment funnel | 3 | 1 | 3 | degraded | Menu consolidation shipped 08-12, **reverted 08-13** after staff objection. No CiviCRM link on instructor interest |
+| Instructor proposal review | 3 | 1 | 3 | watch | `/admin/education` console — the half that survived the rollback |
+| Instructor agreement signing | 2 | 1 | 3 | changing | Now staff-sent; orientation video + quiz switched off. 2 quiz questions contradict our own docs ‖ [Instructor Agreement](https://docs.google.com/document/d/1yd48GRRl0vHfPRcHiC-GEWXssXxcl0210_ps7qiyrC4/edit) |
+| Instructor interest acknowledgement | 1 | 0 | 3 | degraded | Ack email never worked, across 129 submissions |
+| Instructor development & peer observation | 1 | 0 | 3 | planned | Confirmed by JR as an intention we have not started — a roadmap item, not a broken process. *(JR, round 2)* |
+| Instructor evaluation & coaching | 2 | 1 | 3 | degraded | The education manager reviews evaluations as they arrive, but JR: "we can do much better to aggregate, and actually to get people to do the evaluations." Both halves — response rate and trend analysis — are weak |
+| Class scheduling & publishing | 2 | 1 | 4 | changing | **Corrected from `unknown`.** The education manager engages a contractor who schedules. JR has self-serve scheduling in the pipeline, particularly for repeat instructors ‖ [Class Proposal Form](https://www.makehaven.org/Propose-a-class) |
+| Class registration | 4 | ? | 4 | stable | CiviCRM |
+| Class promotion / seat fill | 4 | 1 | 3 | watch | Targeted empty-seats email still unbuilt |
+| Event capacity marketing | 4 | 1 | 2 | stable | Early Bird / Flash Sale |
+| Class evaluation collection | 4 | 2 | 2 | watch | Applied live 08-11. NPS 76.4 but plan notes "low response rate for number of potential respondents" ‖ [Workshop Evaluation](https://docs.google.com/document/d/1mux1xU0hIU4tbtnHNygGNPVg7ge7XRjFkI4doj_Yiso/edit) |
+| Workshop fill-rate management | 3 | 1 | 4 | stable | The education manager watches fill rates; undersubscribed classes get automatic promotion in the newsletter, with automatic discounting intended later. 55% weighted fill against an 80% goal. *(JR, round 2)* |
+| Instructor stipend payment | 4 | 1 | 3 | stable | **Corrected from `unknown` — better automated than assumed.** Instructors submit hours on the instructor dashboard after class; those import to Xero/Melio and staff approve. JR: still being refined, but working ‖ [Instructor Agreement](https://docs.google.com/document/d/1yd48GRRl0vHfPRcHiC-GEWXssXxcl0210_ps7qiyrC4/edit) |
+| GEMS cohort management | 2 | 1 | 3 | stable | **Corrected from `unknown` — running now**, with details in the event listing |
+| Badge quiz authoring | 2 | 1 | 3 | stable | **Corrected from `unknown`.** Mostly written by the shop manager, with a badge-quality report used to find problems — and acknowledged work to do there ‖ [Badge quality report (staff)](https://www.makehaven.org/admin/reports/badge-quality) · [Tool Orientation Checklists](https://drive.google.com/drive/folders/1JN7rJd1z_8lQed-syIrGxgQnkehl7qj2) |
+| Badge grant from quiz | 4 | 1 | 4 | stable | Auto-grants at 100% |
+| Badge checkout appointment | 4 | 1 | 4 | stable | 60-min regression fixed 07-14 |
+| Facilitator scheduling | 4 | 1 | 3 | stable | — ‖ [Facilitator Training](https://docs.google.com/presentation/d/1jBctIZ_C1ntcK_Azp6i2lBER0UCNn4xTbYhdh0QxIME/edit) |
+| Facilitator 6-month renewal | 1 | 1 | 3 | undefined | Policy-only, two overlapping webforms, by hand twice a year ‖ [Community Facilitator Program](https://www.makehaven.org/community-animator-program) · [Facilitator Training](https://docs.google.com/presentation/d/1jBctIZ_C1ntcK_Azp6i2lBER0UCNn4xTbYhdh0QxIME/edit) |
+| On-request badger matching | 3 | 1 | 2 | stable | Shipped 08-02 |
+| Youth & school custodial partnerships | 2 | 2 | 5 | stable | **Materially lower risk than v3 assumed.** Minors attend as guests of their own guardians, or through school partnerships where **the school's instructor supervises — MakeHaven is not the custodian**. Youth safety policies are published. Standards module B still applies, but the screening burden largely sits with partners ‖ [Youth safety policies](https://www.makehaven.org/makehaven-youth-safety-policies) · [TurnBridge Youth Access MOU](https://docs.google.com/document/d/1VSmWqgyx-czRHzeCf12hh9PErIc7562RzAh3gTa2qGg/edit) · [BOE Sewing Program MOU](https://docs.google.com/document/d/1hCqDZTXjwF2nU_9cUZ2FKgiq0FLQilyYjH4AgiJa2Qc/edit) |
+| Peer benchmarking (annual) | 1 | 0 | 2 | planned | Confirmed by JR as an intention we have not started — a roadmap item, not a broken process. *(JR, round 2)* |
+
+## Entrepreneurship
+
+_New group in v2. Four custom modules and a dashboard section exist; the
+operating processes around them mostly do not._
+
+| Process | A | D | I | State | Notes |
+|---|---|---|---|---|---|
+| Entrepreneur goal capture at signup | 4 | 1 | 3 | stable | `field_member_goal` — inventor / entrepreneur / seller. **46% of new members** identify this way |
+| Entrepreneur dashboard & nudges | 4 | 1 | 2 | watch | `makerspace_entrepreneur_dashboard`. Member half was invisible (soft-launch block placed in the admin theme); fixed live 08-09 |
+| Entrepreneurship AI support assistant | 4 | 1 | 2 | stable | Early, experimental, explicitly non-critical and optional per JR. Worth watching against the tool-chatbot precedent rather than investing further yet |
+| Nexus platform bridge | 3 | 1 | 2 | stable | Experimental and used at a very light level, with hopes for future development. Members ticking entrepreneur goals should be invited into Nexus, but that path is underdeveloped and underused |
+| Incubator workspace intake & graduation | 2 | 1 | 3 | stable | **Intake corrected from `undefined`**: applicants apply and the director decides, with live availability published. **Graduation remains undefined** — nothing defines when a venture should move on ‖ [Workspaces](https://www.makehaven.org/workspaces) |
+| Entrepreneurship milestone tracking | 1 | 0 | 3 | planned | Not started. Signup goal data is used for grant reporting and occasional outreach filtering, but no milestone tracking exists. *(JR, round 2)* |
+| Mentor & advisor matching | 1 | 0 | 3 | planned | Tried and abandoned: "it just did not work well, we would need to do redesign from ground up." A prior attempt exists as evidence, so any restart should begin from why it failed. *(JR, round 2)* |
+| Entrepreneurship events programming | 2 | 0 | 3 | degraded | **23 participants against a 300 goal.** The gap is 13× |
+| Cohort programs (Ecolab-style) | 1 | 0 | 3 | planned | Confirmed by JR as an intention we have not started — a roadmap item, not a broken process. *(JR, round 2)* |
+| "Made at MakeHaven" marketplace | 1 | 0 | 2 | stable | Runs at a very light level: a Slack channel where members share design files. Nothing resembling the retail or pop-up presence in the strategic plan. *(JR, round 2)* |
+| Ecosystem partner data alignment | 1 | 0 | 2 | planned | Actively being worked on — shared data standards with ClimateHaven, Collab and the Community Foundation. *(JR, round 2)* |
+
+## Facilities & Equipment
+
+| Process | A | D | I | State | Notes |
+|---|---|---|---|---|---|
+| Tool acquisition & commissioning | 2 | 1 | 3 | stable | **Corrected from `undefined`.** Budget first, then the member wishlist, then consultation with area experts; final call sits with the shop manager and executive director ‖ [Asset inventory](https://www.makehaven.org/asset/inventory) · [Asset Disposal Policy](https://docs.google.com/document/d/1D5d7KUBJr8kXA6f1ShQME3BPIrHW7ClzXyQ2wUS63Fc/edit) · [Wishes](https://www.makehaven.org/wishes) |
+| Tool downtime & repair tracking | 3 | 1 | 4 | watch | **Major correction — v2 and v3 called this a failed attempt; it is live.** `asset_log_entry` holds 117 records and members report faults that feed the KPIs, with a tool-quality report checking configuration. The earlier "did not get traction" note was historical. **New concern from the data: logging has fallen off a cliff** — roughly 29/month across April–June, then 5 in July and 3 so far in August. Either faults dropped or reporting did, and those need different responses ‖ [Asset maintenance queue (staff)](https://www.makehaven.org/admin/content/asset-maintenance) · [Tool quality report (staff)](https://www.makehaven.org/admin/reports/tool-quality) |
+| Preventive maintenance schedule | 2 | 1 | 4 | changing | **Corrected from `undefined`.** The shop manager keeps a spreadsheet of recurring tasks for the shop tech. Intent is to formalise it into `/tasks`; extending it to members is gated on first building a way to certify who is competent to repair what |
+| Equipment depreciation & replacement planning | 2 | 1 | 3 | degraded | **Currently driven by the CPA, not by us.** Once a year they ask what was acquired over $1,000 and what was disposed of. Additions are recorded in the site's equipment inventory. JR wants this connected to actual asset lifetimes so replacement is forecast rather than discovered. *(JR, round 2)* ‖ [Asset inventory](https://www.makehaven.org/asset/inventory) |
+| Shop budget adherence | 2 | 1 | 3 | stable | **Corrected from `unknown`.** A shop budget line exists; the shop manager works within it and the executive director and finance committee monitor. *(JR, round 2)* |
+| Consumable restock | 3 | 1 | 2 | stable | **Corrected from `undefined`.** Store material pages let members flag an item as out; QR codes in the space feed a webform to the operations manager; store inventory has reorder thresholds. **Remaining gap: the free supplies out in the space have no system at all** |
+| Physical inventory count | 4 | 1 | 3 | stable | **Corrected from `unknown`.** Used every month; JR reports staff like it and consider it well developed ‖ [Asset inventory](https://www.makehaven.org/asset/inventory) |
+| 24/7 self-access operation | 4 | 2 | 2 | stable | **Reframed — there is no opening or closing.** The space is 24/7 and unstaffed, with RFID access and the rules carried by the membership agreement. Standards S017 still wants explicit lone-work and after-hours protocols, which is a narrower ask than "document open and close" ‖ [Membership agreement](https://www.makehaven.org/membership-agreement) |
+| Cleaning & shop upkeep | 2 | 2 | 2 | stable | **Corrected from `undefined`.** Contracted to a member under a signed contract ‖ [Woodshop Dust Mitigation](https://docs.google.com/document/d/1s-zby2Ouw8b-R8NkKgpu-e1oUXxSRr4G4PYiDV8q1So/edit) |
+| Building maintenance & landlord liaison | 2 | 1 | 4 | stable | **Better than v4 implied.** The landlord, Steven Bernblum, is himself a MakeHaven member; contact is by direct phone or text, by email, or through the ManageBuilding portal. Shop manager leads and the executive director escalates. The friction is responsiveness — a request typically needs a text and a reminder or two — not a missing channel. *(JR, round 2)* ‖ [ManageBuilding portal](https://bernblum.managebuilding.com/) · [Landlord (member profile)](https://www.makehaven.org/users/steven-bernblum) |
+| Safety program review & drills | 2 | 2 | 5 | stable | **Corrected from `undefined`.** The Safety Program Summary plus tool hazard levels are the core, with the rest embedded in the badging system and the membership agreement. **Emergency drills remain unaddressed** — Standards S011/S019 want them plus a trend review ‖ [Safety Program Summary](https://docs.google.com/document/d/1Zy8JqWkn_ZLyhUPM8tqK5jepFVNQe_Yy7pwtSbIulqg/edit) · [Hazard Bands](https://docs.google.com/drawings/d/1y85LYQM3PWhqW8MazO6iGBF_QF1YoJohnGUK3m89k7Y/edit) · [Safety Signage](https://drive.google.com/drive/folders/19JDhOYJorRwjviIgCVV0gH1jNEUO9e5M) |
+| Incident & near-miss reporting | 2 | 2 | 5 | stable | **Corrected twice.** Not undefined and not degraded: the Safety & Accessibility committee reviews submissions **quarterly**, and reports reach a standing list of staff and volunteers. Real gaps are narrower — paper forms are re-keyed into the online form by hand, and the reporter is never told what happened ‖ [Report form](https://www.makehaven.org/safety-concern-and-accident-report-form) · [Safety Program Summary](https://docs.google.com/document/d/1Zy8JqWkn_ZLyhUPM8tqK5jepFVNQe_Yy7pwtSbIulqg/edit) · [Emergency resources](https://docs.google.com/document/d/1pm7AKcYorVGmJa5HbqGpVDIG8Jy9Ab4fbV8rq4YCrJA/edit) |
+| Accessibility / ADA audit | 2 | 1 | 4 | stable | **Corrected from `undefined`.** A second annual walk-through by the same committee covers accessibility. JR: the audit happens, but there is no defined **review-and-improvement loop** after it |
+| Insurance / lease / compliance renewals | 2 | 2 | 5 | stable | **Now fully documented — the single biggest bus-factor win of this exercise.** Nine recurring items across insurance (General Liability + Umbrella in February, D&O in April, Workers' Comp in October, all through Wellstone), the 770 Chapel St lease, and compliance filings (CT annual report in March, CPA review April–June, Form 990 extended to November, CT charitable solicitation, board COI disclosures in July). Every one is still triggered by an inbound email rather than a calendar, which is how the 990 was late in 2025. Written up in full at `docs/ops/RENEWAL_CALENDAR.md`. *(JR, round 2)* |
+| Sustainable operations practices | 1 | 0 | 2 | planned | Confirmed by JR as an intention we have not started — a roadmap item, not a broken process. *(JR, round 2)* |
+| Chemical inventory & SDS access | 2 | 2 | 5 | stable | **Corrected from `undefined`.** Dedicated flammables cabinets, a printed SDS binder for commonly-used chemicals, a published air-quality usage policy, and air monitors verifying conditions. JR notes the binder is due a review ‖ [Air quality policy](https://www.makehaven.org/air) |
+| Lockout / tagout of unsafe equipment | 3 | 1 | 5 | stable | **Corrected from `undefined`.** Anyone may place a warning sign; staff apply physical cord locks; every tool page carries a report-issue button. Remote lockout is designed but **blocked on tool access control being fixed** |
+| Routine shop inspection walk-through | 2 | 1 | 4 | stable | **Corrected from `undefined`.** The Safety & Accessibility committee walks the shop once a year for general safety |
+| Hazardous & material waste disposal | 2 | 2 | 4 | stable | **Corrected from `degraded` — it is a stated policy, not an oversight.** The membership agreement places responsibility on members to remove what they bring in. Standards S020 still expects an organisation-side procedure for anything generated by our own operations. *(JR, round 2)* ‖ [Membership agreement](https://www.makehaven.org/membership-agreement) |
+
+## Access & Safety
+
+| Process | A | D | I | State | Notes |
+|---|---|---|---|---|---|
+| Door access control (building entry) | 4 | 2 | 5 | degraded | Works day to day, but **every badge tap depends on Drupal being reachable** — "when the website is down or the internet is out, nothing opens. We have repeatedly hit this failure mode." The local-primary rearchitecture is drafted (2026-04-14) and pre-implementation. Instructors on billing pause were silently refused at the door until 08-14 ‖ [Access Control Documentation](https://docs.google.com/document/d/1lDw-kVj9gYE433tGsU--1r5DV75IaIqgF3DDI9JIYyg/edit) |
+| **Tool access control (interlocks)** | 2 | 1 | 5 | degraded | **The most consequential finding in the registry.** The microcontroller locks up after a couple of days and the bug has not been found. **The workaround — trusting members to use only tools they have been signed off on — has been the operating reality for almost two years.** So tool authorisation is currently a social control, not a technical one, and the remote-lockout capability that would take an unsafe tool out of service depends on the same system. *(JR, round 2)* ‖ [Access Control Documentation](https://docs.google.com/document/d/1lDw-kVj9gYE433tGsU--1r5DV75IaIqgF3DDI9JIYyg/edit) · [Hardware repo](https://crice009.github.io/toolauth-hardware/) · [Tool Orientation Checklists](https://drive.google.com/drive/folders/1JN7rJd1z_8lQed-syIrGxgQnkehl7qj2) · [CNC Use Policy](https://docs.google.com/document/d/1ujsuRdkSmYLTDe2e_SV2WYsd_ACVnWDZv27CD99bToU/edit) |
+| Access-control hardware operations | 4 | 2 | 5 | stable | Home-built ESP32 plus Home Assistant. **Vincent, Corey and Lior** hold the knowledge, and a documentation site is linked from the GitHub repository in the MakeHaven org account — GitHub has been the key recovery tool more than once. UniFi Access is an add-on to this, not a parallel system. *(JR, round 2)* ‖ [Access Control Hardware](https://crice009.github.io/toolauth-hardware/) · [System in action (video)](https://www.youtube.com/watch?v=OjUBacrdoow) |
+| Event visitor passes | 4 | 1 | 2 | stable | QR / PIN for registrants, via the UniFi add-on |
+| Access request approval | 3 | 1 | 3 | stable | — |
+| Guest & waiver handling | 3 | 1 | 5 | stable | A guest signs the waiver, it is stored in the system, and they are offered the option to join the email list. JR believes this works. **That is the whole process — there is no follow-up sequence**, which is the likeliest explanation for 2.4% conversion against a 5% goal on 218 waivers a year. *(JR, round 2)* ‖ [Waivers](https://www.makehaven.org/waivers) |
+| Tool issue reporting | 4 | 1 | 3 | stable | Webform to Slack |
+| Tool status communication | 4 | 1 | 3 | stable | — |
+| API endpoint security | 3 | 2 | 5 | degraded | Open critical finding: unauthenticated endpoint exposing door and member data |
+
+## Lending, Storage & Store
+
+_Grouped together because the plan treats them as one thing: FIN O#1 S#2,
+"evaluate major program areas (store, lending library, membership, courses,
+storage, and workspaces) for cost recovery and mission alignment."_
+
+| Process | A | D | I | State | Notes |
+|---|---|---|---|---|---|
+| Borrower onboarding | 4 | 1 | 2 | stable | Role assigned on webform submission |
+| Loan checkout | 4 | 2 | 3 | stable | Module carries its own docs |
+| Loan return | 4 | 2 | 3 | stable | — |
+| Overdue late fee | 4 | 1 | 4 | watch | Real double charges 08-10. Fix staged; refunds pending on 3 members |
+| Damage deposit | 3 | 1 | 3 | stable | — |
+| Battery tracking | 3 | 1 | 2 | stable | — |
+| Missing / lost item handling | 3 | 0 | 3 | degraded | Marking an on-loan item missing silently closes the loan and orphans the battery |
+| Item repair & retirement | 2 | 1 | 2 | stable | A broken library item is removed from circulation. JR's intent is for lending fees to eventually fund replacement, which they do not today. *(JR, round 2)* |
+| Librarian role administration | ? | 0 | 2 | degraded | Granting a new librarian has been open for weeks |
+| Lending budget review | 3 | 1 | 2 | stable | — |
+| Storage assignment | 3 | 1 | 3 | stable | — ‖ [Storage Policy](https://www.makehaven.org/storage) · [Storage ticketing](https://docs.google.com/document/d/1GNGAhenJNU_GsO86tsB6_4jQJ2zuh4FHYYODaGKkMBo/edit) |
+| Storage billing | 2 | 1 | 4 | degraded | **Worse than v4 recorded.** A re-audit against live Stripe on 2026-08-14 found **24 active assignments, roughly $565/month uncollected** — not the 7 and ~$225 previously logged. Seven were never linked and seventeen point at dead, cancelled or expired subscriptions. This is ongoing rather than legacy (two failed this week) and the root cause is that nothing feeds subscription state back: there is no webhook or cron reconciliation and the status field was never created. No member has been over-billed. *(JR, round 2)* |
+| Store purchase | 3 | 1 | 3 | stable | Half the PayPal buttons are hardcoded in a view, not the module |
+| Store member tab collection | 4 | 2 | 3 | watch | Pilot live 08-03; live key lacks a write scope so default-promotion no-ops |
+| Store inventory restock & reorder | 3 | 1 | 2 | stable | Some materials priced at $0.01/unit — any unit cap becomes a silent spend limit |
+| Line-of-business profitability review | 2 | 1 | 4 | stable | **Corrected from `undefined` — the finance committee has actually done this**, breaking results down by line of business. It is laborious, and work is ongoing to make Xero produce it more directly. *(JR, round 2)* |
+
+## Membership & Billing
+
+| Process | A | D | I | State | Notes |
+|---|---|---|---|---|---|
+| Join / signup flow | 3 | 2 | 4 | changing | UX overhaul staged across four repos, deploy pending ‖ [New Member procedure](https://docs.google.com/document/d/1wqWk57i_w1WSEKry2u6wqH0543BVp7ADuqR1mVXbTwI/edit) · [Membership Agreement](https://docs.google.com/document/d/1SAmCthMaj_2ZGspNhtc-a9yC5STRHbmXJHujEiKD6Rk/edit) |
+| Email validation at signup | 1 | 0 | 3 | degraded | Typo'd addresses create a contact with no account. Sitewide scope unmeasured |
+| Payment setup | 4 | 1 | 4 | stable | Chargebee portal |
+| Membership status sync | 4 | 1 | 4 | stable | Webhook to roles and fields |
+| Dunning / payment recovery | 3 | 2 | 4 | stable | Phase 1 shipped 04-21 |
+| Cancellation & offboarding | 4 | 1 | 3 | stable | **Corrected from `unknown` — this is one of the better-automated flows we have.** Member cancels in Chargebee; the sync module removes the member role, which removes door access; the cancellation reason is captured and synced to Drupal/CiviCRM. A failed payment routes to dunning and then the member-success queue instead ‖ [Member success dashboard (staff)](https://www.makehaven.org/admin/makerspace/member-success/dashboard) |
+| Member conduct & discipline | 2 | 2 | 5 | stable | **Corrected from `degraded`.** The executive director decides, following a written guide. The member may appeal to the board chair, who either lets the decision stand or takes it to the board to consider overruling. Low volume, clear escalation path; the weak point is that records live in a spreadsheet rather than the CRM. *(JR, round 2)* ‖ [Member warning](https://docs.google.com/document/d/18BfXtbSVDhe6hm5WxYurEMN5S_KBA_cIf0hlt0YeD_M/edit) · [Member termination](https://docs.google.com/document/d/1LFao9lQ1r8iDtby6iT54-LqLoo6TQnGaMv75__3KNCs/edit) · [Discipline guide](https://docs.google.com/spreadsheets/d/1Hs65Eg6k71zvtbIcsAXfEE36wz-Eujy5pSyeX563NeI/edit) |
+| Exit survey & ending-reason capture | 4 | 1 | 4 | stable | **Corrected from `degraded`.** Reason is captured at cancellation in Chargebee and flows through to the profile, so it is automatic rather than a survey anyone has to chase |
+| Rejoin / recapture campaign | 2 | 0 | 3 | stable | Runs: a contractor does outreach and rejoin buttons exist in the product. What has not happened recently is any larger marketing push to lapsed members. *(JR, round 2)* |
+| Comped / sliding-scale / sponsored memberships | 4 | 1 | 3 | stable | **Corrected from `unknown`.** Applicants self-certify on the join form with an online signature — no approval queue by design ‖ [Scholarship application](https://www.makehaven.org/makehaven-scholarship-application) · [Pricing Policy](https://docs.google.com/document/d/10mGYDuvO_J4AAgWRHIXb3WEO1dU2OQKCnxm2w_0JYpk/edit) |
+| Stripe customer linkage | 2 | 1 | 3 | degraded | 656 unlinked; field only written by manual backfills |
+| Membership pricing review | 2 | 2 | 4 | stable | **Corrected from `unknown`.** Board policy sets an annual inflation-linked default; the executive director holds the authority to apply it ‖ [Pricing Policy](https://docs.google.com/document/d/10mGYDuvO_J4AAgWRHIXb3WEO1dU2OQKCnxm2w_0JYpk/edit) |
+| Workspace rental agreement | 4 | 2 | 3 | watch | Signing flow live 07-29; retire gate live 08-12 ‖ [Workspace Use Agreement (link broken in source)](https://docs.google.com/document/d/1AShT2j-Cc24Q0cxVqJLD8OxZ9V9erV2kCCfyYk49K0c/edit) · [Workspaces](https://www.makehaven.org/workspaces) |
+| Workspace rental billing | 2 | 1 | 3 | stable | **Corrected from `undefined`, and verified: 14 of 15 workspaces now carry a price** — Kate filled them. Many tenants are paying, invoiced through Xero today, with migration to the in-product system intended later. *(JR, round 2)* ‖ [Workspaces](https://www.makehaven.org/workspaces) |
+
+## Member Experience & Retention
+
+| Process | A | D | I | State | Notes |
+|---|---|---|---|---|---|
+| Onboarding nudge / stalled-join recovery | 4 | 2 | 3 | watch | Live 08-11. Efficacy unproven — before widening, 0 of 5 nudged progressed |
+| Orientation scheduling | 3 | 1 | 3 | stable | Calendly. A webhook outage lost Apr–Jun records; orientations never backfilled ‖ [Orientation video / process](https://www.makehaven.org/orientation-video) |
+| First-badge-in-28-days promotion | 3 | 1 | 3 | degraded | **Measured but not managed** — JR: "now just measured and we work against it." 67% against an 80% goal. Current experiment: sending a free GEMS course to members who appear stuck. *(JR, round 2)* |
+| Interest capture + Slack invite | 4 | 1 | 2 | watch | Live 08-07 |
+| Member success outreach queue | 3 | 2 | 3 | stable | — |
+| At-risk early-warning detection | 4 | 2 | 4 | stable | Year 1 list marks this "(done, improve?)" — the one strategy already built |
+| Retention intervention tracking | 3 | 1 | 3 | stable | A contractor works the at-risk queue using member-success module data. Whether interventions actually change outcomes is charted but not, as far as we can tell, acted on. *(JR, round 2)* |
+| New-member 3-month survey | 1 | 0 | 3 | planned | Confirmed by JR as an intention we have not started — a roadmap item, not a broken process. *(JR, round 2)* |
+| New-member gatherings & peer intros | 2 | 1 | 2 | stable | **Split result.** Social events and meetups genuinely happen and are frequent. The **mentorship programme fell apart and is dormant** — that half is the gap, not the social half |
+| Interest-based member groups | 1 | 0 | 2 | stable | Runs loosely through Slack channels and meetups rather than as a supported programme with stipends. *(JR, round 2)* |
+| Member recognition & awards | 1 | 0 | 2 | changing | In the works, and has been for a long time — the awards concept keeps being picked up and put down. *(JR, round 2)* |
+| NPS & satisfaction survey | 2 | 1 | 3 | stable | Member surveys carrying NPS have run for years. JR wants the process integrated into the site and automatic rather than periodic and manual — and flags it as something to check back in on ‖ [2023 Member Survey](https://docs.google.com/document/d/1BHuenfGNNegj1PIDFYOxBacPq6gGpOcBUcKeG2t_Lvw/edit) |
+| Community Wishlist | 4 | 1 | 2 | stable | **Corrected from `undefined` — it exists and runs.** Members submit and vote; it also feeds the tool-acquisition process as the step after budget ‖ [Wishes](https://www.makehaven.org/wishes) |
+| Deferred profile field capture | 1 | 0 | 2 | degraded | Bio and discovery at 0% capture; 14% of members cannot save the form |
+| Member feedback triage | 3 | 2 | 3 | stable | A well-documented A3 — worth copying as a pattern |
+| Quarterly close-the-loop reporting | 1 | 0 | 3 | planned | Confirmed by JR as an intention we have not started — a roadmap item, not a broken process. *(JR, round 2)* |
+| Year in review | 4 | 1 | 1 | stable | — |
+
+## Outreach & Recruitment
+
+_Almost entirely new in v2. v1 folded this into Communications and lost the
+whole conversion funnel._
+
+| Process | A | D | I | State | Notes |
+|---|---|---|---|---|---|
+| Tour booking & delivery | 3 | 1 | 4 | stable | **Corrected from `unknown`.** All staff sit on a published tour schedule. JR is considering moving tours to a volunteer corps, which would change both the capacity and the training need ‖ [Tour booking](https://www.makehaven.org/tour) |
+| Tour follow-up & conversion | 2 | 1 | 4 | degraded | OUT O#1 S#1 wants automated personalised follow-up. Currently manual or absent |
+| Guest waiver → member conversion | 1 | 0 | 3 | degraded | **2.4% against a 5% goal** on 218 waivers. No defined follow-up at all |
+| Workshop participant → member conversion | 2 | 0 | 4 | degraded | JR: it *should* send an email and re-invite attendees, but that needs verifying and is undeveloped either way. 6.4% conversion against a 10% goal, and the strategic plan carries its own note that this is not properly measured. *(JR, round 2)* |
+| Discovery source capture | 3 | 1 | 2 | stable | "How you heard" is collected and discussed in the outreach and marketing committee. Self-reported, so treated as directional rather than reliable. *(JR, round 2)* |
+| Referral / bring-a-friend | 2 | 1 | 3 | degraded | **Corrected from `unknown` — it runs, but by hand.** Members do refer; JR names it explicitly as an area for technical process improvement ‖ [Referral program](https://www.makehaven.org/member-referral-program) |
+| Ambassador program | 1 | 0 | 3 | planned | Confirmed by JR as an intention we have not started — a roadmap item, not a broken process. *(JR, round 2)* |
+| Community tabling & partner events | 2 | 0 | 2 | stable | Confirmed running. *(JR, round 2)* |
+| Community partnership development | 2 | 0 | 3 | stable | Confirmed running, though without a defined pipeline or count. *(JR, round 2)* |
+| Media relations & press kit | 1 | 0 | 2 | planned | Confirmed by JR as an intention we have not started — a roadmap item, not a broken process. *(JR, round 2)* |
+| Neighborhood & postcard campaigns | 2 | 1 | 2 | stable | Run as experiments rather than on a schedule — planned ad hoc rather than triggered. *(JR, round 2)* |
+| Paid digital advertising & retargeting | 1 | 2 | 3 | changing | 250 hrs budgeted. Ad Grant campaign launch-ready, blocked on account access |
+| Lead / inquiry handling | 2 | 1 | 3 | degraded | **Corrected from `unknown` to a named weak point.** `info@` lands in a shared Google inbox answered mostly by Kate, and staff struggle to keep up with the volume |
+| Member phonebank campaigns | 3 | 1 | 3 | stable | **Corrected from `unknown`.** Used once for a fundraising experiment, well received, and planned for the next phonathon. Occasional-use by design rather than neglected |
+
+## Communications
+
+| Process | A | D | I | State | Notes |
+|---|---|---|---|---|---|
+| Weekly digest | 4 | 2 | 3 | watch | Clean at 886/886. Two staged batches must ship before the next Wednesday send |
+| Monthly newsletter | 2 | 1 | 3 | changing | Mailchimp retirement in flight |
+| Mailing list / smart group hygiene | 3 | 1 | 3 | degraded | Recurring failure: hand-fed feeder groups silently freeze. Three have needed repair |
+| Slack announcements | 4 | 1 | 2 | stable | Tasks, events, asset status |
+| Website content publishing | 2 | 0 | 2 | stable | Any staff member can publish; there is no editorial calendar. JR wants to step up blog and announcement output, which would also feed the developing automatic newsletter |
+| SEO & analytics instrumentation | 4 | 2 | 2 | watch | Live 08-09. Tag wiring is implicit and fragile |
+| Inbound phone & voicemail triage | 1 | 0 | 3 | degraded | **Corrected from `unknown` to a named weak point — JR: "this is a weak point."** Calls go to a Google voicemail box that often sits unanswered for a long time because of staff capacity. This is the problem the Voicemail-Tool was built to solve; it is written and pre-launch, awaiting a Twilio number |
+| Impact storytelling & member spotlights | 1 | 0 | 2 | planned | Confirmed by JR as an intention we have not started — a roadmap item, not a broken process. *(JR, round 2)* |
+| Annual report & impact reporting | 2 | 1 | 3 | stable | **Corrected from `undefined`.** The annual member meeting is presented and recorded, and a PDF of that deck serves as the annual report when one is requested. Standards S060 wants finances, participation, outcomes *and setbacks* — worth checking the deck against that |
+
+## Finance & Accounting
+
+| Process | A | D | I | State | Notes |
+|---|---|---|---|---|---|
+| Contractor payment → Xero bill | 4 | 1 | 4 | changing | Duplicate-bill fix pushed, deploy pending. No real double-pays occurred |
+| Vendor payment via Melio | 2 | 1 | 4 | degraded | The failure is visible in Xero if someone looks, and responsibility sits with the staff member who initiated the payment to their own contractor, per the procurement policy's budget-line ownership. **There is no periodic sweep** — detection depends on someone happening to check, which is how two payments sat undelivered. *(JR, round 2)* ‖ [Procurement policy](https://www.makehaven.org/makehaven-procurement-policy) |
+| Stripe → Xero reconciliation | 3 | 2 | 4 | stable | **Corrected from `degraded`.** Statements import into Xero, the bookkeeper matches receipts, and unresolved items are worked through in a standing session with the executive director. The known friction is unlabelled PaymentIntents, where the bank feed shows only a charge description and the income line has to be inferred. *(JR, round 2)* |
+| Monthly financial close | 2 | 2 | 4 | stable | **Corrected from `unknown`.** A contractor does data entry, the executive director handles the harder work, finance committee volunteers assist, and a CPA reviews and prepares the 990 |
+| Budget vs actual review | 2 | 2 | 4 | stable | **Corrected from `unknown`.** The board approves an annual budget and receives regular budget-versus-actual reporting |
+| Reserve fund management | 2 | 2 | 5 | stable | **Corrected from `unknown`.** Governed by published financial and procurement policies, managed by the executive director. Reserve stands at 2.93 months against a 6-month goal ‖ [Financial policies](https://www.makehaven.org/makehaven-financial-policies-and-procedures) · [Procurement policy](https://www.makehaven.org/makehaven-procurement-policy) |
+| Annual external review / audit | 2 | 2 | 4 | stable | **Corrected from `unknown`.** Completed last year; this year's documents are already with the reviewer ‖ [Filing requirements & procedures](https://docs.google.com/document/d/1utOZLoGWzUXXe0hS3D7jt1YPEMKZ93yD1ztQedEaF0k/edit) |
+| Financial policy maintenance | 2 | 2 | 3 | stable | **Corrected from `undefined`** — both policies are published and current ‖ [Financial policies](https://www.makehaven.org/makehaven-financial-policies-and-procedures) · [Procurement policy](https://www.makehaven.org/makehaven-procurement-policy) |
+| Financial dashboards & board briefings | 2 | 1 | 3 | stable | The executive director prepares the board packet from Xero, working documents and the KPI dashboard |
+| Donation processing | 3 | 1 | 3 | stable | **Corrected from `unknown`.** The acknowledgement procedure is followed. Some manual steps are deliberate — handwritten notes on cards — and JR sees room to automate acknowledgements for smaller donations while keeping the personal touch for larger ones. *(JR, round 2)* ‖ [Donation Acknowledgement Procedure](https://docs.google.com/document/d/1Xd3CkHtjPSUSQdXktw2MZ3chxBd8uEiyPMwyFzphnMc/edit) |
+
+## Development & Fundraising
+
+_New group in v2. Has a committee, a dashboard, and five strategic objectives;
+had zero rows in v1._
+
+| Process | A | D | I | State | Notes |
+|---|---|---|---|---|---|
+| Annual appeals (spring + year-end) | 2 | 1 | 4 | stable | **Corrected from `unknown`.** Run by the Resource Development committee with Kate as staff lead ‖ [Fundraising Plan](https://docs.google.com/document/d/1ehYHyPDqcll_xW0tpcqhJt237GxUi7VjD3-Gvqd5BBo/edit) |
+| Recurring giving program | 2 | 1 | 3 | stable | Owned by Kate with the resource development committee; 39 recurring donors against a 60 goal. *(JR, round 2)* |
+| Major donor LAI qualification & pipeline | 3 | 1 | 4 | changing | Sponsorship-Tool implements LAI scoring and a pipeline board; 3 tasks from done ‖ [LAI Scoring Sheet](https://docs.google.com/document/d/1pn_sc4nKokRn0hxEPdSOVGvQuD3bHXWsQzCSihxSs5A/edit) |
+| Major donor stewardship cadence | 2 | 1 | 4 | stable | **Corrected from `undefined`.** Staff steward major donors and the board is sometimes involved. JR: the system could be built out — cadence is not yet systematic |
+| Corporate sponsorship solicitation & renewal | 2 | 2 | 4 | watch | Tier ladder + benefit matrix live 08-09; round 3 staged. $7,916 against a $25,000 goal ‖ [Sponsorship Levels](https://docs.google.com/document/d/1M2m3-Yj7wuhvFAC5yPaY79NjOV_O-_IdYyfkJhtaX9E/edit) · [Example Sponsor Letter](https://docs.google.com/document/d/1H3U11lrA-jERoDLlV6aJ70zt2IgZQjyE0dhrBWlsZ6A/edit) |
+| Sponsor recognition & benefit fulfilment | 2 | 1 | 3 | stable | Kate leads, shared with the executive director for sponsor relationships. *(JR, round 2)* |
+| Grant pipeline & deadline tracking | 3 | 1 | 4 | stable | **Major correction, now verified against the database. JR was right and the KPI is wrong.** `civicrm_value_funding_7` holds 46 records; **6 have 2026 due dates and 5 of those 6 carry a submitted link**. So roughly five grants were submitted this year, not zero. The win ratio KPI is fine (12 won of 34 decided = 35%, reported 32%), so this is one broken metric, not a broken dashboard. **The pipeline has no `submitted` status at all** — it runs researching → waiting → won/lost/abandoned — so "submitted" is inferred from a link field and the period is keyed off the due date. That inference is what fails |
+| Grant outcome recording | 3 | 1 | 3 | stable | Recorded in CiviCRM by Kate and the executive director; win ratio 12 of 34 decided. *(JR, round 2)* |
+| Donor data hygiene in CRM | 2 | 1 | 3 | stable | **Kate owns donor data quality** and does most of the checking, shared with the executive director for major donors and sponsors. *(JR, round 2)* |
+| Case statement maintenance | 1 | 0 | 2 | planned | Confirmed by JR as an intention we have not started — a roadmap item, not a broken process. *(JR, round 2)* |
+| Planned giving / bequest program | 1 | 0 | 2 | degraded | A page exists but there is no cultivation activity behind it — present in form, dormant in practice. *(JR, round 2)* |
+
+## Governance & People
+
+_6 rows in v1, 17 here. This is where the strategic plan added the most, and
+where almost nothing is defined._
+
+| Process | A | D | I | State | Notes |
+|---|---|---|---|---|---|
+| Board recruitment matrix & sourcing | 2 | 1 | 4 | stable | **Corrected from `undefined`.** A webform is sent to candidates to collect skills and demographic information, which feeds the matrix used to build the slate. *(JR, round 2)* ‖ [Board Skill & Demographic Matrix](https://docs.google.com/document/d/1PEZszopG0dXW9gUtas5myG1Ps_sRzhTtKC8LScWg4Do/edit) · [Board roster](https://www.makehaven.org/team) |
+| Board nomination & election | 2 | 1 | 4 | stable | **Corrected from `unknown`.** The governance committee discusses; nominations arrive through a website form; candidates are assessed against the skills matrix; the committee talks with the strongest, assembles a slate, and the board passes it. *(JR, round 2)* |
+| Board onboarding | 2 | 1 | 3 | stable | **Corrected from `undefined`.** A new director receives a one-hour orientation presentation with Q&A. *(JR, round 2)* ‖ [Board orientation slides](https://docs.google.com/presentation/d/1S-zx_82MFvUkyZ1Yw-Mjjnu2segRcwHGAr0MgZr9b8I/edit) · [Expectations for Board Members](https://docs.google.com/document/d/1DS9-Av-3Y8HBOX79xtD0s5rw7OVLNOyaAjUY1DGMN90/edit) |
+| Board self-assessment (annual) | 2 | 1 | 3 | changing | In progress now via a board survey, after a long gap ‖ [Board survey (staff)](https://www.makehaven.org/survey/board) |
+| Board & committee minutes retention | 2 | 1 | 4 | stable | Board meets quarterly plus committees; approved minutes retained in Google Drive. Candidate for Governance-Dance if that app is adopted ‖ [Board roster](https://www.makehaven.org/team) |
+| Governance policy annual review | 2 | 2 | 5 | stable | Conflict-of-interest policy published; the policy set is indexed in the operations doc ‖ [Conflict of interest](https://www.makehaven.org/conflict-interest-policy) · [Operations index](https://www.makehaven.org/operations) · [Bylaws](https://docs.google.com/document/d/1yhU7K5EpKeP6KRXCDboMOiFOrT6bd5vA5Dcippb694g/edit) · [Whistleblower Policy](https://docs.google.com/document/d/1XF4N91TwuxkHUsOLHZ7QZEn8t755kPxO6qtczERSiyU/edit) |
+| Committee charters & effectiveness | 2 | 1 | 3 | stable | **Correction: the DEI committee is active and meeting** — v2's "no active members" is stale. Committee structure is published. **Real remaining gap, in JR's words: no reliable way to track who is actually on each committee** — the clearest use case for Governance-Dance ‖ [Committee structure](https://www.makehaven.org/volunteer-leadership-structure) |
+| Governance archive / institutional memory | 1 | 1 | 3 | planned | Partly served by Google Drive and the operations index today, but nothing purpose-built. JR wants something stronger — possibly Governance-Dance, possibly a dedicated continuity tool. *(JR, round 2)* |
+| Succession planning (board + staff) | 1 | 0 | 5 | undefined | **Confirmed by JR: "not really, we should work on this."** Now the highest-impact genuinely-undefined row on the page |
+| Staff onboarding / offboarding | 1 | 1 | 3 | stable | **Reframed.** The same four staff have been in post for years, so this rarely fires; when it does, the executive director spends substantial one-to-one time. **JR's own redirect is the useful finding: the real onboarding gap is instructors and volunteers, not staff** — and those are far higher-volume. *(JR, round 2)* ‖ [Personnel Policy](https://docs.google.com/document/d/1G70oyO5qSCDrjqVkLztEoLJyAbQzYs85QZJx_h3Snt0/edit) · [Staff Responsibilities Map](https://docs.google.com/drawings/d/1w8iB6siS0NJh0tNlZ0A3myBtsTayvzGYybzU_qRA8OQ/edit) |
+| Staff development, benefits & wellbeing | 2 | 2 | 3 | stable | Annual evaluations happen and job descriptions are reviewed at the same time; both live in Google Drive ‖ [Employee Evaluation](https://docs.google.com/document/d/1hm2Tl-jVQSOHfMhyDOjz4SCHxcOkS-BgGO7vZW4gR50/edit) · [Personnel Policy](https://docs.google.com/document/d/1G70oyO5qSCDrjqVkLztEoLJyAbQzYs85QZJx_h3Snt0/edit) |
+| Staffing plan & role clarity | 1 | 1 | 4 | degraded | JR: "not really formally… I feel like we have it but not in one place." Individual job descriptions exist and are reviewed at annual evaluations; the org-level plan does not exist as a single artefact. *(JR, round 2)* ‖ [Staff Responsibilities Map](https://docs.google.com/drawings/d/1w8iB6siS0NJh0tNlZ0A3myBtsTayvzGYybzU_qRA8OQ/edit) |
+| Volunteer pathway, roles & recognition | 2 | 1 | 3 | stable | **Corrected from `undefined`.** Roughly **75+ titled volunteers** across facilitators, shop techs, the lending librarian, ambassadors, board and committee members. Structure is published; the gap is a single maintained roster ‖ [Volunteer structure](https://www.makehaven.org/volunteer-leadership-structure) · [Intern Program](https://www.makehaven.org/intern-program) · [New Member Ambassador](https://docs.google.com/document/d/1XKOOxTMI4VJH66fhmKHbuVxwsz4eo_xgdWBQ4e_tBZc/edit) |
+| Annual member meeting | 2 | 1 | 3 | stable | Held with a recorded presentation; the PDF of that deck doubles as the annual report when one is requested |
+| ED time reporting to board | 2 | 2 | 2 | changing | New Aug 2026, from a 5-day pilot. **Also the only real source for the `effort_hrs_month` field this registry is missing** — worth wiring the two together rather than estimating twice |
+| Harassment & conduct complaints | 3 | 2 | 5 | stable | **Corrected from `unknown`.** Intake is a Google Form — chosen deliberately for privacy control rather than the site's own webforms — which emails staff, who act immediately. Gap: no case record or tracking beyond the mailbox ‖ [Harassment policy](https://www.makehaven.org/harassment) |
+| Board–member engagement | 1 | 0 | 3 | degraded | A member comment states the board "fails every transparency test I can think of"; JR's reply agrees a stronger feedback loop is needed ‖ [Expectations for Board Members](https://docs.google.com/document/d/1DS9-Av-3Y8HBOX79xtD0s5rw7OVLNOyaAjUY1DGMN90/edit) · [Board roster](https://www.makehaven.org/team) |
+| DEI review (inclusion, accessibility, affordability) | 2 | 1 | 3 | stable | The DEI committee is active again and the accessibility walk-through runs annually alongside the safety one ‖ [Committee structure](https://www.makehaven.org/volunteer-leadership-structure) |
+| Records retention & filings calendar | 1 | 1 | 5 | degraded | Filings are now documented in the renewal calendar, but **JR confirms there is no retention rule of any kind yet — "need to establish."** That blocks the Standards three-years-of-evidence test and leaves no defined answer to what we keep, for how long, or where. *(JR, round 2)* ‖ [Filing requirements & procedures](https://docs.google.com/document/d/1utOZLoGWzUXXe0hS3D7jt1YPEMKZ93yD1ztQedEaF0k/edit) |
+| Nondiscrimination & accommodation requests | 3 | 1 | 4 | stable | **Corrected from `undefined`.** Requests go to the shop manager and director, and there is a dedicated accessibility-issue intake alongside the general concern pipeline. *(JR, round 2)* ‖ [Accessibility issue form](https://www.makehaven.org/accessibility-issue) |
+| Member IP rights | 2 | 2 | 3 | stable | **Corrected — a policy does exist.** The membership agreement states members keep their own IP, which satisfies Standards S008. *(JR, round 2)* ‖ [Membership agreement](https://www.makehaven.org/membership-agreement) |
+| Demographic data collection & reporting | 4 | 2 | 3 | stable | Lives in CiviCRM since Dec 2025; dashboards converted 07-10 |
+
+## Platform & Meta
+
+_How we change everything else._
+
+| Process | A | D | I | State | Notes |
+|---|---|---|---|---|---|
+| Feature planning | 2 | 2 | 3 | stable | Tracks carry a premise and kill criteria since 07-09 |
+| Deploy pipeline | 4 | 3 | 4 | stable | **The model for what stable looks like.** An SOP others have run, a wizard that enforces it, a ground-truth state file |
+| Config reconciliation | 3 | 2 | 4 | stable | Known gotcha: it deletes committed staged config |
+| Security audit | 3 | 2 | 5 | stable | Quarterly. Four of six dimensions never run |
+| Weekly pulse triage | 3 | 2 | 2 | stable | — |
+| Cycle review | 2 | 2 | 3 | stable | Replaced a 950-line improvement pipeline that was fully specified and never ran once |
+| Backup & disaster recovery | 3 | 2 | 5 | stable | Three systems hold essentially everything: **Google Drive** (Google for Education) for documents, **Pantheon** for the website with its own robust backups, and **GitHub** for code — which has repeatedly been the actual recovery tool. UniFi cameras are a fourth, lesser store. Each vendor carries its own recovery documentation, and JR has performed real restores. What is missing is a MakeHaven-side runbook saying which to restore in what order. *(JR, round 2)* |
+| Admin access & systems register | 2 | 1 | 4 | changing | **Upgraded from `degraded` — a register has been started.** Access is genuinely distributed (Pantheon with Terence and Yan, Chargebee/Stripe with Kate, Xero with the treasurer, Home Assistant with Vincent, Corey and Lior, Firebase under an org account, domain under org email) and everything is recoverable by taking control of the ED's work email. Finishing the started document closes the largest remaining bus-factor gap. *(JR, round 2)* ‖ [Systems register (draft)](https://docs.google.com/document/d/18B7Oxe8kvQCvrex1dLNuhUiMWqXN-r7yzE-QwXHxe2Q/edit) |
+| Local development environment | 2 | 2 | 2 | stable | Documented and repeatedly repaired |
+| Preview / staff testing | 4 | 2 | 2 | stable | Sandbox site for extended staff testing |
+| Policy & procedure document index | 1 | 1 | 4 | changing | The operations doc is the current answer and it is drifting. JR wants something stronger — possibly folded into Governance-Dance, possibly its own continuity tool. **That decision is now live rather than hypothetical**, because this registry is starting to do part of the job. *(JR, round 2)* ‖ [Operations index](https://www.makehaven.org/operations) · [Staff tools hub (staff)](https://www.makehaven.org/staff-tools) |
+| Process registry maintenance | 1 | 2 | 3 | changing | This document. It belongs in its own inventory, and it starts at A1 |
+
+---
+
+## Where this draft is weakest
+
+1. **Facilities, Governance and staff/HR are still largely inferred.** v2 knows
+   what the strategic plan *wants* those processes to be. It still does not know
+   what actually happens today. A plan saying "conduct annual drills" is not
+   evidence that drills happen.
+2. **Documentation scores are the least reliable column.** "An SOP file exists"
+   is not D2 "current," and nothing here is verified D3.
+3. **Effort in staff hours is absent** — the field that would most improve the
+   automation ranking. The strategic plan's Year 1 hour estimates are the best
+   available proxy and are only a forecast, not a measurement.
+4. **Granularity is unvalidated and now visibly uneven.** Lending gets ten rows;
+   "space opening / closing" gets one. That is an artefact of where documentation
+   exists, not of where the work is.
+5. **Some rows may be aspirations, not processes.** "Planned giving programme"
+   and "Made at MakeHaven marketplace" are strategic intentions with no current
+   operation. The registry needs to distinguish *a process running badly* from
+   *a process that does not exist yet* — `undefined` currently conflates them.
+   Worth a sixth state, or a `planned: true` flag, before Phase 1.
+
+---
+
+## Suggested agenda for the Phase 0 session
+
+1. **Argue with the groups first** (15 min). Thirteen groups. Confirm the
+   group → strategic-goal mapping, since that is what makes the board view work.
+2. **Separate aspiration from operation** (20 min). Walk the `undefined` rows
+   and split them: *should be running and isn't* vs *not started, and that's
+   fine.* Weakness 5 above.
+3. **Fill Facilities and Governance from life, not from the plan** (45 min).
+   What actually happens when a tool breaks, when the building floods, when a
+   board seat opens. Only staff can supply this.
+4. **Calibrate on ten rows** (30 min). Where two people disagree, fix the *scale
+   wording*, not the score.
+5. **Assign owners** (30 min). Rows where nobody can name an owner are the
+   finding.
+6. **Do not score the whole list in the room.** Owners score their own rows;
+   the AI maintenance pass keeps the derived fields current afterward.

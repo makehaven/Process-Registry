@@ -1,0 +1,575 @@
+<title>Process Stabilization Registry</title>
+<style>
+  :root {
+    --paper:#f5f4f1; --surface:#ffffff; --sunken:#eceae6;
+    --ink:#191619; --ink-2:#4b4642; --ink-3:#7d766e;
+    --rule:#dcd8d1; --rule-2:#c6c1b8; --crimson:#8b1919;
+    --s-stable:#3d6b52; --s-watch:#9c6a0c; --s-changing:#2d5b87;
+    --s-degraded:#a01f1f; --s-undefined:#6b6560; --s-unknown:#a9a29a; --s-planned:#4a5a7a;
+    --s-stable-bg:#e5efe8; --s-watch-bg:#f6ecd8; --s-changing-bg:#e2ebf4;
+    --s-degraded-bg:#f6e3e3; --s-undefined-bg:#e9e6e2; --s-unknown-bg:#eeebe7; --s-planned-bg:#e7ebf2;
+    --sans: ui-sans-serif, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    --maxw: 1200px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:#141316; --surface:#1c1a1e; --sunken:#252227;
+      --ink:#eae6e2; --ink-2:#b3ada6; --ink-3:#8b847c;
+      --rule:#322e34; --rule-2:#423d45; --crimson:#d96a6a;
+      --s-stable:#7cc39a; --s-watch:#dfae52; --s-changing:#7bacd8;
+      --s-degraded:#e58080; --s-undefined:#9a938b; --s-unknown:#6e6862; --s-planned:#93a6c4;
+      --s-stable-bg:#1e3129; --s-watch-bg:#33280f; --s-changing-bg:#1c2b3a;
+      --s-degraded-bg:#38201f; --s-undefined-bg:#2a2725; --s-unknown-bg:#232120; --s-planned-bg:#20262f;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:#141316; --surface:#1c1a1e; --sunken:#252227;
+    --ink:#eae6e2; --ink-2:#b3ada6; --ink-3:#8b847c;
+    --rule:#322e34; --rule-2:#423d45; --crimson:#d96a6a;
+    --s-stable:#7cc39a; --s-watch:#dfae52; --s-changing:#7bacd8;
+    --s-degraded:#e58080; --s-undefined:#9a938b; --s-unknown:#6e6862; --s-planned:#93a6c4;
+    --s-stable-bg:#1e3129; --s-watch-bg:#33280f; --s-changing-bg:#1c2b3a;
+    --s-degraded-bg:#38201f; --s-undefined-bg:#2a2725; --s-unknown-bg:#232120; --s-planned-bg:#20262f;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans);
+         font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:var(--maxw); margin:0 auto; padding:0 24px; }
+
+  .masthead { border-bottom:2px solid var(--ink); background:var(--surface); }
+  .masthead .wrap { display:flex; flex-direction:column; gap:18px; padding-top:34px; padding-bottom:26px; }
+  .eyebrow { font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+             color:var(--crimson); font-weight:600; }
+  h1 { margin:0; font-size:clamp(30px,4.6vw,46px); line-height:1.04; letter-spacing:-.025em;
+       font-weight:800; text-wrap:balance; max-width:22ch; }
+  .standfirst { margin:0; max-width:66ch; color:var(--ink-2); font-size:17px; line-height:1.5; }
+  .meta-line { display:flex; flex-wrap:wrap; gap:8px 22px; font-family:var(--mono); font-size:11.5px;
+               letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3); }
+
+  .placard { display:flex; gap:14px; align-items:flex-start; margin:26px 0 0; padding:15px 18px;
+             background:var(--s-watch-bg); border:1px solid var(--s-watch); border-left-width:5px; border-radius:2px; }
+  .placard.q { background:var(--s-changing-bg); border-color:var(--s-changing); }
+  .placard .tag { font-family:var(--mono); font-size:10.5px; font-weight:700; letter-spacing:.12em;
+                  text-transform:uppercase; color:var(--s-watch); white-space:nowrap; padding-top:2px; line-height:1.4; }
+  .placard.q .tag { color:var(--s-changing); }
+  .placard p { margin:0 0 9px; font-size:14px; color:var(--ink-2); max-width:80ch; }
+  .placard p:last-child { margin-bottom:0; }
+  .placard strong { color:var(--ink); }
+
+  section { padding:46px 0 0; }
+  section:last-of-type { padding-bottom:64px; }
+  h2 { margin:0 0 4px; font-size:12px; font-family:var(--mono); letter-spacing:.15em; text-transform:uppercase;
+       font-weight:700; color:var(--ink); padding-bottom:9px; border-bottom:1px solid var(--ink); }
+  .sec-note { margin:12px 0 22px; color:var(--ink-2); font-size:14.5px; max-width:74ch; }
+  .sec-note strong { color:var(--ink); }
+
+  .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(172px,1fr)); gap:1px;
+           background:var(--rule); border:1px solid var(--rule); border-radius:2px; overflow:hidden; }
+  .tile { background:var(--surface); padding:18px; }
+  .tile .num { font-family:var(--mono); font-size:34px; font-weight:700; letter-spacing:-.03em;
+               line-height:1; font-variant-numeric:tabular-nums; display:block; }
+  .tile .lbl { display:block; margin-top:9px; font-family:var(--mono); font-size:10.5px; letter-spacing:.1em;
+               text-transform:uppercase; color:var(--ink-3); font-weight:600; }
+  .tile .sub { display:block; margin-top:5px; font-size:12.5px; color:var(--ink-2); }
+  .tile.accent .num { color:var(--s-watch); }
+  .tile.bad .num { color:var(--s-degraded); }
+  .tile.gap .num { color:var(--s-undefined); }
+  .tile.plan .num { color:var(--s-planned); }
+
+  .legend { display:flex; flex-wrap:wrap; gap:7px 18px; margin:0 0 20px; font-family:var(--mono);
+            font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-2); }
+  .legend span { display:inline-flex; align-items:center; gap:7px; }
+  .swatch { width:11px; height:11px; border-radius:1px; flex:none; }
+
+  .board { display:flex; flex-direction:column; gap:3px; }
+  .row-g { display:grid; grid-template-columns:230px 1fr 40px; align-items:center; gap:14px; }
+  .row-g .gname { font-size:13.5px; font-weight:600; text-align:right; color:var(--ink); }
+  .row-g .gtot { font-family:var(--mono); font-size:12px; color:var(--ink-3); font-variant-numeric:tabular-nums; }
+  .bar { height:26px; border-radius:2px; overflow:hidden; background:var(--sunken); }
+  .barin { display:flex; height:100%; }
+  .barin i { display:block; height:100%; font-style:normal; }
+  @media (max-width:760px) {
+    .row-g { grid-template-columns:1fr 40px; }
+    .row-g .gname { text-align:left; grid-column:1/-1; margin-bottom:1px; }
+  }
+
+  .rank { display:flex; flex-direction:column; gap:1px; background:var(--rule);
+          border:1px solid var(--rule); border-radius:2px; overflow:hidden; }
+  .rank-row { display:grid; grid-template-columns:34px 1fr auto; gap:16px; align-items:baseline;
+              background:var(--surface); padding:12px 16px; }
+  .rank-row .n { font-family:var(--mono); font-size:12px; color:var(--ink-3); font-variant-numeric:tabular-nums; }
+  .rank-row .what b { font-weight:650; font-size:14.5px; }
+  .rank-row .what em { font-style:normal; color:var(--ink-2); display:block; font-size:13px; margin-top:2px; }
+  .rank-row .grp { display:inline-block; margin-top:5px; font-family:var(--mono); font-size:10px;
+                   letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); }
+  .rank-row .score { font-family:var(--mono); font-size:13px; font-weight:700; font-variant-numeric:tabular-nums;
+                     color:var(--crimson); white-space:nowrap; }
+  .rank-row .score small { display:block; font-size:10px; font-weight:500; color:var(--ink-3);
+                           letter-spacing:.06em; text-align:right; }
+
+  .flux { display:flex; flex-direction:column; gap:1px; background:var(--rule);
+          border:1px solid var(--rule); border-radius:2px; overflow:hidden; }
+  .flux-row { display:grid; grid-template-columns:96px 240px 1fr; gap:16px; align-items:start;
+              background:var(--surface); padding:12px 16px; }
+  .flux-row .what b { display:block; font-size:14px; font-weight:650; }
+  .flux-row .what .grp { display:block; margin-top:3px; font-family:var(--mono); font-size:10px;
+                         letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); }
+  .flux-row .n { font-size:13px; color:var(--ink-2); }
+  @media (max-width:760px) {
+    .flux-row { grid-template-columns:1fr; gap:6px; }
+  }
+
+  .unranked { margin-top:22px; padding:18px 20px; background:var(--s-degraded-bg);
+              border:1px solid var(--s-degraded); border-left-width:5px; border-radius:2px; }
+  .unranked h3 { margin:0 0 8px; font-family:var(--mono); font-size:11px; letter-spacing:.12em;
+                 text-transform:uppercase; color:var(--s-degraded); }
+  .unranked p { margin:0 0 10px; font-size:14px; color:var(--ink-2); max-width:76ch; }
+  .unranked ul { margin:0; padding-left:18px; font-size:13.5px; color:var(--ink); }
+  .unranked li { margin-bottom:5px; }
+
+  .tblwrap { border:1px solid var(--rule); border-radius:2px; background:var(--surface); overflow:hidden; }
+  .tblwrap .tnote { margin:0; padding:13px 16px 0; font-size:13px; color:var(--ink-2); font-style:italic; }
+  .tblwrap table { display:block; overflow-x:auto; }
+  table { border-collapse:collapse; width:100%; }
+  caption { caption-side:top; text-align:left; font-size:15px; font-weight:700; padding:15px 16px 11px;
+            border-bottom:1px solid var(--rule-2); letter-spacing:-.01em; }
+  caption span { font-family:var(--mono); font-size:11px; font-weight:500; color:var(--ink-3);
+                 letter-spacing:.06em; margin-left:9px; text-transform:uppercase; }
+  caption b { display:block; margin-top:5px; font-family:var(--mono); font-size:10.5px; font-weight:500;
+              color:var(--ink-3); letter-spacing:.05em; }
+  thead, tbody, tr { display:table; width:100%; table-layout:fixed; }
+  th { text-align:left; font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+       color:var(--ink-3); font-weight:600; padding:9px 12px; border-bottom:1px solid var(--rule);
+       background:var(--sunken); white-space:nowrap; }
+  td { padding:10px 12px; border-bottom:1px solid var(--rule); vertical-align:top; font-size:13.5px; }
+  tr:last-child td { border-bottom:none; }
+  th:nth-child(1), td:nth-child(1) { width:22%; }
+  th:nth-child(2), td:nth-child(2), th:nth-child(3), td:nth-child(3), th:nth-child(4), td:nth-child(4) { width:4%; }
+  th:nth-child(5), td:nth-child(5) { width:11%; }
+  td.p { font-weight:600; }
+  td.s { font-family:var(--mono); font-size:12.5px; text-align:center; font-variant-numeric:tabular-nums; color:var(--ink-2); }
+  td.s.hi { color:var(--s-degraded); font-weight:700; }
+  td.s.q { color:var(--s-unknown); }
+  td.n { color:var(--ink-2); font-size:13px; }
+  td.n a, .unranked a, .sec-note a { color:var(--crimson); text-decoration:underline;
+                                     text-underline-offset:2px; text-decoration-thickness:1px; }
+  td.n a:hover, .sec-note a:hover { text-decoration-thickness:2px; }
+  a:focus-visible { outline:2px solid var(--crimson); outline-offset:2px; border-radius:1px; }
+  .res { display:block; margin-top:7px; padding-top:6px; border-top:1px dotted var(--rule-2);
+         font-size:12px; line-height:1.7; }
+  .res b { font-family:var(--mono); font-size:9.5px; letter-spacing:.11em; text-transform:uppercase;
+           color:var(--ink-3); font-weight:600; margin-right:8px; }
+  td.n code { font-family:var(--mono); font-size:11.5px; background:var(--sunken); padding:1px 4px;
+              border-radius:2px; color:var(--ink-2); }
+
+  .pill { display:inline-block; font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.09em;
+          text-transform:uppercase; padding:3px 8px; border-radius:2px; white-space:nowrap; border:1px solid transparent; }
+  .pill.stable{color:var(--s-stable);background:var(--s-stable-bg);border-color:var(--s-stable)}
+  .pill.watch{color:var(--s-watch);background:var(--s-watch-bg);border-color:var(--s-watch)}
+  .pill.changing{color:var(--s-changing);background:var(--s-changing-bg);border-color:var(--s-changing)}
+  .pill.degraded{color:var(--s-degraded);background:var(--s-degraded-bg);border-color:var(--s-degraded)}
+  .pill.undefined{color:var(--s-undefined);background:var(--s-undefined-bg);border-color:var(--s-undefined)}
+  .pill.planned{color:var(--s-planned);background:var(--s-planned-bg);border-color:var(--s-planned)}
+  .pill.unknown{color:var(--s-unknown);background:var(--s-unknown-bg);border-color:var(--s-unknown)}
+
+  .group-stack { display:flex; flex-direction:column; gap:26px; }
+
+  .quotes { display:flex; flex-direction:column; gap:14px; }
+  blockquote { margin:0; padding:14px 18px; border-left:3px solid var(--crimson); background:var(--surface);
+               border-radius:0 2px 2px 0; font-size:14.5px; color:var(--ink); }
+  blockquote cite { display:block; margin-top:7px; font-style:normal; font-family:var(--mono); font-size:10.5px;
+                    letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); }
+
+  .scales { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:22px; }
+  .scale h3 { margin:0 0 9px; font-family:var(--mono); font-size:11px; letter-spacing:.11em;
+              text-transform:uppercase; color:var(--crimson); }
+  .scale dl { margin:0; font-size:13.5px; }
+  .scale dt { font-family:var(--mono); font-size:11.5px; font-weight:700; color:var(--ink); margin-top:7px; }
+  .scale dd { margin:1px 0 0; color:var(--ink-2); font-size:13px; }
+
+  .caveats { display:grid; grid-template-columns:repeat(auto-fit,minmax(262px,1fr)); gap:1px;
+             background:var(--rule); border:1px solid var(--rule); border-radius:2px; overflow:hidden; }
+  .caveat { background:var(--surface); padding:17px 18px; }
+  .caveat h3 { margin:0 0 6px; font-size:14px; font-weight:700; }
+  .caveat p { margin:0; font-size:13.5px; color:var(--ink-2); }
+
+  .agenda { display:flex; flex-direction:column; gap:1px; background:var(--rule);
+            border:1px solid var(--rule); border-radius:2px; overflow:hidden; }
+  .ag { display:grid; grid-template-columns:66px 1fr; gap:16px; background:var(--surface); padding:14px 17px; }
+  .ag .t { font-family:var(--mono); font-size:11.5px; color:var(--crimson); font-weight:700;
+           letter-spacing:.05em; padding-top:2px; }
+  .ag .b strong { display:block; font-size:14.5px; margin-bottom:2px; }
+  .ag .b span { font-size:13.5px; color:var(--ink-2); }
+
+  footer { border-top:2px solid var(--ink); background:var(--surface); margin-top:40px; }
+  footer .wrap { padding-top:22px; padding-bottom:34px; }
+  footer p { margin:0; font-family:var(--mono); font-size:11.5px; color:var(--ink-3);
+             letter-spacing:.04em; line-height:1.7; }
+  footer code { color:var(--ink-2); }
+</style>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">MakeHaven · v6 · characterised</div>
+    <h1>Process Stabilization Registry</h1>
+    <p class="standfirst">
+      Every operational process at MakeHaven on one page — scored for how manual it is,
+      how well documented, how much it costs us when it breaks, and whether it is moving
+      right now. The point is not to stop changing. It is to make the change countable.
+    </p>
+    <div class="meta-line">
+      <span>Seeded 2026-08-14 · v6</span>
+      <span>{{N}} processes · 13 groups</span>
+      <span>conductor/tracks/process_stabilization_20260814</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="placard">
+    <div class="tag">Draft</div>
+    <div>
+      <p><strong>Two rounds of questions took this from a guess to a map.</strong> The
+      uncharacterised count went 98 → 45 → 2. What remains genuinely undefined is two
+      processes, both confirmed rather than assumed: the facilitator six-month renewal, and
+      succession planning.</p>
+      <p><strong>The picture that emerged is better than the first draft implied.</strong> 116
+      of 186 processes run normally. Almost everything that moved out of "unknown" went
+      straight to <em>stable</em> — it existed, it worked, it simply wasn't written anywhere a
+      new person could find it. <strong>The gap at MakeHaven is legibility, not competence.</strong>
+      That is a different and far more tractable problem, and it is what this registry now fixes
+      directly: the answers gathered while scoring have become the process descriptions, so the
+      map and the documentation are the same artefact.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Where we stand</h2>
+    <p class="sec-note">Four numbers, all of which should move over the next year.</p>
+    <div class="tiles">{{TILES}}
+    </div>
+  </section>
+
+  <section>
+    <h2>This is Year 1 Strategy #5</h2>
+    <p class="sec-note">
+      The strategic plan makes this registry's case in its own words — including, in a
+      margin comment, asking for it by name as a precondition for the AI-efficiency work.
+    </p>
+    <div class="quotes">
+      <blockquote>Systematize, stabilize […]: website, systems, operations to lay the groundwork
+        for growth, innovation, responsiveness [move past start-up style]
+        <cite>Lever strategy #1</cite></blockquote>
+      <blockquote>Establish and conduct a regular, consistent process for reviewing, improving,
+        and stabilizing operational systems and procedures.
+        <cite>Facilities &amp; Operations · Year 1 Strategy #5 · 200 hours budgeted</cite></blockquote>
+      <blockquote>It might be worth doing an audit of the current systems first to make sure
+        they're actually efficient before bringing in AI. That way, we're improving the process
+        itself, not just automating around any existing issues.
+        <cite>Margin comment on Infrastructure O#1 S#4</cite></blockquote>
+    </div>
+    <div class="placard q" style="margin-top:24px">
+      <div class="tag">The<br>arithmetic</div>
+      <div>
+        <p>The plan's own reality check: <strong>160 staff hours a week, 90% of it keeping the
+        lights on, leaving 16 hours a week — 800 hours a year — as the entire strategic budget.</strong>
+        The Year 1 strategy list carries hour estimates. They total roughly <strong>3,300 hours</strong>,
+        and about ten items are unpriced, so that is an undercount.</p>
+        <p>Year 1 is oversubscribed by at least four times. Something gets cut whether or not
+        anyone decides to cut it. A ranking of impact against manual effort, over a real
+        inventory, is how that becomes a decision instead of an accident.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Change board</h2>
+    <p class="sec-note">
+      The board's question — <em>is change under control?</em> — is this chart, tracked over time.
+      One caution: <strong>track the count in flux ({{CHANGELOAD}}), not the percentage.</strong>
+      The inventory nearly doubled between v1 and v2, so the ratio moved for reasons that had
+      nothing to do with how much was actually changing.
+    </p>
+    <div class="legend">{{LEGEND}}</div>
+    <div class="board">
+{{BOARD}}
+    </div>
+    <p class="sec-note" style="margin-top:22px">
+      <strong>The grey has almost gone.</strong> Two rounds of answers replaced it, and the bars now
+      show something more useful than ignorance: 27 processes that need attention, 27 in flux, and 14
+      marked <span class="pill planned" style="padding:1px 5px">planned</span> — intentions we have not
+      started, which the earlier drafts were unfairly counting as failures. Separating those two was the
+      single biggest improvement to how fair this page is.
+    </p>
+    <div class="placard" style="margin-top:24px;background:var(--s-degraded-bg);border-color:var(--s-degraded)">
+      <div class="tag" style="color:var(--s-degraded)">Top<br>finding</div>
+      <div>
+        <p><strong>Access control is one problem wearing two hats.</strong> Door entry and tool
+        interlocks are now separate rows, and tool access is the more broken of the two — repeated
+        bug-and-redeploy cycles against an endpoint that is rated I5. But they share a root cause
+        the architecture plan already names: <em>every badge tap depends on the website being
+        reachable.</em> In its own words — "when the website is down or the internet is out,
+        nothing opens. We have repeatedly hit this failure mode."</p>
+        <p>The local-primary rearchitecture that fixes both is drafted and pre-implementation.
+        That combination — highest impact, actively failing, fix already designed but unbuilt —
+        makes it the most valuable single item in the inventory, and it is exactly the kind of
+        thing a registry exists to keep visible between the day it is diagnosed and the day it
+        is fixed.</p>
+      </div>
+    </div>
+
+    <div class="placard" style="margin-top:16px">
+      <div class="tag">Worked<br>example</div>
+      <div>
+        <p>The instructor rows changed twice while this page was being written. A menu
+        consolidation shipped on 12 August and was <strong>reverted on 13 August after staff
+        objected</strong>. That is exactly the sequence the board is worried about — a process
+        changed, the people who run it found out afterward, and it had to be undone.</p>
+        <p>A registry does not prevent that. What it does is give the change a <em>name, an
+        owner, and a watch window</em>, so the objection arrives before the deploy instead of after.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>In flux right now</h2>
+    <p class="sec-note">
+      The standing answer to "what are we working on, and what has just landed?" —
+      <strong>{{NCHANGING}} actively changing and {{NWATCH}} recently changed and being watched.</strong>
+      This is the list to put in front of a board or staff meeting. A process leaves
+      <span class="pill watch" style="padding:1px 5px">watch</span> when its watch window closes with
+      nothing having gone wrong; it does not leave by being forgotten.
+    </p>
+    <div class="flux">
+{{INFLUX}}
+    </div>
+  </section>
+
+  <section>
+    <h2>Where to automate next</h2>
+    <p class="sec-note">
+      Ranked by <strong>impact × how manual it still is</strong>, scored out of 20. A prioritization
+      aid, not a verdict — effort in staff hours is the column we do not yet have, and it is the
+      one that would change this order most.
+    </p>
+    <div class="rank">
+{{RANK}}
+    </div>
+    <div class="unranked">
+      <h3>Four processes that cannot be ranked at all</h3>
+      <p>These carry the highest impact rating on the page — safety, legal, or existential — and
+      <strong>no one has scored how manual they are, because no one has described them.</strong>
+      An unrankable I5 is worse news than anything in the ranked list above.</p>
+      <ul>{{UNRANK}}</ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>How the scoring works</h2>
+    <p class="sec-note">
+      Three axes, defined tightly enough that two people should land on the same number.
+      If they don't, the fix is the wording of the scale — not the score.
+    </p>
+    <div class="scales">
+      <div class="scale"><h3>Automation · A1–A5</h3><dl>
+        <dt>A1 Tribal</dt><dd>Lives in someone's head. Nothing written.</dd>
+        <dt>A2 Documented</dt><dd>An SOP exists; a human does every step.</dd>
+        <dt>A3 Assisted</dt><dd>Tooling helps, but a human drives each instance.</dd>
+        <dt>A4 Automated</dt><dd>Runs itself; humans handle exceptions only.</dd>
+        <dt>A5 Monitored</dt><dd>Runs itself <em>and tells us when it fails.</em></dd>
+      </dl></div>
+      <div class="scale"><h3>Documentation · D0–D3</h3><dl>
+        <dt>D0</dt><dd>Nothing written.</dd>
+        <dt>D1</dt><dd>Informal — scattered notes, Slack threads, code comments.</dd>
+        <dt>D2</dt><dd>A current SOP exists.</dd>
+        <dt>D3</dt><dd>Proven — someone other than the owner has run it from the doc.</dd>
+      </dl></div>
+      <div class="scale"><h3>Impact · I1–I5</h3><dl>
+        <dt>I1</dt><dd>Internal annoyance.</dd>
+        <dt>I2</dt><dd>Staff time, or minor member friction.</dd>
+        <dt>I3</dt><dd>Member experience or revenue, at scale.</dd>
+        <dt>I4</dt><dd>Significant revenue, trust, or data integrity.</dd>
+        <dt>I5</dt><dd>Safety, legal, or existential.</dd>
+      </dl></div>
+    </div>
+    <p class="sec-note" style="margin-top:20px">
+      The gap that matters most is <strong>A4 → A5</strong>. The door-sync integration was down for
+      a month before anyone noticed; a calendar webhook dropped three months of activity records
+      silently. Both were A4 processes everyone believed were A5. "Runs itself" and "tells us when
+      it stops" are different products.
+    </p>
+  </section>
+
+  <section>
+    <h2>Checked against an external standard</h2>
+    <p class="sec-note">
+      The CT Makerspace Network's <strong>Standards of Excellence</strong> self-assessment defines
+      68 standards across six domains, scored 0–3 on <em>evidence</em>. Two useful things came of
+      testing the inventory against it.
+    </p>
+    <p class="sec-note">
+      <strong>First, its scale is a better-specified version of ours</strong>, so the two should be
+      the same number rather than two competing assessments. A registry that is honestly maintained
+      produces the self-assessment as a by-product — and because its history lives in git, it also
+      produces the three years of dated evidence the "Accredited-ready" level requires.
+    </p>
+    <div class="tblwrap">
+      <table>
+        <caption>Documentation scale, aligned<b>score once, use twice</b></caption>
+        <thead><tr><th style="width:34%">Standards of Excellence</th><th style="width:20%">Registry</th><th>Evidence test</th></tr></thead>
+        <tbody>
+          <tr><td class="p">0 · Absent</td><td class="s">D0</td><td class="n">No reliable practice or evidence</td></tr>
+          <tr><td class="p">1 · Foundational</td><td class="s">D1</td><td class="n">Basic practice exists; informal or inconsistent</td></tr>
+          <tr><td class="p">2 · Operational</td><td class="s">D2</td><td class="n">Written, assigned, consistently implemented, current evidence</td></tr>
+          <tr><td class="p">3 · Sustained</td><td class="s">D3</td><td class="n">Effectiveness reviewed; improvements documented; history supports continuity</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="sec-note" style="margin-top:20px">
+      <strong>Second, it found eight processes nothing else did</strong> — mostly Tier 1 critical
+      safety items that are invisible from code, absent from the strategic plan, and easy to assume
+      someone handles: a chemical inventory and SDS access, lockout/tagout for unsafe equipment,
+      routine shop inspection, hazardous waste disposal, a records-retention and filings calendar,
+      nondiscrimination and accommodation requests, member IP rights, and an admin-access register.
+      All eight enter the inventory as <span class="pill undefined" style="padding:1px 5px">undefined</span>,
+      which is a claim to check rather than a conclusion.
+    </p>
+    <div class="placard">
+      <div class="tag">Fix<br>first</div>
+      <div>
+        <p><strong>The Profile sheet is mostly unfilled, so conditional modules default to "No"</strong>
+        and switch off extensions that plainly apply. Confirmed with JR: tool lending <em>yes</em>;
+        workspace and storage rentals <em>yes, active</em>; incubation already <em>yes</em>; repair
+        <em>partly</em> — Precious Plastic equipment is in place and a larger grant for it was
+        cancelled; youth <em>via partnerships</em>, where the school supervises and MakeHaven is not
+        the custodian.</p>
+        <p>The one that bites: <strong>there is no records-retention policy yet</strong>, which is
+        both a Standards requirement in its own right and the blocker on the three-years-of-evidence
+        test for the top recognition level. Applicable standards read 52; corrected, closer to 75.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The resource layer</h2>
+    <p class="sec-note">
+      The bus-factor question — <em>if the person who does this left tomorrow, could someone
+      else pick it up?</em> — is answered by attaching documents to processes. There is already
+      a document doing this job to absorb rather than replace:
+      <a href="https://makehaven.org/operations" target="_blank" rel="noopener">makehaven.org/operations</a>,
+      which opens "a compilation of key organizational documents… a reference for future staff
+      of the organization" and holds about seventy real policy, procedure and job-description
+      links. <strong>Forty rows below now carry those links under a <span class="pill unknown"
+      style="padding:1px 5px">Docs</span> line.</strong>
+    </p>
+    <div class="tblwrap">
+      <table>
+        <caption>Why attaching the documents to processes beats listing them<b>the operations doc is the ancestor of this registry, and its limits are structural</b></caption>
+        <thead><tr><th style="width:44%">The operations doc</th><th>The registry</th></tr></thead>
+        <tbody>
+          <tr><td class="p">A flat list of documents</td><td class="n">Documents attached to the process that uses them</td></tr>
+          <tr><td class="p">No dates — cannot tell current from abandoned</td><td class="n">A <code>reviewed</code> date, plus staleness derived from the file itself</td></tr>
+          <tr><td class="p">No owner per document</td><td class="n">An owner and a backup per process</td></tr>
+          <tr><td class="p">At least one broken link</td><td class="n">Link-checkable in the build</td></tr>
+          <tr><td class="p">Back half is an unrelated field-trip photo log</td><td class="n">Scoped to operations</td></tr>
+          <tr><td class="p">Nothing says whether the document is <em>followed</em></td><td class="n">The A, D and I scores say exactly that</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="sec-note" style="margin-top:20px">
+      Doing this surfaced two processes no other source did, both rated I5:
+      <strong>member conduct &amp; discipline</strong> — warning and termination procedures exist
+      as documents, but whether they are followed or logged is unknown — and
+      <strong>harassment &amp; conduct complaints</strong>, a public policy with an invisible intake.
+      It also sharpens what D0–D3 means: "a current SOP exists" is a claim you can only check
+      against a link.
+    </p>
+  </section>
+
+  <section>
+    <h2>Who keeps it current</h2>
+    <p class="sec-note">
+      This is the third attempt at something like this. The previous two were fully specified
+      and never operated — they each needed a new human discipline that nobody sustained.
+      So the maintenance model is the design, not an afterthought: <strong>a scheduled AI pass
+      proposes updates with evidence, and a human merges them.</strong> It works here because most
+      improvements at MakeHaven are code, or have a data component that can be checked.
+    </p>
+    <div class="caveats">
+      <div class="caveat"><h3>Tier 1 · applied automatically</h3>
+        <p>Last-changed dates from module git history, <code>watch</code> set on recent change,
+        <code>changing</code> set from active tracks, documentation staleness from file dates.
+        No judgement required; wrong answers are obvious.</p></div>
+      <div class="caveat"><h3>Tier 2 · proposed with evidence</h3>
+        <p>"Seven storage assignments still have no subscription — query returns 7 rows."
+        The pass opens a diff citing its evidence and does not merge itself.</p></div>
+      <div class="caveat"><h3>Tier 3 · flagged, never guessed</h3>
+        <p>Who owns it, whether it is genuinely tribal, whether an SOP is <em>current</em> rather
+        than merely present. Roughly a third of the inventory lives here — the processes with no
+        code behind them at all.</p></div>
+      <div class="caveat"><h3>The guard rails</h3>
+        <p>The pass may not create or delete processes, only update fields. Scores move one step
+        per pass. A confidently wrong maintainer is worse than a stale registry, because it
+        launders a guess into a dated commit.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The inventory</h2>
+    <p class="sec-note">
+      All {{N}} rows, grouped operationally and mapped to the strategic plan's six goals.
+      <strong>?</strong> means genuinely unknown — please do not guess it in review, ask the person
+      who does it. Owners are omitted throughout because we do not have any; assigning them is the
+      main output of the session.
+    </p>
+    <div class="group-stack">
+{{TABLES}}
+    </div>
+  </section>
+
+  <section>
+    <h2>Where this draft is weakest</h2>
+    <div class="caveats">
+      <div class="caveat"><h3>Facilities and Governance are inferred</h3>
+        <p>v2 knows what the strategic plan wants those processes to be. It does not know what
+        actually happens. A plan saying "conduct annual drills" is not evidence that drills happen.</p></div>
+      <div class="caveat"><h3>Aspiration is mixed with operation</h3>
+        <p>"Planned giving programme" and "Made at MakeHaven marketplace" are intentions with no
+        current operation. <code>undefined</code> currently conflates <em>running badly</em> with
+        <em>not started</em>. Splitting those is the first job of the session.</p></div>
+      <div class="caveat"><h3>Staff hours are missing entirely</h3>
+        <p>The field that would most improve the automation ranking, and the one no codebase can
+        supply. The plan's Year 1 estimates are a forecast, not a measurement.</p></div>
+      <div class="caveat"><h3>Granularity is visibly uneven</h3>
+        <p>Lending gets sixteen rows; "space opening and closing" gets one. That reflects where
+        documentation exists, not where the work is.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Proposed working session</h2>
+    <p class="sec-note">Two and a half hours. The goal is a corrected map with owners on it,
+    not a completed scoring exercise.</p>
+    <div class="agenda">
+      <div class="ag"><div class="t">15 min</div><div class="b"><strong>Argue with the groups</strong><span>Thirteen groups, {{N}} rows. Confirm the mapping to the plan's six goals — that is what makes the board view work.</span></div></div>
+      <div class="ag"><div class="t">20 min</div><div class="b"><strong>Separate aspiration from operation</strong><span>Walk the undefined rows and split them: should be running and isn't, versus not started and that's fine.</span></div></div>
+      <div class="ag"><div class="t">45 min</div><div class="b"><strong>Fill Facilities and Governance from life</strong><span>What actually happens when a tool breaks, when the building floods, when a board seat opens. Only staff can supply this.</span></div></div>
+      <div class="ag"><div class="t">30 min</div><div class="b"><strong>Calibrate on ten rows</strong><span>Score them together. Where two people disagree, fix the wording of the scale — not the score.</span></div></div>
+      <div class="ag"><div class="t">30 min</div><div class="b"><strong>Assign owners</strong><span>Every row gets a name and a backup. Rows where nobody can name an owner are the finding.</span></div></div>
+      <div class="ag"><div class="t">After</div><div class="b"><strong>Owners score their own rows</strong><span>Do not attempt {{N}} in the room. The AI pass keeps the derived fields current afterward.</span></div></div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>
+      Seed draft v2 · 2026-08-14 · not yet staff-reviewed<br>
+      Generated from <code>seed-inventory.md</code> — {{N}} processes, {{STABLE}} stable, {{DEGRADED}} degraded, {{CANTSAY}} uncharacterised<br>
+      Plan, schema and phases: <code>conductor/tracks/process_stabilization_20260814/plan.md</code>
+    </p>
+  </div>
+</footer>
