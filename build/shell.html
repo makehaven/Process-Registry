@@ -557,15 +557,22 @@
       <blockquote>It might be worth doing an audit of the current systems first to make sure
         they're actually efficient before bringing in AI. That way, we're improving the process
         itself, not just automating around any existing issues.
-        <cite>Margin comment on Infrastructure O#1 S#4</cite></blockquote>
+        <cite>Margin comment on the AI-efficiency strategy</cite></blockquote>
     </div>
     <div class="placard q" style="margin-top:24px">
       <div class="tag">Strategy<br>link</div>
       <div>
-        <p><strong>{{WITHSTRAT}} processes now carry the strategy that acts on them</strong> — the ID,
-        its priority, and its work type from the five-year sequence sheet. <strong>{{NP1}} carry a
-        ★ elevated-priority strategy.</strong> The registry does not replace that sheet: it is edited by
-        committees, it holds owners and year-by-year sequencing, and it should stay where it is.</p>
+        <p><strong>{{WITHSTRAT}} processes carry the strategy that acts on them</strong> — named in
+        plain language: the area of the plan it belongs to, and what that work is meant to do
+        (planning, building, scaling, refining or maintaining). <strong>{{NP1}} are marked
+        <em>Priority</em>.</strong> The registry does not replace the plan: the plan is edited by
+        committees, holds owners and year-by-year sequencing, and should stay where it is.</p>
+
+        <p><strong>These used to read as coded identifiers</strong> — <code>OUT O#3 S#3 · GROW</code>
+        and the like. The codes are how the sequence sheet indexes its strategies, not something
+        anyone should have to decode to use this page, so each one is now resolved to the strategy
+        it actually names. The lookup lives in <code>data/strategies.csv</code>; if the plan renames
+        a strategy, correct it there and every row follows.</p>
         <p>What the link buys is two questions neither system answers alone: <em>which processes does
         this strategy actually touch?</em> and — the more useful one — <em>which of our degraded
         processes has no strategy pointed at it at all?</em> The sequence sheet is entirely

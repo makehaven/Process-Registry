@@ -1,0 +1,90 @@
+Strategy ID,Strategy Title,Next Work Type,Priority
+GOV O#1 S#1,Strategic Board Recruitment,MAINTAIN,P2
+GOV O#1 S#2,Inclusive Nomination and Onboarding,MAINTAIN,P2
+GOV O#1 S#3,Board Governance Development,DEVELOP,P2
+GOV O#2 S#1,Volunteer Pathways and Member Committees,GROW,P2
+GOV O#2 S#2,Transparent Communication and Shared Leadership,DEVELOP,P2
+GOV O#2 S#3,Board Interaction with Members,GROW,P2
+GOV O#3 S#1,Governance Model and Policy Review,REFINE,P2
+GOV O#3 S#2,Leadership and Succession Planning,PLAN,P2
+GOV O#3 S#3,Knowledge Transfer and Governance Archive,DEVELOP,P2
+FIN O#1 S#1,Reserve Development and Investment Strategy,DEVELOP,P1
+FIN O#1 S#2,Building Capital and Endowment Preparation,DEVELOP,P2
+FIN O#2 S#1,Sustainable and Equitable Membership Revenue,GROW,P2
+FIN O#2 S#2,Program and Product Line Monitoring,REFINE,P2
+FIN O#2 S#3,Partnership and Organizational Revenue,GROW,P2
+FIN O#3 S#1,Modern and Efficient Financial Infrastructure,REFINE,P2
+FIN O#3 S#2,Financial Dashboards and Transparency Tools,DEVELOP,P2
+FIN O#3 S#3,Policies Review and Audit Cycle,DEVELOP,P2
+INF O#1 S#1,Comprehensive Safety Program,REFINE,P2
+INF O#1 S#2,Tool Maintenance and Replacement Planning,DEVELOP,P2
+INF O#1 S#3,Sustainable Operations Practices,PLAN,P2
+INF O#1 S#4,Staff Retention Efficiency and Operational Continuity,REFINE,P2
+INF O#2 S#1,Space Design and Member Experience,PLAN,P1
+INF O#2 S#2,Digital Support and Self-Service Systems,REFINE,P2
+INF O#2 S#3,Accessibility and Inclusive Design,GROW,P2
+INF O#2 S#4,Adaptive Tools Training and Representation,DEVELOP,P2
+INF O#3 S#1,Secure and Collaborative Digital Infrastructure,DEVELOP,P2
+INF O#3 S#2,AI-Driven Automation and Member Support,DEVELOP,P2
+INF O#3 S#3,Centralized Feedback and Engagement System,REFINE,P2
+INF O#3 S#4,Makerspace Network Integration and Collaboration,GROW,P2
+INF O#4 S#1,Downtown Space Optimization and Expansion,PLAN,P2
+INF O#4 S#2,Second-Site Feasibility and Ownership Planning,PLAN,P2
+INF O#4 S#3,Regional and Network Leadership Framework,PLAN,P2
+OUT O#1 S#1,Conversion-Focused Marketing and Follow-Ups,PLAN,P2
+OUT O#1 S#2,Paid Digital Advertising and Retargeting,PLAN,P2
+OUT O#1 S#3,Website and Onboarding Optimization,REFINE,P2
+OUT O#2 S#1,Member Referral and Ambassador Programs,GROW,P2
+OUT O#2 S#2,Neighborhood Apartment and Regional Outreach,PLAN,P1
+OUT O#2 S#3,Community Tabling and Partner Events,GROW,P2
+OUT O#2 S#4,Earned Media and Public Relations,PLAN,P2
+OUT O#3 S#1,Sliding Scale Scholarships and Financial Flexibility,REFINE,P2
+OUT O#3 S#2,Partner Outreach and Sponsored Access Programs,PLAN,P2
+OUT O#3 S#3,Diverse Instructors and Inclusive Marketing,GROW,P2
+OUT O#3 S#4,Targeted Welcome Nights and Inclusive Maker Support,DEVELOP,P2
+RET O#1 S#1,Data-Driven Retention Tracking,DEVELOP,P2
+RET O#1 S#2,Rejoin and Recapture Pathways,PLAN,P1
+RET O#2 S#1,Structured Onboarding and Early Engagement,REFINE,P1
+RET O#2 S#2,Early Engagement Monitoring,DEVELOP,P1
+RET O#2 S#3,New Member Gatherings and Peer Introductions,DEVELOP,P2
+RET O#3 S#1,Interest-Based Groups,GROW,P2
+RET O#3 S#2,Community Events and Member Recognition,GROW,P2
+RET O#3 S#3,GEMs and Introductory Program Expansion,GROW,P2
+RET O#3 S#4,Inclusive Representation and Accessibility Review,REFINE,P2
+RET O#4 S#1,Transparency Feedback and Dashboards,DEVELOP,P2
+RET O#4 S#2,Culture of Listening and Recognition,GROW,P2
+EDU O#1 S#1,Data-Driven and Automated Learning Systems,DEVELOP,P2
+EDU O#1 S#2,Collaborative and Co-Designed Programs,PLAN,P2
+EDU O#1 S#3,Personalized Engagement Tools,DEVELOP,P2
+EDU O#2 S#1,Quality Assurance and Continuous Improvement,PLAN,P2
+EDU O#2 S#2,Instructor Development and Diversity Pipeline,DEVELOP,P2
+EDU O#3 S#1,Learning Pathways and Progressive Projects,DEVELOP,P2
+EDU O#3 S#2,Storytelling and Showcasing Achievements,GROW,P2
+EDU O#3 S#3,Digital Badging and Workforce Pathways,GROW,P2
+EDU O#4 S#1,Sliding-Scale and Sponsored Access,REFINE,P2
+EDU O#4 S#2,Targeted Outreach and Co-Creation,DEVELOP,P2
+EDU O#4 S#3,Youth and School Collaboration,GROW,P2
+ENT O#1 S#1,Entrepreneurship Coordination and Network Building,GROW,P2
+ENT O#1 S#2,Metrics and Ecosystem Tracking,DEVELOP,P2
+ENT O#1 S#3,Sustainable Funding and Partnerships,DEVELOP,P2
+ENT O#2 S#1,Integrated Idea-to-Prototype Pathway,REFINE,P2
+ENT O#2 S#2,Incubator Workspace Program,GROW,P2
+ENT O#2 S#3,Cohort-Based Entrepreneurship Programs,PLAN,P2
+ENT O#2 S#4,Entrepreneurship Events and Community Education,GROW,P2
+ENT O#3 S#1,Craft and Micro-Enterprise Support,PLAN,P2
+ENT O#3 S#2,Maker Marketplace and Retail Presence,PLAN,P2
+ENT O#3 S#3,Manufacturing Transition Partnerships,DEVELOP,P2
+DEV O#1 S#1,Sponsorship Plan Materials and Recognition,DEVELOP,P1
+DEV O#1 S#2,Sponsorship Program Leadership,DEVELOP,P2
+DEV O#2 S#1,Two Annual Appeals,MAINTAIN,P2
+DEV O#2 S#2,Recurring Giving Program,REFINE,P2
+DEV O#3 S#1,LAI Qualification and Pipeline,GROW,P1
+DEV O#3 S#2,Stewardship Cadence,PLAN,P2
+DEV O#4 S#1,Integrated CRM and Calendar Tracking,GROW,P1
+DEV O#4 S#2,Collaborative Proposals,PLAN,P2
+DEV O#4 S#3,Rotating Case Statements,PLAN,P2
+DEV O#5 S#1,CRM and Pipeline Management,DEVELOP,P2
+DEV O#5 S#2,Board Staff and Committee Enablement,PLAN,P1
+DEV O#5 S#3,Multi-Year and Matching Gift Tools,PLAN,P2
+DEV O#5 S#4,Planned Giving Quiet Build,PLAN,P2
+DEV O#5 S#5,Program-Linked Sponsorships and Mission Partnerships,PLAN,P2

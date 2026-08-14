@@ -66,7 +66,8 @@ change_load = st_tot["watch"] + st_tot["changing"]
 cant_say = st_tot["undefined"] + st_tot["unknown"]
 planned = st_tot["planned"]
 with_strat = sum(1 for r in rows if chr(0x27D0) in r["note"])
-p1_rows = [r for r in rows if "\u2605" in r["note"]]
+p1_rows = [r for r in rows if "⟐" in r["note"]
+            and "Priority ·" in r["note"].split("⟐", 1)[1]]
 
 def md(s):
     s = html.escape(s)
