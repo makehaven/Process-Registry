@@ -108,6 +108,27 @@
   .rank-row .score small { display:block; font-size:10px; font-weight:500; color:var(--ink-3);
                            letter-spacing:.06em; text-align:right; }
 
+  .morebtn { appearance:none; margin-top:14px; width:100%; cursor:pointer; font:inherit;
+             font-family:var(--mono); font-size:11px; letter-spacing:.09em; text-transform:uppercase;
+             font-weight:600; color:var(--ink-2); background:var(--surface);
+             border:1px solid var(--rule); border-radius:2px; padding:11px 14px; }
+  .morebtn:hover { color:var(--ink); border-color:var(--rule-2); }
+  .morebtn:focus-visible { outline:2px solid var(--accent,var(--crimson)); outline-offset:2px; }
+  .morebtn b { font-weight:600; }
+  .morebtn span { color:var(--ink-3); font-weight:500; margin-left:6px; }
+
+  .raised { display:flex; flex-direction:column; gap:1px; background:var(--rule);
+            border:1px solid var(--rule); border-radius:2px; overflow:hidden; }
+  .raise-row { display:grid; grid-template-columns:260px 1fr 110px; gap:16px; align-items:start;
+               background:var(--surface); padding:13px 16px; }
+  .raise-row .what b { display:block; font-size:14.5px; font-weight:650; }
+  .raise-row .what .grp { display:block; margin-top:4px; font-family:var(--mono); font-size:10px;
+                          letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); }
+  .raise-row .n { font-size:13.5px; color:var(--ink-2); }
+  .raise-row .st { text-align:right; }
+  @media (max-width:760px) { .raise-row { grid-template-columns:1fr; } .raise-row .st { text-align:left; } }
+  .res.raised b { color:var(--s-watch); }
+
   .flux { display:flex; flex-direction:column; gap:1px; background:var(--rule);
           border:1px solid var(--rule); border-radius:2px; overflow:hidden; }
   .flux-row { display:grid; grid-template-columns:96px 240px 1fr; gap:16px; align-items:start;
@@ -308,6 +329,7 @@
   <div class="wrap" role="tablist" aria-label="Registry sections">
     <button role="tab" id="t-overview" aria-controls="p-overview" aria-selected="true">Overview</button>
     <button role="tab" id="t-flux" aria-controls="p-flux" aria-selected="false" tabindex="-1">What&rsquo;s moving<span class="c">{{CHANGELOAD}}</span></button>
+    <button role="tab" id="t-next" aria-controls="p-next" aria-selected="false" tabindex="-1">Next<span class="c">{{NRANK}}</span></button>
     <button role="tab" id="t-inventory" aria-controls="p-inventory" aria-selected="false" tabindex="-1">Inventory<span class="c">{{N}}</span></button>
     <button role="tab" id="t-method" aria-controls="p-method" aria-selected="false" tabindex="-1">Method &amp; caveats</button>
   </div>
@@ -358,7 +380,7 @@
 
 <div class="panel" id="p-flux" role="tabpanel" aria-labelledby="t-flux" hidden>
 
-  <p class="lead">The <strong>{{CHANGELOAD}} processes that are not sitting still</strong>, and where the next automation effort is best spent.</p>
+  <p class="lead">The <strong>{{CHANGELOAD}} processes that are not sitting still</strong> — what is mid-change, and what just landed and is still being watched.</p>
 
   <dl class="statedef">
     <div><dt><span class="pill changing">changing</span></dt>
@@ -382,6 +404,12 @@
     </div>
   </section>
 
+</div>
+
+<div class="panel" id="p-next" role="tabpanel" aria-labelledby="t-next" hidden>
+
+  <p class="lead">Where effort pays best next, ranked by <strong>impact × how manual it still is</strong>. A prioritisation aid, not a verdict — staff hours is the column we do not have, and it is the one that would change this order most.</p>
+
   <section>
     <h2>Where to automate next</h2>
     <p class="sec-note">
@@ -389,11 +417,18 @@
       aid, not a verdict — effort in staff hours is the column we do not yet have, and it is the
       one that would change this order most.
     </p>
-    <div class="rank">
+    <div class="rank" id="rank-list">
 {{RANK}}
     </div>
+    <button type="button" id="rank-more" class="morebtn"
+            aria-expanded="false" aria-controls="rank-list"
+            data-total="{{NRANK}}" data-shown="{{NSHOWN}}" data-more="{{NMORE}}">
+      <b>Show all {{NRANK}}</b><span>+{{NMORE}} more</span>
+    </button>
 {{UNRANK}}
   </section>
+
+{{RAISED}}
 </div>
 
 <div class="panel" id="p-inventory" role="tabpanel" aria-labelledby="t-inventory" hidden>
@@ -710,6 +745,22 @@
   // Deep links: #flux, #inventory, #method open the matching tab on load.
   var want = document.getElementById('t' + location.hash.replace('#', '-'));
   if (want) select(want);
+
+  // Ranking: reveal the tail on demand rather than truncating it silently.
+  var more = document.getElementById('rank-more');
+  if (more) {
+    more.addEventListener('click', function () {
+      var open = more.getAttribute('aria-expanded') === 'true';
+      Array.prototype.forEach.call(document.querySelectorAll('.rank-extra'),
+        function (r) { r.hidden = open; });
+      more.setAttribute('aria-expanded', open ? 'false' : 'true');
+      more.querySelector('b').textContent =
+        open ? 'Show all ' + more.dataset.total : 'Show top ' + more.dataset.shown;
+      more.querySelector('span').textContent =
+        open ? '+' + more.dataset.more + ' more' : 'collapse';
+      if (open) more.scrollIntoView({block: 'nearest'});
+    });
+  }
 
   // Inventory filter — hides non-matching rows, then any table left empty.
   var box = document.getElementById('inv-filter'), hits = document.getElementById('inv-hits');

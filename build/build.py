@@ -105,7 +105,8 @@ def score_cell(axis, v):
 # and rows that omit a field cost nothing. Order in the source is by convention
 # description ⚑owner ◷reviewed ⚙code ⟐strategy ‖docs, but parsing does not
 # depend on that order.
-SIGILS = {"⚑": "owner", "◷": "reviewed", "⚙": "code", "⟐": "strategy", "‖": "docs"}
+SIGILS = {"⚑": "owner", "◷": "reviewed", "⚙": "code", "⚠": "raised",
+          "⟐": "strategy", "‖": "docs"}
 
 def parse_note(raw):
     """Split a note cell into its prose and whichever optional fields it carries."""
@@ -136,6 +137,8 @@ def note_cell(raw):
     """Prose first, then each optional field as its own labelled line."""
     p = parse_note(raw)
     out = md(p["note"])
+    if p.get("raised"):
+        out += f'<span class="res raised"><b>Raised</b>{md(p["raised"])}</span>'
     if p.get("code"):
         out += f'<span class="res code"><b>Code</b>{code_links(p["code"])}</span>'
     if p.get("strategy"):
@@ -158,9 +161,40 @@ for r in rows:
         if score > 0:
             ranked.append((score, int(r["i"]), r))
 ranked.sort(key=lambda t: (-t[0], -t[1], t[2]["name"]))
-top = ranked[:12]
+# A dedicated tab has room for more than a dozen. Show 30 and keep the rest
+# one click away rather than truncating silently.
+SHOWN = 30
+top = ranked
 
 unrankable = [r for r in rows if r["i"] == "5" and not r["a"].isdigit()]
+
+# ---- raised by people -------------------------------------------------------
+# The ranking is a formula and cannot know what staff have noticed. Rows
+# carrying ⚠ were flagged by a person; they belong next to the ranking, not
+# inside it, because they are judgement rather than arithmetic.
+raised = [(r, parse_note(r["note"])) for r in rows]
+raised = [(r, f) for r, f in raised if f.get("raised")]
+raised.sort(key=lambda t: (t[0]["group"], t[0]["name"]))
+if raised:
+    items = "".join(
+        f"""      <div class="raise-row">
+        <div class="what"><b>{md(r['name'])}</b><span class="grp">{html.escape(r['group'])}</span></div>
+        <div class="n">{md(f['raised'])}</div>
+        <div class="st"><span class="pill {r['state']}">{r['state']}</span></div></div>"""
+        for r, f in raised)
+    raised_html = f"""  <section>
+    <h2>Raised by people</h2>
+    <p class="sec-note">
+      The ranking above is arithmetic — impact multiplied by how manual something still is.
+      It cannot know what staff have noticed. These {len(raised)} were flagged by a person, and
+      that is a different and often better signal.
+    </p>
+    <div class="raised">
+{items}
+    </div>
+  </section>"""
+else:
+    raised_html = ""
 
 # ---- in flux right now ------------------------------------------------------
 flux = [r for r in rows if r["state"] in ("changing", "watch")]
@@ -195,7 +229,8 @@ for g, rs in by_group.items():
 
 rank_html = []
 for n, (score, _, r) in enumerate(top, 1):
-    rank_html.append(f"""      <div class="rank-row"><div class="n">{n:02d}</div>
+    extra = "" if n <= SHOWN else " rank-extra"
+    rank_html.append(f"""      <div class="rank-row{extra}"{'' if n <= SHOWN else ' hidden'}><div class="n">{n:02d}</div>
         <div class="what"><b>{md(r['name'])}</b><em>{md(plain_note(r['note']))}</em>
         <span class="grp">{html.escape(r['group'])}</span></div>
         <div class="score">{score}<small>I{r['i']} × A{r['a']}</small></div></div>""")
@@ -254,7 +289,9 @@ for key, val in [("TILES", tiles), ("LEGEND", legend), ("BOARD", "\n".join(board
                  ("NMANUALUNDOC", str(n_manual_undoc)), ("ND3", str(n_d3)),
                  ("NFLOORED", str(n_floored)), ("NOWNER", str(n_owner)),
                  ("NREVIEWED", str(n_reviewed)), ("NCODE", str(n_code)),
-                 ("NNEVER", str(n_never)),
+                 ("NNEVER", str(n_never)), ("NRANK", str(len(top))), ("NSHOWN", str(SHOWN)),
+                 ("NMORE", str(max(0, len(top) - SHOWN))), ("RAISED", raised_html),
+                 ("NRAISED", str(len(raised))),
                  ("RANK", "\n".join(rank_html)), ("TABLES", "\n".join(tables)),
                  ("UNRANK", unrank_html), ("INFLUX", influx), ("N", str(N)),
                  ("NCHANGING", str(st_tot["changing"])), ("NWATCH", str(st_tot["watch"])),
