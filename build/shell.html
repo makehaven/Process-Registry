@@ -132,13 +132,22 @@
   .tblwrap .tnote { margin:0; padding:13px 16px 0; font-size:13px; color:var(--ink-2); font-style:italic; }
   .tblwrap table { display:block; overflow-x:auto; }
   table { border-collapse:collapse; width:100%; }
-  caption { caption-side:top; text-align:left; font-size:15px; font-weight:700; padding:15px 16px 11px;
+  /* The table is display:block so it can scroll horizontally, which orphans the
+     caption: a table-caption box inside a block parent gets its own anonymous
+     shrink-to-fit table and collapses to a narrow column. Make it a plain block
+     so it spans the full width. It stays first in the DOM, so it still sits on top. */
+  caption { display:block; text-align:left; font-size:15px; font-weight:700; padding:15px 16px 11px;
             border-bottom:1px solid var(--rule-2); letter-spacing:-.01em; }
   caption span { font-family:var(--mono); font-size:11px; font-weight:500; color:var(--ink-3);
                  letter-spacing:.06em; margin-left:9px; text-transform:uppercase; }
   caption b { display:block; margin-top:5px; font-family:var(--mono); font-size:10.5px; font-weight:500;
               color:var(--ink-3); letter-spacing:.05em; }
   thead, tbody, tr { display:table; width:100%; table-layout:fixed; }
+  /* Below ~660px the fixed columns crush into each other, so let the rows keep
+     their width and scroll the table instead. The caption sticks to the left
+     edge so the group name stays readable while the columns scroll under it. */
+  .tblwrap thead, .tblwrap tbody, .tblwrap tr { min-width:660px; }
+  .tblwrap caption { position:sticky; left:0; }
   th { text-align:left; font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
        color:var(--ink-3); font-weight:600; padding:9px 12px; border-bottom:1px solid var(--rule);
        background:var(--sunken); white-space:nowrap; }
