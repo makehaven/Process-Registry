@@ -5,20 +5,26 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
-      - name: Build
+
+      - name: Build site
         run: python3 build/build.py
-      # Deploy step intentionally left unwired until the Firebase project exists.
-      # - uses: FirebaseExtended/action-hosting-deploy@v0
-      #   with:
-      #     repoToken: ${{ secrets.GITHUB_TOKEN }}
-      #     firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-      #     projectId: makehaven-process-registry
-      #     channelId: live
-      - uses: actions/upload-artifact@v4
-        with: { name: site, path: public/ }
+
+      - name: Check for unrendered placeholders
+        run: |
+          if grep -qE '\{\{[A-Z]+\}\}' public/index.html; then
+            echo "::error::Unrendered placeholders in output"; exit 1
+          fi
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: makehaven-process-registry
+          channelId: live

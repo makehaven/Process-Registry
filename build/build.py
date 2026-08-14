@@ -51,6 +51,8 @@ N = len(rows)
 change_load = st_tot["watch"] + st_tot["changing"]
 cant_say = st_tot["undefined"] + st_tot["unknown"]
 planned = st_tot["planned"]
+with_strat = sum(1 for r in rows if chr(0x27D0) in r["note"])
+p1_rows = [r for r in rows if "\u2605" in r["note"]]
 
 def md(s):
     s = html.escape(s)
@@ -62,11 +64,15 @@ def md(s):
     return s
 
 def note_cell(raw):
-    """Notes may carry a resource list after a U+2016 separator."""
-    if "‖" in raw:
-        note, res = raw.split("‖", 1)
-        return md(note.strip()) + f'<span class="res"><b>Docs</b>{md(res.strip())}</span>'
-    return md(raw)
+    """note [⟐ strategies] [‖ docs] — each rendered as its own labelled line."""
+    body, _, docs = raw.partition("‖")
+    note, _, strat = body.partition("⟐")
+    out = md(note.strip())
+    if strat.strip():
+        out += f'<span class="res strat"><b>Strategy</b>{md(strat.strip())}</span>'
+    if docs.strip():
+        out += f'<span class="res"><b>Docs</b>{md(docs.strip())}</span>'
+    return out
 
 # ---- automation ranking ----------------------------------------------------
 ranked = []
@@ -86,7 +92,7 @@ flux.sort(key=lambda r: (r["state"] != "changing", r["group"], r["name"]))
 influx = "".join(
     f"""      <div class="flux-row"><div><span class="pill {r['state']}">{r['state']}</span></div>
         <div class="what"><b>{md(r['name'])}</b><span class="grp">{html.escape(r['group'])}</span></div>
-        <div class="n">{md(r['note'].split(chr(0x2016))[0].strip())}</div></div>""" for r in flux)
+        <div class="n">{md(r['note'].split(chr(0x2016))[0].split(chr(0x27D0))[0].strip())}</div></div>""" for r in flux)
 
 # ---- fragments -------------------------------------------------------------
 tiles = f"""
@@ -114,7 +120,7 @@ for g, rs in by_group.items():
 rank_html = []
 for n, (score, _, r) in enumerate(top, 1):
     rank_html.append(f"""      <div class="rank-row"><div class="n">{n:02d}</div>
-        <div class="what"><b>{md(r['name'])}</b><em>{md(r['note'].split(chr(0x2016))[0].strip())}</em>
+        <div class="what"><b>{md(r['name'])}</b><em>{md(r['note'].split(chr(0x2016))[0].split(chr(0x27D0))[0].strip())}</em>
         <span class="grp">{html.escape(r['group'])}</span></div>
         <div class="score">{score}<small>I{r['i']} × A{r['a']}</small></div></div>""")
 
@@ -147,7 +153,7 @@ for key, val in [("TILES", tiles), ("LEGEND", legend), ("BOARD", "\n".join(board
                  ("NCHANGING", str(st_tot["changing"])), ("NWATCH", str(st_tot["watch"])),
                  ("CHANGELOAD", str(change_load)), ("CANTSAY", str(cant_say)),
                  ("DEGRADED", str(st_tot["degraded"])), ("UNDEF", str(st_tot["undefined"])),
-                 ("STABLE", str(st_tot["stable"])), ("PLANNED", str(planned))]:
+                 ("STABLE", str(st_tot["stable"])), ("PLANNED", str(planned)), ("WITHSTRAT", str(with_strat)), ("NP1", str(len(p1_rows)))]:
     page = page.replace("{{" + key + "}}", val)
 OUT.parent.mkdir(parents=True, exist_ok=True)
 OUT.write_text(page)
