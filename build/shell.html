@@ -205,14 +205,6 @@
   .caveat h3 { margin:0 0 6px; font-size:14px; font-weight:700; }
   .caveat p { margin:0; font-size:13.5px; color:var(--ink-2); }
 
-  .agenda { display:flex; flex-direction:column; gap:1px; background:var(--rule);
-            border:1px solid var(--rule); border-radius:2px; overflow:hidden; }
-  .ag { display:grid; grid-template-columns:66px 1fr; gap:16px; background:var(--surface); padding:14px 17px; }
-  .ag .t { font-family:var(--mono); font-size:11.5px; color:var(--crimson); font-weight:700;
-           letter-spacing:.05em; padding-top:2px; }
-  .ag .b strong { display:block; font-size:14.5px; margin-bottom:2px; }
-  .ag .b span { font-size:13.5px; color:var(--ink-2); }
-
   footer { border-top:2px solid var(--ink); background:var(--surface); margin-top:40px; }
   footer .wrap { padding-top:22px; padding-bottom:34px; }
   footer p { margin:0; font-family:var(--mono); font-size:11.5px; color:var(--ink-3);
@@ -433,7 +425,7 @@
       All {{N}} rows, grouped operationally and mapped to the strategic plan's six goals.
       <strong>?</strong> means genuinely unknown — please do not guess it in review, ask the person
       who does it. Owners are omitted throughout because we do not have any; assigning them is the
-      main output of the session.
+      biggest single improvement still available here.
     </p>
     <div class="filter">
       <input id="inv-filter" type="search" autocomplete="off"
@@ -612,7 +604,7 @@
       <div class="caveat"><h3>Aspiration is mixed with operation</h3>
         <p>"Planned giving programme" and "Made at MakeHaven marketplace" are intentions with no
         current operation. <code>undefined</code> currently conflates <em>running badly</em> with
-        <em>not started</em>. Splitting those is the first job of the session.</p></div>
+        <em>not started</em>. Splitting those two apart is the first correction this draft needs.</p></div>
       <div class="caveat"><h3>Staff hours are missing entirely</h3>
         <p>The field that would most improve the automation ranking, and the one no codebase can
         supply. The plan's Year 1 estimates are a forecast, not a measurement.</p></div>
@@ -622,19 +614,6 @@
     </div>
   </section>
 
-  <section>
-    <h2>Proposed working session</h2>
-    <p class="sec-note">Two and a half hours. The goal is a corrected map with owners on it,
-    not a completed scoring exercise.</p>
-    <div class="agenda">
-      <div class="ag"><div class="t">15 min</div><div class="b"><strong>Argue with the groups</strong><span>{{NGROUPS}} groups, {{N}} rows. Confirm the mapping to the plan's six goals — that is what makes the board view work.</span></div></div>
-      <div class="ag"><div class="t">20 min</div><div class="b"><strong>Separate aspiration from operation</strong><span>Walk the undefined rows and split them: should be running and isn't, versus not started and that's fine.</span></div></div>
-      <div class="ag"><div class="t">45 min</div><div class="b"><strong>Fill Facilities and Governance from life</strong><span>What actually happens when a tool breaks, when the building floods, when a board seat opens. Only staff can supply this.</span></div></div>
-      <div class="ag"><div class="t">30 min</div><div class="b"><strong>Calibrate on ten rows</strong><span>Score them together. Where two people disagree, fix the wording of the scale — not the score.</span></div></div>
-      <div class="ag"><div class="t">30 min</div><div class="b"><strong>Assign owners</strong><span>Every row gets a name and a backup. Rows where nobody can name an owner are the finding.</span></div></div>
-      <div class="ag"><div class="t">After</div><div class="b"><strong>Owners score their own rows</strong><span>Do not attempt {{N}} in the room. The AI pass keeps the derived fields current afterward.</span></div></div>
-    </div>
-  </section>
 </div>
 
 
