@@ -4,7 +4,7 @@ A standing map of every operational process at MakeHaven — what it is, who own
 it, how manual it is, how well documented, how much it costs us when it breaks,
 and whether it is changing right now.
 
-**Live:** `process.makehaven.org` *(not yet published — see Deploy)*
+**Live:** `process.makehaven.org` — see [SETUP.md](SETUP.md) to publish
 **Track:** `makehaven-website/conductor/tracks/process_stabilization_20260814/`
 
 ---
@@ -35,9 +35,11 @@ them.
 
 - **A strategy tracker.** The five-year strategy sequence lives in its own
   spreadsheet with owners, priorities and a PLAN → DEVELOP → GROW → REFINE →
-  MAINTAIN lifecycle. Processes carry `strategy_ids` pointing at it; they do not
-  absorb it. The strategy sheet is edited by committees in Google Sheets and
-  should stay that way.
+  MAINTAIN lifecycle. 74 processes carry the strategy ID acting on them, with its
+  priority and work type; they do not absorb the sheet. It is edited by
+  committees in Google Sheets and should stay that way. Its *numbers* — hours,
+  year sequencing — are a live draft and are deliberately not reproduced here;
+  what the registry builds on is the set of strategies and their priorities.
 - **A task or project system.** Conductor tracks own that.
 - **A documentation platform.** Descriptions are a paragraph. Anything longer
   becomes a document in `docs/` or an external link.
@@ -72,13 +74,17 @@ self-contained HTML file.
 
 ## Deploy
 
-Not wired up yet. Intended shape, matching the pattern already used by
-`Voicemail-Tool`, `Phonebank-Tool` and `Sponsorship-Tool`:
+Firebase Hosting at `process.makehaven.org`, matching the pattern already used by
+`Voicemail-Tool`, `Phonebank-Tool` and `Sponsorship-Tool`. Config is committed
+(`firebase.json`, `.firebaserc`, `.github/workflows/deploy.yml`); the project,
+domain and CI secret are not yet created.
 
-- Firebase Hosting, custom domain `process.makehaven.org`
-- GitHub Action on push to `main`: run the build, deploy `public/`
-- **Public, read-only, no auth.** Fields marked staff-only are stripped at build
-  time before anything is published.
+**One-time setup instructions: [SETUP.md](SETUP.md).**
+
+Once wired, editing is: change `data/inventory.md`, commit, push. The Action
+builds and redeploys in about a minute.
+
+Public, read-only, no auth.
 
 ## Conventions
 
