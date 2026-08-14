@@ -45,6 +45,19 @@ for ln in SRC.read_text().split("\n"):
             rows.append(dict(group=group, name=c[0], a=c[1], d=c[2], i=c[3],
                              state=c[4], note=c[5]))
 
+# ---- documentation floor ----------------------------------------------------
+# A process that runs as code (A4+) has a maintained implementation, and that
+# implementation is a current description of what happens — better than most
+# SOPs, because it cannot drift from the behaviour it defines. Such rows are
+# floored at D2. Applied here rather than edited into inventory.md so the raw
+# assessment stays intact and the rule is visible and reversible in one place.
+# The floor stops at D2: D3 needs a second person to have worked from it.
+n_floored = 0
+for r in rows:
+    if r["a"].isdigit() and int(r["a"]) >= 4 and r["d"].isdigit() and int(r["d"]) < 2:
+        r["d"], r["d_floored"] = "2", True
+        n_floored += 1
+
 by_group = collections.OrderedDict((g, [r for r in rows if r["group"] == g]) for g in ORDER)
 st_tot = collections.Counter(r["state"] for r in rows)
 N = len(rows)
@@ -63,11 +76,39 @@ def md(s):
     s = re.sub(r"`(.+?)`", r"<code>\1</code>", s)
     return s
 
+def strip_history(note):
+    """Drop drafting provenance ("Corrected from `unknown`.", "(JR, round 2)")
+    while keeping any substantive clause that was riding along with it. The
+    source file keeps the full text; only the rendered page is cleaned."""
+    def fix(m):
+        rest = re.sub(r"^Corrected from\s*`[^`]*`(\s*to a named weak point)?", "", m.group(1))
+        rest = rest.lstrip(" .,;—-")
+        return f"**{rest[0].upper()}{rest[1:]}**" if rest else ""
+    note = re.sub(r"\*\*(Corrected from[^*]*?)\*\*", fix, note)
+    note = re.sub(r"\s*\*?\(JR,\s*round\s*\d\)\*?", "", note)
+    note = re.sub(r"^[\s.,;—-]+", "", note)
+    note = re.sub(r"\s{2,}", " ", note)
+    note = re.sub(r"\s+([.,])", r"\1", note).strip()
+    return note[0].upper() + note[1:] if note else note
+
+# Severity of each score, so the digit can carry a status colour. The digit is
+# always rendered, so colour is redundant encoding rather than the only signal.
+SEV = {"a": {"1": "crit", "2": "warn", "3": "mid", "4": "good", "5": "good"},
+       "d": {"0": "crit", "1": "warn", "2": "good", "3": "good"},
+       "i": {"5": "crit", "4": "warn", "3": "mid", "2": "low", "1": "low"}}
+
+def score_cell(axis, v):
+    return f'<td class="s sc-{SEV[axis].get(v, "q")}">{html.escape(v)}</td>'
+
+def plain_note(raw):
+    """Just the prose: no strategy tail, no doc links, no drafting history."""
+    return strip_history(raw.split("‖")[0].split("⟐")[0].strip())
+
 def note_cell(raw):
     """note [⟐ strategies] [‖ docs] — each rendered as its own labelled line."""
     body, _, docs = raw.partition("‖")
     note, _, strat = body.partition("⟐")
-    out = md(note.strip())
+    out = md(strip_history(note.strip()))
     if strat.strip():
         out += f'<span class="res strat"><b>Strategy</b>{md(strat.strip())}</span>'
     if docs.strip():
@@ -92,7 +133,7 @@ flux.sort(key=lambda r: (r["state"] != "changing", r["group"], r["name"]))
 influx = "".join(
     f"""      <div class="flux-row"><div><span class="pill {r['state']}">{r['state']}</span></div>
         <div class="what"><b>{md(r['name'])}</b><span class="grp">{html.escape(r['group'])}</span></div>
-        <div class="n">{md(r['note'].split(chr(0x2016))[0].split(chr(0x27D0))[0].strip())}</div></div>""" for r in flux)
+        <div class="n">{md(plain_note(r['note']))}</div></div>""" for r in flux)
 
 # ---- fragments -------------------------------------------------------------
 tiles = f"""
@@ -120,7 +161,7 @@ for g, rs in by_group.items():
 rank_html = []
 for n, (score, _, r) in enumerate(top, 1):
     rank_html.append(f"""      <div class="rank-row"><div class="n">{n:02d}</div>
-        <div class="what"><b>{md(r['name'])}</b><em>{md(r['note'].split(chr(0x2016))[0].split(chr(0x27D0))[0].strip())}</em>
+        <div class="what"><b>{md(r['name'])}</b><em>{md(plain_note(r['note']))}</em>
         <span class="grp">{html.escape(r['group'])}</span></div>
         <div class="score">{score}<small>I{r['i']} × A{r['a']}</small></div></div>""")
 
@@ -130,16 +171,14 @@ for g, rs in by_group.items():
     blurb = f'<p class="tnote">{md(blurbs[g])}</p>' if g in blurbs else ""
     body = "".join(
         f"""<tr><td class="p">{md(r['name'])}</td>"""
-        f"""<td class="s{' q' if not r['a'].isdigit() else (' hi' if r['a']=='1' else '')}">{r['a']}</td>"""
-        f"""<td class="s{' q' if not r['d'].isdigit() else (' hi' if r['d']=='0' else '')}">{r['d']}</td>"""
-        f"""<td class="s{' q' if not r['i'].isdigit() else (' hi' if r['i']=='5' else '')}">{r['i']}</td>"""
+        f"""{score_cell('a', r['a'])}{score_cell('d', r['d'])}{score_cell('i', r['i'])}"""
         f"""<td><span class="pill {r['state']}">{r['state']}</span></td>"""
         f"""<td class="n">{note_cell(r['note'])}</td></tr>""" for r in rs)
     counts = " · ".join(f"{c[s]} {s}" for s in STATES if c[s])
     tables.append(f"""      <div class="tblwrap">
         {blurb}<table>
           <caption>{html.escape(g)} <span>{len(rs)} processes · {GOAL[g]}</span><b>{counts}</b></caption>
-          <thead><tr><th>Process</th><th>A</th><th>D</th><th>I</th><th>State</th><th>Notes</th></tr></thead>
+          <thead><tr><th>Process</th><th>Auto</th><th>Doc</th><th>Impact</th><th>State</th><th>Notes</th></tr></thead>
           <tbody>{body}</tbody>
         </table>
       </div>""")
@@ -162,10 +201,18 @@ else:
     unrank_html = ""
 
 nres = sum(1 for r in rows if "‖" in r["note"])
+n_auto   = sum(1 for r in rows if r["a"].isdigit() and int(r["a"]) >= 4)
+n_manual = sum(1 for r in rows if r["a"].isdigit() and int(r["a"]) <= 2)
+n_manual_undoc = sum(1 for r in rows if r["a"].isdigit() and int(r["a"]) <= 2
+                     and r["d"].isdigit() and int(r["d"]) <= 1)
+n_d3 = sum(1 for r in rows if r["d"] == "3")
 
 page = TPL.read_text()
 for key, val in [("TILES", tiles), ("LEGEND", legend), ("BOARD", "\n".join(board)),
                  ("NRES", str(nres)), ("NGROUPS", str(len(by_group))),
+                 ("NAUTO", str(n_auto)), ("NMANUAL", str(n_manual)),
+                 ("NMANUALUNDOC", str(n_manual_undoc)), ("ND3", str(n_d3)),
+                 ("NFLOORED", str(n_floored)),
                  ("RANK", "\n".join(rank_html)), ("TABLES", "\n".join(tables)),
                  ("UNRANK", unrank_html), ("INFLUX", influx), ("N", str(N)),
                  ("NCHANGING", str(st_tot["changing"])), ("NWATCH", str(st_tot["watch"])),
@@ -178,5 +225,5 @@ if left:
     raise SystemExit(f"unrendered placeholders: {sorted(set(left))}")
 OUT.parent.mkdir(parents=True, exist_ok=True)
 OUT.write_text(page)
-print(f"resource-linked rows: {nres}")
+print(f"resource-linked rows: {nres}; D2 floor applied to {n_floored} code-run rows")
 print(f"wrote {OUT} — {N} processes, {len(tables)} groups, change load {change_load}, can't-say {cant_say}")

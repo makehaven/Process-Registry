@@ -153,13 +153,32 @@
        background:var(--sunken); white-space:nowrap; }
   td { padding:10px 12px; border-bottom:1px solid var(--rule); vertical-align:top; font-size:13.5px; }
   tr:last-child td { border-bottom:none; }
-  th:nth-child(1), td:nth-child(1) { width:22%; }
-  th:nth-child(2), td:nth-child(2), th:nth-child(3), td:nth-child(3), th:nth-child(4), td:nth-child(4) { width:4%; }
-  th:nth-child(5), td:nth-child(5) { width:11%; }
+  th:nth-child(1), td:nth-child(1) { width:21%; }
+  /* Auto / Doc / Impact — wide enough for the words, not just the digits. */
+  th:nth-child(2), td:nth-child(2), th:nth-child(3), td:nth-child(3) { width:5%; }
+  th:nth-child(4), td:nth-child(4) { width:7%; }
+  th:nth-child(5), td:nth-child(5) { width:11%; padding-left:12px; }
+  .tblwrap th:nth-child(4) { padding-right:12px; }
   td.p { font-weight:600; }
   td.s { font-family:var(--mono); font-size:12.5px; text-align:center; font-variant-numeric:tabular-nums; color:var(--ink-2); }
-  td.s.hi { color:var(--s-degraded); font-weight:700; }
-  td.s.q { color:var(--s-unknown); }
+  /* Auto / Doc / Impact carry a status colour keyed to severity, not to the raw
+     number: low automation, no documentation and high impact all read as the same
+     kind of problem. The digit is always shown, so colour is a second encoding
+     rather than the only one. Contrast against both surfaces is >= 3:1. */
+  td.s.sc-crit { color:var(--s-degraded); font-weight:700; background:var(--s-degraded-bg); }
+  td.s.sc-warn { color:var(--s-watch);    font-weight:600; background:var(--s-watch-bg); }
+  td.s.sc-mid  { color:var(--ink-2); }
+  td.s.sc-good { color:var(--s-stable);   background:var(--s-stable-bg); }
+  td.s.sc-low  { color:var(--ink-3); }
+  td.s.sc-q    { color:var(--s-unknown); }
+
+  .statedef { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1px;
+              margin:0 0 30px; background:var(--rule); border:1px solid var(--rule);
+              border-radius:2px; overflow:hidden; }
+  .statedef > div { background:var(--surface); padding:15px 17px; }
+  .statedef dt { margin-bottom:7px; }
+  .statedef dd { margin:0; font-size:13.5px; color:var(--ink-2); line-height:1.5; }
+  .statedef dd strong { color:var(--ink); }
   td.n { color:var(--ink-2); font-size:13px; }
   td.n a, .unranked a, .sec-note a { color:var(--crimson); text-decoration:underline;
                                      text-underline-offset:2px; text-decoration-thickness:1px; }
@@ -284,10 +303,12 @@
 <div class="panel" id="p-overview" role="tabpanel" aria-labelledby="t-overview">
 
   <p class="lead">
-    <strong>Most of MakeHaven works. Very little of it is written down.</strong>
-    {{STABLE}} of the {{N}} processes here run normally — they exist, they work, they
-    simply aren&rsquo;t recorded anywhere a new person could find them. The gap here is
-    legibility, not competence, which is a far more tractable problem.
+    <strong>The automated half of MakeHaven documents itself. The hand-run half doesn&rsquo;t.</strong>
+    {{NAUTO}} processes run as code, where the module <em>is</em> the description and cannot
+    drift from what actually happens. But {{NMANUAL}} still take a human at every step, and
+    {{NMANUALUNDOC}} of those have nothing written beyond scattered notes. Only {{ND3}} process in
+    {{N}} has documentation a second person has actually worked from — which is the real gap,
+    and it applies to the code too.
   </p>
 
   <section>
@@ -316,34 +337,6 @@
       started yet. Planned is not a failure, and keeping it out of the degraded count is what makes
       this chart fair to read.
     </p>
-    <div class="placard" style="margin-top:24px;background:var(--s-degraded-bg);border-color:var(--s-degraded)">
-      <div class="tag" style="color:var(--s-degraded)">Top<br>finding</div>
-      <div>
-        <p><strong>Access control is one problem wearing two hats.</strong> Door entry and tool
-        interlocks are now separate rows, and tool access is the more broken of the two — repeated
-        bug-and-redeploy cycles against an endpoint that is rated I5. But they share a root cause
-        the architecture plan already names: <em>every badge tap depends on the website being
-        reachable.</em> In its own words — "when the website is down or the internet is out,
-        nothing opens. We have repeatedly hit this failure mode."</p>
-        <p>The local-primary rearchitecture that fixes both is drafted and pre-implementation.
-        That combination — highest impact, actively failing, fix already designed but unbuilt —
-        makes it the most valuable single item in the inventory, and it is exactly the kind of
-        thing a registry exists to keep visible between the day it is diagnosed and the day it
-        is fixed.</p>
-      </div>
-    </div>
-
-    <div class="placard" style="margin-top:16px">
-      <div class="tag">Worked<br>example</div>
-      <div>
-        <p>The instructor rows changed twice while this page was being written. A menu
-        consolidation shipped on 12 August and was <strong>reverted on 13 August after staff
-        objected</strong>. That is exactly the sequence the board is worried about — a process
-        changed, the people who run it found out afterward, and it had to be undone.</p>
-        <p>A registry does not prevent that. What it does is give the change a <em>name, an
-        owner, and a watch window</em>, so the objection arrives before the deploy instead of after.</p>
-      </div>
-    </div>
   </section>
 </div>
 
@@ -351,14 +344,22 @@
 
   <p class="lead">The <strong>{{CHANGELOAD}} processes that are not sitting still</strong>, and where the next automation effort is best spent.</p>
 
+  <dl class="statedef">
+    <div><dt><span class="pill changing">changing</span></dt>
+      <dd><strong>Work is happening to it right now.</strong> Someone is mid-change — shipping,
+      rebuilding or migrating. Expect it to behave differently next week than it does today.</dd></div>
+    <div><dt><span class="pill watch">watch</span></dt>
+      <dd><strong>The change already landed; we are still watching it.</strong> A process leaves
+      <em>watch</em> when its window closes with nothing having gone wrong — it does not leave
+      by being forgotten.</dd></div>
+  </dl>
+
   <section>
     <h2>In flux right now</h2>
     <p class="sec-note">
       The standing answer to "what are we working on, and what has just landed?" —
       <strong>{{NCHANGING}} actively changing and {{NWATCH}} recently changed and being watched.</strong>
-      This is the list to put in front of a board or staff meeting. A process leaves
-      <span class="pill watch" style="padding:1px 5px">watch</span> when its watch window closes with
-      nothing having gone wrong; it does not leave by being forgotten.
+      This is the list to put in front of a board or staff meeting.
     </p>
     <div class="flux">
 {{INFLUX}}
@@ -399,9 +400,11 @@
       </dl></div>
       <div class="scale"><h3>Documentation · D0–D3</h3><dl>
         <dt>D0</dt><dd>Nothing written.</dd>
-        <dt>D1</dt><dd>Informal — scattered notes, Slack threads, code comments.</dd>
-        <dt>D2</dt><dd>A current SOP exists.</dd>
-        <dt>D3</dt><dd>Proven — someone other than the owner has run it from the doc.</dd>
+        <dt>D1</dt><dd>Informal only — scattered notes, Slack threads, tribal memory.</dd>
+        <dt>D2</dt><dd>A durable, current description exists: <em>either</em> a written SOP
+          <em>or</em> a maintained implementation — the module, repo or README that runs it.</dd>
+        <dt>D3</dt><dd>Proven — someone other than the author has run the process, or changed
+          the code, working from that description alone.</dd>
       </dl></div>
       <div class="scale"><h3>Impact · I1–I5</h3><dl>
         <dt>I1</dt><dd>Internal annoyance.</dd>
@@ -410,6 +413,23 @@
         <dt>I4</dt><dd>Significant revenue, trust, or data integrity.</dd>
         <dt>I5</dt><dd>Safety, legal, or existential.</dd>
       </dl></div>
+    </div>
+    <div class="placard q" style="margin-top:24px">
+      <div class="tag">Scale<br>rule</div>
+      <div>
+        <p><strong>Code counts as documentation.</strong> An earlier version of this scale filed
+        code alongside Slack threads at D1, which scored our best-described processes as though
+        nobody had written anything. A maintained module is a better description than most SOPs:
+        it is precise, and it cannot drift from what actually happens, because it <em>is</em> what
+        happens.</p>
+        <p>So any process that runs as code — <strong>A4 or above</strong> — is floored at
+        <strong>D2</strong>: the implementation is the current description. <strong>{{NFLOORED}}
+        processes are raised by this rule.</strong> It applies only from A4; at A3 and below a
+        human still drives steps the code does not capture, so the tooling does not describe the
+        whole process.</p>
+        <p>What code does <em>not</em> earn is D3. That still takes a second person working from
+        it unaided — and by that test the codebase is as unproven as the paperwork.</p>
+      </div>
     </div>
     <p class="sec-note" style="margin-top:20px">
       The gap that matters most is <strong>A4 → A5</strong>. The door-sync integration was down for
