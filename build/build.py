@@ -92,14 +92,18 @@ def strip_history(note):
     note = re.sub(r"\s+([.,])", r"\1", note).strip()
     return note[0].upper() + note[1:] if note else note
 
-# Severity of each score, so the digit can carry a status colour. The digit is
-# always rendered, so colour is redundant encoding rather than the only signal.
-SEV = {"a": {"1": "crit", "2": "warn", "3": "mid", "4": "good", "5": "good"},
-       "d": {"0": "crit", "1": "warn", "2": "good", "3": "good"},
-       "i": {"5": "crit", "4": "warn", "3": "mid", "2": "low", "1": "low"}}
+# Colour flags a deficit and nothing else. The three axes have different ranges
+# and opposite polarity — Auto 1-5 and Doc 0-3 are better when high, Impact 1-5
+# is worse when high — so tinting "good" values made the same digit green in one
+# column and amber in the next, which read as a bug rather than a meaning.
+# Only the ends that need attention are coloured; everything else stays ink.
+SEV = {"a": {"1": "crit", "2": "warn"},
+       "d": {"0": "crit", "1": "warn"},
+       "i": {"5": "crit", "4": "warn"}}
 
 def score_cell(axis, v):
-    return f'<td class="s sc-{SEV[axis].get(v, "q")}">{html.escape(v)}</td>'
+    cls = SEV[axis].get(v, "q" if not v.isdigit() else "ok")
+    return f'<td class="s sc-{cls}">{html.escape(v)}</td>'
 
 # Optional fields, each introduced by its own sigil so the note stays one cell
 # and rows that omit a field cost nothing. Order in the source is by convention

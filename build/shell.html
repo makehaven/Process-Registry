@@ -188,10 +188,14 @@
      rather than the only one. Contrast against both surfaces is >= 3:1. */
   td.s.sc-crit { color:var(--s-degraded); font-weight:700; background:var(--s-degraded-bg); }
   td.s.sc-warn { color:var(--s-watch);    font-weight:600; background:var(--s-watch-bg); }
-  td.s.sc-mid  { color:var(--ink-2); }
-  td.s.sc-good { color:var(--s-stable);   background:var(--s-stable-bg); }
-  td.s.sc-low  { color:var(--ink-3); }
+  td.s.sc-ok   { color:var(--ink-2); }
   td.s.sc-q    { color:var(--s-unknown); }
+  .scorekey { display:flex; flex-wrap:wrap; gap:8px 20px; align-items:center; margin:0 0 20px;
+              font-size:12.5px; color:var(--ink-2); }
+  .scorekey i { font-style:normal; font-family:var(--mono); font-size:12px; font-weight:700;
+                padding:2px 7px; border-radius:2px; margin-right:7px; }
+  .scorekey .k-crit { color:var(--s-degraded); background:var(--s-degraded-bg); }
+  .scorekey .k-warn { color:var(--s-watch); background:var(--s-watch-bg); }
 
   .coverage { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1px;
               margin:0 0 30px; background:var(--rule); border:1px solid var(--rule);
@@ -513,6 +517,11 @@
       <strong>?</strong> means genuinely unknown — please do not guess it in review, ask the person
       who does it. Owners are omitted throughout because we do not have any; assigning them is the
       biggest single improvement still available here.
+    </p>
+    <p class="scorekey">
+      <span><i class="k-crit">1</i> worst on that axis — A1 tribal, D0 nothing written, I5 safety or legal</span>
+      <span><i class="k-warn">2</i> second worst</span>
+      <span>Colour marks a deficit only, so it means the same thing in all three columns.</span>
     </p>
     <div class="filter">
       <input id="inv-filter" type="search" autocomplete="off"

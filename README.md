@@ -55,6 +55,8 @@ on it*. That is 27 of our 186 processes.
 ```
 data/inventory.md        the registry itself — the source of truth
 build/build.py           renderer: inventory.md -> public/index.html
+build/sweep.py           what changed in the website repo, and which rows it touches
+build/questions.py       generates a question round from the registry's weak spots
 build/shell.html         page template (CSS, prose sections, {{PLACEHOLDERS}})
 docs/                    documents spun out of the registry when a description
                          outgrew a paragraph (e.g. RENEWAL_CALENDAR.md)
