@@ -312,6 +312,99 @@
     .tabbar, .filter { display:none; }
     .panel[hidden] { display:block !important; }
   }
+
+  /* ---- participation ---------------------------------------------------- */
+  /* Sign-in, votes and comments are added to the built page at runtime. Every
+     control below starts hidden and is revealed only once a Drupal session
+     resolves, so a signed-out visitor sees the registry exactly as before
+     rather than a row of buttons that do nothing. */
+  .authbar { display:flex; flex-wrap:wrap; align-items:center; gap:12px;
+             font-family:var(--mono); font-size:11.5px; letter-spacing:.05em;
+             color:var(--ink-3); }
+  .authbar .who { text-transform:uppercase; }
+  .authbar[data-status="in"] .who { color:var(--s-stable); font-weight:600; }
+  .authbar button { appearance:none; cursor:pointer; font:inherit; font-size:11px;
+             letter-spacing:.08em; text-transform:uppercase; font-weight:600;
+             color:var(--ink); background:var(--surface); border:1px solid var(--rule-2);
+             border-radius:2px; padding:6px 12px; }
+  .authbar button:hover { border-color:var(--ink-2); }
+  .authbar button:focus-visible { outline:2px solid var(--accent,var(--crimson)); outline-offset:2px; }
+
+  .vote { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:9px; }
+  .vote .vt { appearance:none; cursor:pointer; font:inherit; font-family:var(--mono);
+              font-size:11px; font-weight:600; letter-spacing:.04em; color:var(--ink-2);
+              background:var(--surface); border:1px solid var(--rule); border-radius:2px;
+              padding:3px 8px; display:inline-flex; align-items:center; gap:5px; }
+  .vote .vt:hover { border-color:var(--rule-2); color:var(--ink); }
+  .vote .vt:disabled { opacity:.5; cursor:progress; }
+  .vote .vt .c { font-variant-numeric:tabular-nums; color:var(--ink-3); }
+  .vote .up.on { color:var(--s-stable); border-color:var(--s-stable); background:var(--s-stable-bg); }
+  .vote .up.on .c { color:var(--s-stable); }
+  .vote .down.on { color:var(--s-degraded); border-color:var(--s-degraded); background:var(--s-degraded-bg); }
+  .vote .down.on .c { color:var(--s-degraded); }
+  .vote .say { color:var(--ink-3); }
+  .movecue { font-family:var(--mono); font-size:10px; letter-spacing:.08em;
+             text-transform:uppercase; color:var(--s-watch); }
+  .rank-row .score .adj { font-weight:700; }
+  .rank-row .score .adj.up { color:var(--s-stable); }
+  .rank-row .score .adj.down { color:var(--s-degraded); }
+
+  .rowsay { appearance:none; cursor:pointer; font:inherit; font-family:var(--mono);
+            font-size:9.5px; letter-spacing:.09em; text-transform:uppercase; font-weight:600;
+            color:var(--ink-3); background:none; border:1px solid var(--rule);
+            border-radius:2px; padding:1px 6px; margin-left:8px; vertical-align:middle; }
+  .rowsay:hover { color:var(--ink); border-color:var(--rule-2); }
+
+  /* The dock matches the pattern already used across the other MakeHaven apps:
+     a bottom-right pill that opens an anchored panel, never a modal, so the
+     registry stays readable behind it while someone writes about a row. */
+  .fbdock { position:fixed; z-index:9998; bottom:16px; left:16px; right:16px;
+            display:flex; flex-direction:column; align-items:flex-end; gap:10px;
+            pointer-events:none; }
+  @media (min-width:760px) { .fbdock { left:auto; right:22px; bottom:22px; } }
+  .fbdock > * { pointer-events:auto; }
+  .fbpill { appearance:none; cursor:pointer; font:inherit; font-family:var(--mono);
+            font-size:11px; letter-spacing:.09em; text-transform:uppercase; font-weight:700;
+            color:#fff; background:var(--crimson); border:0; border-radius:999px;
+            padding:12px 20px; box-shadow:0 6px 20px rgba(0,0,0,.22); }
+  .fbpill:hover { filter:brightness(1.08); }
+  .fbpanel { width:min(400px,100%); background:var(--surface); border:1px solid var(--rule-2);
+             border-radius:8px; box-shadow:0 18px 48px rgba(0,0,0,.26); overflow:hidden; }
+  .fbhead { display:flex; align-items:center; justify-content:space-between; gap:10px;
+            padding:13px 16px; border-bottom:1px solid var(--rule); }
+  .fbhead b { font-size:14px; }
+  .fbx { appearance:none; background:none; border:0; cursor:pointer; font-size:19px;
+         line-height:1; color:var(--ink-3); padding:0 2px; }
+  .fbx:hover { color:var(--ink); }
+  .fbbody { padding:14px 16px 16px; }
+  .fbl { display:block; font-family:var(--mono); font-size:10px; letter-spacing:.1em;
+         text-transform:uppercase; color:var(--ink-3); font-weight:600; margin:0 0 5px; }
+  .fbbody select, .fbbody textarea { width:100%; font:inherit; font-size:13.5px;
+         color:var(--ink); background:var(--paper); border:1px solid var(--rule);
+         border-radius:4px; padding:8px 10px; }
+  .fbbody select:focus, .fbbody textarea:focus { outline:none; border-color:var(--accent,var(--crimson)); }
+  .fbbody textarea { min-height:96px; resize:vertical; }
+  .fbgap { margin-top:13px; }
+  .fbkind { display:flex; flex-wrap:wrap; gap:5px; }
+  .fbkind label { font-family:var(--mono); font-size:10.5px; letter-spacing:.05em;
+                  text-transform:uppercase; font-weight:600; color:var(--ink-2);
+                  border:1px solid var(--rule); border-radius:2px; padding:5px 9px; cursor:pointer; }
+  .fbkind input { position:absolute; opacity:0; pointer-events:none; }
+  .fbkind input:checked + span { color:var(--ink); }
+  .fbkind label:has(input:checked) { border-color:var(--ink-2); background:var(--sunken); color:var(--ink); }
+  .fbkind label:has(input:focus-visible) { outline:2px solid var(--accent,var(--crimson)); outline-offset:2px; }
+  .fbfoot { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:14px; }
+  .fbfoot .hint { font-family:var(--mono); font-size:10px; color:var(--ink-3); letter-spacing:.05em; }
+  #fbsend { appearance:none; cursor:pointer; font:inherit; font-family:var(--mono);
+            font-size:11px; letter-spacing:.09em; text-transform:uppercase; font-weight:700;
+            color:#fff; background:var(--crimson); border:0; border-radius:3px; padding:9px 18px; }
+  #fbsend:disabled { opacity:.6; cursor:progress; }
+  .fberr { margin:11px 0 0; font-size:12.5px; color:var(--s-degraded); }
+  .fbdone { padding:26px 18px; text-align:center; }
+  .fbdone b { display:block; font-size:15px; }
+  .fbdone span { display:block; margin-top:5px; font-size:13px; color:var(--ink-2); }
+
+  @media print { .fbdock, .authbar, .vote, .rowsay { display:none !important; } }
 </style>
 
 <header class="masthead">
@@ -323,6 +416,10 @@
       documented, how much it costs us when it breaks, and whether it is moving right
       now. The point is not to stop changing. It is to make the change countable.
     </p>
+    <div class="authbar" id="authbar" data-status="off">
+      <span class="who" id="authwho">Sign in with your MakeHaven account to vote and comment</span>
+      <button type="button" id="authbtn" hidden>Sign in</button>
+    </div>
     <div class="meta-line">
       <span>{{N}} processes · {{NGROUPS}} groups</span>
       <span>{{STABLE}} running normally · {{DEGRADED}} failing · {{UNOPT}} never built out</span>
@@ -418,14 +515,21 @@
 
 <div class="panel" id="p-next" role="tabpanel" aria-labelledby="t-next" hidden>
 
-  <p class="lead">Where effort pays best next, ranked by <strong>impact × how manual it still is</strong>. A prioritisation aid, not a verdict — staff hours is the column we do not have, and it is the one that would change this order most.</p>
+  <p class="lead">Where effort pays best next, ranked by <strong>impact × how manual it still is</strong> — then adjusted by the people who actually run these processes. A prioritisation aid, not a verdict.</p>
 
   <section>
     <h2>Where to automate next</h2>
     <p class="sec-note">
-      Ranked by <strong>impact × how manual it still is</strong>, scored out of 20. A prioritization
-      aid, not a verdict — effort in staff hours is the column we do not yet have, and it is the
-      one that would change this order most.
+      The base score is <strong>impact × how manual it still is</strong>, out of 20. That is
+      arithmetic, and arithmetic does not know which of these actually hurts on a Tuesday.
+      <strong>Anyone with a MakeHaven account can push a row up or down</strong>, and the net of
+      those votes moves the score by up to ±5 — enough to lift something several places, not
+      enough for a handful of early clicks to bury a safety process nobody happened to vote on.
+    </p>
+    <p class="sec-note">
+      Both halves stay on the row: <code>I4 × A2</code> is the formula, <code>+2</code> is the room.
+      If a row moved, it says so. The column still missing from all of this is effort in staff
+      hours, and it is the one that would change this order most.
     </p>
     <div class="rank" id="rank-list">
 {{RANK}}
@@ -808,3 +912,56 @@
   apply();
 })();
 </script>
+
+<!-- Participation dock. Hidden until a Drupal session resolves; see
+     public/participate.js. The process list is emitted by the build so the
+     picker can offer any of the {{N}} rows, not only the ones on screen. -->
+<script type="application/json" id="process-manifest">{{MANIFEST}}</script>
+
+<div class="fbdock" id="fbdock" hidden>
+  <div class="fbpanel" id="fbpanel" hidden role="dialog" aria-labelledby="fbtitle">
+    <div class="fbhead">
+      <b id="fbtitle">Tell us what we got wrong</b>
+      <button type="button" class="fbx" id="fbx" aria-label="Close">&times;</button>
+    </div>
+    <div class="fbbody">
+      <div id="fbform">
+        <label class="fbl" for="fbproc">Which process</label>
+        <select id="fbproc">
+          <option value="">&mdash; the registry as a whole, or one that is missing &mdash;</option>
+        </select>
+
+        <div class="fbgap">
+          <span class="fbl">What kind of note</span>
+          <div class="fbkind">
+            <label><input type="radio" name="fbkind" value="correction" checked><span>This is wrong</span></label>
+            <label><input type="radio" name="fbkind" value="changed"><span>We changed it</span></label>
+            <label><input type="radio" name="fbkind" value="missing"><span>Something is missing</span></label>
+            <label><input type="radio" name="fbkind" value="priority"><span>Wrong priority</span></label>
+            <label><input type="radio" name="fbkind" value="context"><span>Added context</span></label>
+          </div>
+        </div>
+
+        <div class="fbgap">
+          <label class="fbl" for="fbtext">What should we know</label>
+          <textarea id="fbtext" placeholder="Say it the way you would say it to a colleague. Anything concrete &mdash; a number, a name, what actually happens &mdash; is worth more than a rating."></textarea>
+        </div>
+
+        <div class="fbfoot">
+          <span class="hint">&#8984;&#8629; to send</span>
+          <button type="button" id="fbsend">Send</button>
+        </div>
+        <p class="fberr" id="fberr" hidden></p>
+      </div>
+      <div class="fbdone" id="fbdone" hidden>
+        <b>Sent &mdash; thank you.</b>
+        <span>It goes into the next review of the registry.</span>
+      </div>
+    </div>
+  </div>
+  <button type="button" class="fbpill" id="fbpill" aria-expanded="false" aria-controls="fbpanel">
+    Comment on the registry
+  </button>
+</div>
+
+<script type="module" src="/participate.js"></script>

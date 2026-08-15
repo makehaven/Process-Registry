@@ -1,0 +1,90 @@
+rules_version = '2';
+
+// Process Registry — participation storage.
+//
+// Every request here carries a Firebase session minted by Drupal through the
+// makerspace_firebase_auth bridge, so request.auth.uid is a real MakeHaven
+// account and cannot be typed in. That is the whole security model: there is no
+// anonymous auth and no unauthenticated write path.
+//
+// Deliberately open on who may participate — any MakeHaven account can vote and
+// comment, staff and members alike. Reading is where the lines are drawn:
+// comments name people and describe what is broken, so only staff read the
+// inbox; vote tallies are visible to anyone signed in, because a ranking people
+// cannot inspect is one they will not trust.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Set from Drupal roles by the bridge's claim rules. Absent claims are null,
+    // so this is false for everyone until the rules are configured — failing
+    // closed on the read side rather than open.
+    function isStaff() {
+      return signedIn() && (request.auth.token.staff == true
+                            || request.auth.token.admin == true);
+    }
+
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function isTrimmedString(v, maxLen) {
+      return v is string && v.size() > 0 && v.size() <= maxLen;
+    }
+
+    // ---- votes on the Next ranking ----------------------------------------
+    // Document id is "<uid>__<processId>", which is what makes one-person-one-
+    // vote structural rather than a thing the client promises. A second vote
+    // overwrites the first; changing your mind is an ordinary edit.
+    match /votes/{voteId} {
+      allow read: if signedIn();
+
+      allow create, update: if isSelf(request.resource.data.uid)
+        && voteId == request.auth.uid + '__' + request.resource.data.processId
+        && request.resource.data.value in [1, -1]
+        && isTrimmedString(request.resource.data.processId, 160)
+        && request.resource.data.keys().hasOnly([
+             'processId', 'processName', 'group', 'value',
+             'uid', 'name', 'email', 'roles', 'updatedAt'
+           ]);
+
+      // Clearing your own vote is how the arrows toggle off. Nobody may delete
+      // anyone else's, including staff — a tally that an admin can quietly prune
+      // is not a tally.
+      allow delete: if isSelf(resource.data.uid);
+    }
+
+    // ---- comments on processes --------------------------------------------
+    // Write-only for the person filing: they cannot read the inbox back, edit
+    // what they said, or see what anyone else reported. Staff read and triage.
+    match /feedback/{docId} {
+      allow read: if isStaff();
+
+      allow create: if isSelf(request.resource.data.uid)
+        && isTrimmedString(request.resource.data.text, 4000)
+        && request.resource.data.kind in
+             ['correction', 'changed', 'missing', 'priority', 'context']
+        && request.resource.data.status == 'new'
+        && request.resource.data.keys().hasOnly([
+             'id', 'processId', 'processName', 'group', 'state', 'kind', 'text',
+             'uid', 'name', 'email', 'roles', 'status', 'createdAt'
+           ]);
+
+      // Triage only — staff move status and attach a note. The original text and
+      // its author stay immutable, so the record of what someone said cannot be
+      // edited after the fact by the people it is about.
+      allow update: if isStaff()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['status', 'adminNote', 'reviewedBy', 'reviewedAt']);
+
+      allow delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

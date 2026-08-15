@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Prototype of the Phase 2 renderer: seed-inventory.md -> one self-contained page."""
-import re, html, collections, pathlib
+import re, html, json, collections, pathlib
 
 SRC = pathlib.Path(__file__).resolve().parents[1] / "data" / "inventory.md"
 TPL = pathlib.Path(__file__).with_name("shell.html")
@@ -79,6 +79,26 @@ planned = st_tot["planned"]
 with_strat = sum(1 for r in rows if chr(0x27D0) in r["note"])
 p1_rows = [r for r in rows if "⟐" in r["note"]
             and "Priority ·" in r["note"].split("⟐", 1)[1]]
+
+# ---- stable process ids -----------------------------------------------------
+# Votes and comments live in Firestore keyed by these, so they have to survive a
+# rebuild. Group + name is the only pair the inventory guarantees to be unique,
+# and it stays legible in the exported digest — which matters, because a human
+# reads that digest. Renaming a process orphans its votes; the digest reports
+# orphans rather than silently dropping them.
+def pid(group, name):
+    raw = f"{group} {name}"
+    slug = re.sub(r"[^a-z0-9]+", "-", raw.lower().replace("&", " and ")).strip("-")
+    return slug[:120]
+
+
+for r in rows:
+    r["pid"] = pid(r["group"], r["name"])
+
+_dupes = [k for k, n in collections.Counter(r["pid"] for r in rows).items() if n > 1]
+if _dupes:
+    raise SystemExit(f"duplicate process ids — votes would collide: {_dupes}")
+
 
 def md(s):
     s = html.escape(s)
@@ -244,20 +264,30 @@ for g, rs in by_group.items():
         <div class="gtot">{len(rs)}</div>
       </div>""")
 
+# The rank rows carry their base score as data so the client can re-sort them
+# once votes load, without a second copy of the arithmetic living in JS.
 rank_html = []
 for n, (score, _, r) in enumerate(top, 1):
     extra = "" if n <= SHOWN else " rank-extra"
-    rank_html.append(f"""      <div class="rank-row{extra}"{'' if n <= SHOWN else ' hidden'}><div class="n">{n:02d}</div>
+    rank_html.append(f"""      <div class="rank-row{extra}" data-pid="{r['pid']}" data-base="{score}" data-rank="{n}"{'' if n <= SHOWN else ' hidden'}><div class="n">{n:02d}</div>
         <div class="what"><b>{md(r['name'])}</b><em>{md(plain_note(r['note']))}</em>
-        <span class="grp">{html.escape(r['group'])}</span></div>
-        <div class="score">{score}<small>I{r['i']} × A{r['a']}</small></div></div>""")
+        <span class="grp">{html.escape(r['group'])}</span>
+        <div class="vote" data-pid="{r['pid']}" hidden>
+          <button type="button" class="vt up" data-v="1" aria-label="More important than ranked">&#9650;<span class="c">0</span></button>
+          <button type="button" class="vt down" data-v="-1" aria-label="Less important than ranked">&#9660;<span class="c">0</span></button>
+          <button type="button" class="vt say" aria-label="Comment on this process">Comment</button>
+          <span class="movecue"></span>
+        </div></div>
+        <div class="score"><span class="final">{score}</span><small>I{r['i']} &times; A{r['a']}<span class="adj"></span></small></div></div>""")
 
 tables = []
 for g, rs in by_group.items():
     c = collections.Counter(r["state"] for r in rs)
     blurb = f'<p class="tnote">{md(blurbs[g])}</p>' if g in blurbs else ""
     body = "".join(
-        f"""<tr><td class="p">{md(r['name'])}</td>"""
+        f"""<tr data-pid="{r['pid']}"><td class="p">{md(r['name'])}"""
+        f"""<button type="button" class="rowsay" data-pid="{r['pid']}" """
+        f"""aria-label="Comment on {html.escape(r['name'], quote=True)}">Comment</button></td>"""
         f"""{score_cell('a', r['a'])}{score_cell('d', r['d'])}{score_cell('i', r['i'])}"""
         f"""<td><span class="pill {r['state']}">{r['state']}</span></td>"""
         f"""<td class="n">{note_cell(r['note'])}</td></tr>""" for r in rs)
@@ -299,6 +329,15 @@ n_reviewed = sum(1 for f in fields if f.get("reviewed"))
 n_code     = sum(1 for f in fields if f.get("code"))
 n_never    = N - n_reviewed
 
+# The comment panel lets someone pick any process, not just one they can see on
+# the current tab, so it needs the full list. Emitted as JSON rather than scraped
+# from the DOM because the inventory tab is filtered in place.
+manifest = json.dumps(
+    [{"pid": r["pid"], "name": re.sub(r"[*`]", "", r["name"]),
+      "group": r["group"], "state": r["state"]}
+     for r in sorted(rows, key=lambda r: (r["group"], r["name"]))],
+    ensure_ascii=False, separators=(",", ":"))
+
 page = TPL.read_text()
 for key, val in [("TILES", tiles), ("LEGEND", legend), ("BOARD", "\n".join(board)),
                  ("NRES", str(nres)), ("NGROUPS", str(len(by_group))),
@@ -308,6 +347,7 @@ for key, val in [("TILES", tiles), ("LEGEND", legend), ("BOARD", "\n".join(board
                  ("NREVIEWED", str(n_reviewed)), ("NCODE", str(n_code)),
                  ("NNEVER", str(n_never)), ("NRANK", str(len(top))), ("NSHOWN", str(SHOWN)),
                  ("NMORE", str(max(0, len(top) - SHOWN))), ("RAISED", raised_html),
+                 ("MANIFEST", manifest),
                  ("NRAISED", str(len(raised))),
                  ("RANK", "\n".join(rank_html)), ("TABLES", "\n".join(tables)),
                  ("UNRANK", unrank_html), ("INFLUX", influx), ("N", str(N)),

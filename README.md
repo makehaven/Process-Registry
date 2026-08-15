@@ -48,7 +48,7 @@ them.
 
 The one thing it supplies that nothing else does: the strategy sheet is entirely
 forward-looking and has no state meaning *this is broken right now and nobody is
-on it*. That is 27 of our 186 processes.
+on it* (10 processes), nor *this was never built far enough* (17).
 
 ## Layout
 
@@ -62,7 +62,11 @@ docs/                    documents spun out of the registry when a description
                          outgrew a paragraph (e.g. RENEWAL_CALENDAR.md)
 questions/               archived question rounds with answers inline — the raw
                          record behind every description. Append-only.
-public/                  build output, gitignored
+public/index.html        build output, gitignored
+public/participate.js    sign-in, voting and comments (source, committed)
+public/registry-config.js  deployment config — OAuth client id goes here
+firestore.rules          who may vote, comment and read the comment inbox
+build/digest.py          exports votes and comments for review
 ```
 
 ## Build
@@ -86,7 +90,8 @@ domain and CI secret are not yet created.
 Once wired, editing is: change `data/inventory.md`, commit, push. The Action
 builds and redeploys in about a minute.
 
-Public, read-only, no auth.
+Public and readable with no account. Signing in with a MakeHaven account adds
+voting and comments — see below.
 
 ## How it stays current
 
@@ -98,7 +103,8 @@ died because they needed someone to remember them.
 |---|---|---|
 | **pantheon-deploy** — close-out | Mark affected processes `changing`; add rows for processes the work revealed | Staging a feature |
 | **pantheon-deploy** — after live | Flip shipped processes to `watch` with what to watch for | Every release |
-| **weekly-triage** | Mark `degraded` when the pulse finds something; close watches whose window passed clean | Weekly, only on real signal |
+| **weekly-triage** | Mark `degraded` when the pulse finds something actually failing; close watches whose window passed clean | Weekly, only on real signal |
+| **digest review** | Read what staff and members said and voted; apply what holds up | Whenever the digest is non-empty |
 | **cycle-review** | Resolve expired watches, add processes the cycle revealed, re-check the `degraded` list, sanity-check change load | Biweekly |
 | **flow-check** | A flow walk maps one-to-one onto processes — mark or close accordingly | Per flow |
 | **security-audit** | Confirmed findings that leave a process unreliable → `degraded`, pointing at the ledger | Quarterly |
@@ -143,5 +149,46 @@ Documentation deliberately matches the CT Makerspace Network Standards of
 Excellence 0–3 evidence scale, so a maintained registry produces that
 self-assessment as a by-product.
 
-**States:** `stable` · `changing` · `watch` · `planned` · `degraded` ·
-`undefined` · `unknown`
+**States:** `stable` · `changing` · `watch` · `planned` · `unoptimized` ·
+`degraded` · `undefined` · `unknown`
+
+`degraded` and `unoptimized` are both deficits and are not the same problem.
+**`degraded` means it fails** — something that is supposed to happen does not,
+whether it broke or never once fired. **`unoptimized` means it does what it was
+built to do and was never built further.** The distinction matters because a
+single word made 27 rows read as an emergency when 17 of them are ordinary
+unfinished work, and because only one of the two is a reason to drop everything.
+
+## Participation
+
+The registry is a description of other people's work, written mostly by one
+person. That is its biggest weakness, and the participation layer exists to
+attack it directly.
+
+Anyone with a MakeHaven account — staff, board or member — can sign in and:
+
+- **Vote a row up or down on the Next tab.** The base score is arithmetic
+  (impact × how manual something still is). Net votes move it by up to ±5, which
+  is enough to lift a row several places but not enough for a few early clicks to
+  bury a safety process nobody voted on. Both halves stay visible on the row, so
+  the ranking can be argued with rather than just distrusted.
+- **Comment on any process** — this is wrong, we changed it, something is
+  missing, wrong priority, or added context.
+
+Identity comes from Drupal through the `makerspace_firebase_auth` bridge
+(OAuth2 PKCE → Firebase custom token), so a vote carries a real account rather
+than a typed-in name, and one person gets one vote per process structurally
+rather than by promise.
+
+**Nothing written by participants edits the registry.** Votes and comments live
+in Firestore; `build/digest.py` exports them to `data/feedback-digest.md`, and a
+person decides what is actually true before editing `data/inventory.md` by hand.
+Letting anyone with an account rewrite the record directly would make the
+registry a thing whoever clicked last owns.
+
+The digest calls out two things specifically: **contested** rows where people
+voted in both directions — disagreements worth a conversation, not an edit — and
+**orphaned** ids where a vote points at a process that has since been renamed.
+
+Setup is in [SETUP.md](SETUP.md) §6. Until the OAuth client id is filled in, the
+page renders exactly as it did before with sign-in hidden.

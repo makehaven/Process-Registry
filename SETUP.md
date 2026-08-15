@@ -101,6 +101,119 @@ Watch the run under the repo's **Actions** tab.
 
 ---
 
+## 6. Participation — sign-in, votes and comments
+
+This is the only remaining setup that is not already done in code. The page ships
+with participation **switched off**: `OAUTH_CLIENT_ID` in
+`public/registry-config.js` is empty, so the sign-in control stays hidden and
+visitors see the registry exactly as before. Filling that value in is what turns
+it on.
+
+Already done, nothing to do:
+
+- Firestore database `(default)` in `makehaven-process-registry` (nam5)
+- Security rules written and deployed — `firestore.rules`
+- Firebase web app registered; its config is in `public/registry-config.js`
+- The client — `public/participate.js`
+
+### 6a. Register the app with the Drupal bridge
+
+The `makerspace_firebase_auth` module is already generic — one module, any number
+of apps, `app_id` as a route parameter. **No Drupal code change is needed**, only
+config.
+
+1. Firebase Console → `makehaven-process-registry` → Project Settings → Service
+   Accounts → **Generate new private key**.
+2. Upload it to Drupal's private files as
+   `private://firebase/process-registry-sa.json`.
+3. At `/admin/config/services/firebase-auth`, add:
+
+   ```yaml
+   process_registry:
+     project_id: makehaven-process-registry
+     service_account_key: 'private://firebase/process-registry-sa.json'
+     token_ttl: 3600
+     claim_rules:
+       - type: role
+         role: administrator
+         claim: admin
+         value: true
+       - type: role
+         role: manager
+         claim: staff
+         value: true
+       - type: email_domain
+         domain: makehaven.org
+         claim: staff
+         value: true
+   ```
+
+   These claims decide **who reads the comment inbox**, nothing else. Voting and
+   commenting need only a signed-in account, so no rule is required to let
+   members participate — that is deliberate, and it is why there is no `board`
+   role here. If it turns out to need narrowing later, add a rule and tighten
+   `firestore.rules`; the rules already fail closed on reads.
+
+4. `lando drush cex` so the registration lands in git.
+
+### 6b. Create the OAuth consumer
+
+At `/admin/config/services/consumer`, add a consumer:
+
+| Field | Value |
+|---|---|
+| Label | Process Registry |
+| Redirect URI | `https://process.makehaven.org/` |
+| Scopes | `process_registry` (create it if absent) |
+| Confidential | **no** — this is a public PKCE client, no secret |
+
+Add `https://process.makehaven.org` to the site's CORS allow-list, alongside the
+entries for `sponsorship` and `phonebank`.
+
+Then paste the consumer's **client id** into `public/registry-config.js`:
+
+```js
+export const OAUTH_CLIENT_ID = "…";
+```
+
+Commit and push. That deploy is what makes the sign-in control appear.
+
+### 6c. Check it
+
+Open `process.makehaven.org`, sign in, and confirm three things: the arrows on
+the **Next** tab move a row and the score shows `+n` beside the formula; a
+**Comment** button appears on inventory rows; and the pill at bottom right opens
+the panel. If sign-in reports *"not registered with the Drupal Firebase bridge
+yet"*, step 6a has not been exported to the live site.
+
+---
+
+## 7. Reading what people said
+
+Votes and comments never write back to `data/inventory.md`. Anyone with an
+account can vote, so letting that edit the record directly would mean the
+registry could be rewritten by whoever clicked last. Instead they are exported
+and a person decides:
+
+```bash
+gcloud auth login jrlogan@makehaven.org   # once; the personal gmail account has no access
+python3 build/digest.py                   # writes data/feedback-digest.md
+```
+
+The digest groups comments by process, tallies the votes, and calls out two
+things worth looking at directly: **contested** rows where people voted in both
+directions, and **orphaned** ids where a vote points at a process that has since
+been renamed. Hand it to Claude with the inventory, or read it yourself, then
+edit `data/inventory.md` by hand and push.
+
+Once the changes are in, `python3 build/digest.py --mark-reviewed` clears the
+queue so the next run only shows what is new.
+
+`data/feedback-digest.md` is gitignored — it is a working file, and it contains
+names and unverified claims about people's work.
+
+---
+
 ## After it's live
 
 **Editing is now: change `data/inventory.md`, commit, push.** The site rebuilds
@@ -126,6 +239,9 @@ Three things worth doing in the first week:
 |---|---|
 | Registry data | `data/inventory.md` — the source of truth |
 | Renderer | `build/build.py`, `build/shell.html` |
+| Participation client | `public/participate.js`, `public/registry-config.js` |
+| Firestore rules | `firestore.rules` — deploy with `firebase deploy --only firestore:rules` |
+| Feedback export | `build/digest.py` → `data/feedback-digest.md` (gitignored) |
 | Spun-out documents | `docs/` — currently the renewal calendar |
 | Answer archive | `questions/` — append-only, never edited after the fact |
 | Track and rationale | `makehaven-website/conductor/tracks/process_stabilization_20260814/plan.md` |

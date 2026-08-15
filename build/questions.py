@@ -68,6 +68,17 @@ def questions(rows):
                         "Is this still broken, and is anyone on it now?",
                         f"Marked degraded at I{i}. Degraded with nobody assigned is the "
                         "registry's main finding — confirm it is still true."))
+        elif r["state"] == "unoptimized":
+            # A different question from the degraded one on purpose. Asking "is
+            # it still broken" about something that was never built invites the
+            # answer "it was never broken", which is true and useless. What is
+            # worth knowing is where the ceiling is and whether it is worth the
+            # climb — several of these may be fine left exactly as they are.
+            out.append((base + 22, "Unoptimized", nm,
+                        "What would good enough look like here, and is it worth building?",
+                        f"Marked unoptimized at I{i} — it runs, it was just never built "
+                        "further. Some of these are fine as they are; the registry cannot "
+                        "tell which without asking."))
 
         if not r.get("reviewed") and i >= 4:
             out.append((base + 25, "Never verified", nm,
@@ -134,7 +145,7 @@ def main():
     rows = load()
     qs = questions(rows)[:a.limit]
     if not qs:
-        sys.exit("Nothing worth asking — no uncharacterised, degraded, "
+        sys.exit("Nothing worth asking — no uncharacterised, degraded, unoptimized, "
                  "unverified or unowned high-impact rows.")
     text, n = render(qs, rows)
     if a.write:

@@ -1,4 +1,7 @@
-public/
+# Only index.html is generated — build/build.py writes it from data/inventory.md.
+# The rest of public/ is source: the participation client and its config.
+public/index.html
+data/feedback-digest.md
 __pycache__/
 *.pyc
 .DS_Store
