@@ -370,6 +370,13 @@
   @media (min-width:760px) { .fbdock { left:auto; right:22px; bottom:22px; } }
   .fbdock > * { pointer-events:auto; }
   .fbdock[hidden] { display:none; }
+
+  /* `hidden` is only display:none from the UA stylesheet, so any class rule that
+     sets display outranks it. Every element this page hides by attribute needs
+     its own override. `.vote` starts hidden until sign-in resolves; `.rank-row`
+     hides the tail of the ranking behind the "show all" button — which had been
+     revealing all of it regardless since the first commit. */
+  .vote[hidden], .rank-row[hidden] { display:none; }
   .fbpill { appearance:none; cursor:pointer; font:inherit; font-family:var(--mono);
             font-size:11px; letter-spacing:.09em; text-transform:uppercase; font-weight:700;
             color:#fff; background:var(--crimson); border:0; border-radius:999px;
