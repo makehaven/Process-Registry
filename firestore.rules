@@ -7,11 +7,19 @@ rules_version = '2';
 // account and cannot be typed in. That is the whole security model: there is no
 // anonymous auth and no unauthenticated write path.
 //
-// Deliberately open on who may participate — any MakeHaven account can vote and
-// comment, staff and members alike. Reading is where the lines are drawn:
-// comments name people and describe what is broken, so only staff read the
-// inbox; vote tallies are visible to anyone signed in, because a ranking people
-// cannot inspect is one they will not trust.
+// Deliberately open on both sides. Any MakeHaven account can vote and comment,
+// and any MakeHaven account can read what everyone else said — a suggestion box
+// nobody can see into produces the same silence it is meant to fix, and the
+// disagreements are the most useful thing in here.
+//
+// Because comments are readable by the whole membership, no document stores an
+// email address. `uid` already resolves to a Drupal account for anyone who needs
+// to follow up, so carrying the address as well would publish every
+// participant's email to every member for nothing.
+//
+// Signing in is still required to read. This is a members' record of members'
+// work, and it names people and describes what is broken; it does not belong to
+// anonymous web traffic.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -48,7 +56,7 @@ service cloud.firestore {
         && isTrimmedString(request.resource.data.processId, 160)
         && request.resource.data.keys().hasOnly([
              'processId', 'processName', 'group', 'value',
-             'uid', 'name', 'email', 'roles', 'updatedAt'
+             'uid', 'name', 'roles', 'updatedAt'
            ]);
 
       // Clearing your own vote is how the arrows toggle off. Nobody may delete
@@ -58,10 +66,12 @@ service cloud.firestore {
     }
 
     // ---- comments on processes --------------------------------------------
-    // Write-only for the person filing: they cannot read the inbox back, edit
-    // what they said, or see what anyone else reported. Staff read and triage.
+    // Readable by any signed-in member; writable only as yourself. Nobody can
+    // edit a comment after filing it, including its author and including staff,
+    // so what someone said cannot be quietly reworded by the people it is about.
+    // Staff move triage status and attach a note alongside it.
     match /feedback/{docId} {
-      allow read: if isStaff();
+      allow read: if signedIn();
 
       allow create: if isSelf(request.resource.data.uid)
         && isTrimmedString(request.resource.data.text, 4000)
@@ -70,7 +80,7 @@ service cloud.firestore {
         && request.resource.data.status == 'new'
         && request.resource.data.keys().hasOnly([
              'id', 'processId', 'processName', 'group', 'state', 'kind', 'text',
-             'uid', 'name', 'email', 'roles', 'status', 'createdAt'
+             'uid', 'name', 'roles', 'status', 'createdAt'
            ]);
 
       // Triage only — staff move status and attach a note. The original text and

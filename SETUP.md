@@ -148,11 +148,17 @@ config.
          value: true
    ```
 
-   These claims decide **who reads the comment inbox**, nothing else. Voting and
-   commenting need only a signed-in account, so no rule is required to let
-   members participate — that is deliberate, and it is why there is no `board`
-   role here. If it turns out to need narrowing later, add a rule and tighten
-   `firestore.rules`; the rules already fail closed on reads.
+   These claims decide **only who can triage** — move a comment to reviewed and
+   attach an admin note. Everything else is open to any signed-in account:
+   voting, commenting, and reading what everyone else said. That is why there is
+   no `board` role here and no rule granting members anything; being signed in
+   is the whole qualification. If it needs narrowing later, tighten the `read`
+   line in `firestore.rules` and add a claim rule to match.
+
+   Note that **no document stores an email address**. Comments are readable by
+   the whole membership, and Firestore rules are per-document rather than
+   per-field, so there is no way to show the text while hiding the address.
+   `uid` resolves to the Drupal account for anyone who needs to follow up.
 
 4. `lando drush cex` so the registration lands in git.
 
@@ -180,11 +186,12 @@ Commit and push. That deploy is what makes the sign-in control appear.
 
 ### 6c. Check it
 
-Open `process.makehaven.org`, sign in, and confirm three things: the arrows on
+Open `process.makehaven.org`, sign in, and confirm four things: the arrows on
 the **Next** tab move a row and the score shows `+n` beside the formula; a
-**Comment** button appears on inventory rows; and the pill at bottom right opens
-the panel. If sign-in reports *"not registered with the Drupal Firebase bridge
-yet"*, step 6a has not been exported to the live site.
+**Comment** button appears on inventory rows; the pill at bottom right opens the
+panel; and after filing one comment, re-opening the panel shows it back with
+your name on it. If sign-in reports *"not registered with the Drupal Firebase
+bridge yet"*, step 6a has not been exported to the live site.
 
 ---
 

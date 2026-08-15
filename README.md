@@ -174,6 +174,12 @@ Anyone with a MakeHaven account — staff, board or member — can sign in and:
   the ranking can be argued with rather than just distrusted.
 - **Comment on any process** — this is wrong, we changed it, something is
   missing, wrong priority, or added context.
+- **Read what everyone else said.** Comments are visible to any signed-in
+  account, shown above the form on the process they are about. A suggestion box
+  nobody can see into produces the silence it was built to fix, and it makes
+  people file the same note five times. Because the whole membership can read
+  them, no document stores an email address — `uid` resolves to the Drupal
+  account when someone needs following up.
 
 Identity comes from Drupal through the `makerspace_firebase_auth` bridge
 (OAuth2 PKCE → Firebase custom token), so a vote carries a real account rather

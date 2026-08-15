@@ -133,9 +133,16 @@ SEV = {"a": {"1": "crit", "2": "warn"},
        "d": {"0": "crit", "1": "warn"},
        "i": {"5": "crit", "4": "warn"}}
 
+# On a phone the table becomes a stack of cards and the column headers go away,
+# which would leave three bare digits meaning nothing. Each score cell carries
+# its own label so CSS can put it back with ::before at narrow widths.
+AXIS_LABEL = {"a": "Auto", "d": "Doc", "i": "Impact"}
+
+
 def score_cell(axis, v):
     cls = SEV[axis].get(v, "q" if not v.isdigit() else "ok")
-    return f'<td class="s sc-{cls}">{html.escape(v)}</td>'
+    return (f'<td class="s sc-{cls}" data-l="{AXIS_LABEL[axis]}">'
+            f'{html.escape(v)}</td>')
 
 # Optional fields, each introduced by its own sigil so the note stays one cell
 # and rows that omit a field cost nothing. Order in the source is by convention

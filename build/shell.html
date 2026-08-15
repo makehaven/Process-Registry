@@ -414,9 +414,92 @@
             color:#fff; background:var(--crimson); border:0; border-radius:3px; padding:9px 18px; }
   #fbsend:disabled { opacity:.6; cursor:progress; }
   .fberr { margin:11px 0 0; font-size:12.5px; color:var(--s-degraded); }
+  /* What other members already said, above the form. Capped in height so a busy
+     process cannot push the textarea off a phone screen. */
+  .fbthread { max-height:34vh; overflow-y:auto; margin:0 0 14px; padding:0 0 12px;
+              border-bottom:1px solid var(--rule); }
+  .fbthread[hidden] { display:none; }
+  .fbc { padding:9px 0 0; }
+  .fbc b { display:block; font-family:var(--mono); font-size:10px; letter-spacing:.06em;
+           text-transform:uppercase; color:var(--ink-2); font-weight:700; }
+  .fbc i { font-style:normal; font-family:var(--mono); font-size:9.5px; color:var(--ink-3); }
+  .fbc p { margin:3px 0 0; font-size:13px; color:var(--ink); white-space:pre-wrap;
+           overflow-wrap:anywhere; }
+  .fbmore { display:block; margin-top:10px; font-family:var(--mono); font-size:10px;
+            letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); }
+  .rowsay.has, .vt.say.has { color:var(--crimson); border-color:var(--crimson); }
   .fbdone { padding:26px 18px; text-align:center; }
   .fbdone b { display:block; font-size:15px; }
   .fbdone span { display:block; margin-top:5px; font-size:13px; color:var(--ink-2); }
+
+
+  /* ---- phones ----------------------------------------------------------- */
+  /* The page was built for a desk. Below 640px the masthead alone filled a
+     whole screen before any content, and the inventory was a 660px-wide table
+     you read by dragging sideways. This block is the phone version: a shorter
+     head, and tables that become stacked cards instead of a scrollable grid. */
+  @media (max-width:640px) {
+    .wrap { padding:0 16px; }
+
+    /* Was ~1 full screen of preamble. Now roughly a third of one. */
+    .masthead .wrap { gap:11px; padding-top:18px; padding-bottom:15px; }
+    h1 { font-size:clamp(25px,7.4vw,33px); letter-spacing:-.02em; }
+    .standfirst { font-size:14.5px; line-height:1.45; }
+    .eyebrow { font-size:10px; }
+    .meta-line { gap:3px 14px; font-size:10px; letter-spacing:.03em; }
+    .authbar { font-size:10px; gap:9px; }
+
+    section { padding:30px 0 0; }
+    section:last-of-type { padding-bottom:44px; }
+    .lead { font-size:.95rem; margin-bottom:22px; }
+    .sec-note { font-size:13.5px; }
+
+    .tiles { grid-template-columns:repeat(2,1fr); }
+    .tile { padding:13px 14px; }
+    .tile .num { font-size:27px; }
+    .tile .sub { font-size:11.5px; }
+
+    .tabbar button { font-size:.8rem; margin-right:19px; padding:13px 2px 11px; }
+
+    /* Score is its own line rather than a third column fighting for width. */
+    .rank-row { grid-template-columns:24px 1fr; gap:10px; padding:12px 14px; }
+    .rank-row .score { grid-column:2; text-align:left; margin-top:8px; }
+    .rank-row .score small { display:inline; margin-left:8px; text-align:left; }
+    .rank-row .what b { font-size:14px; }
+
+    /* Comfortable thumb targets — the desktop sizes are 25px tall. */
+    .vote { gap:7px; }
+    .vote .vt { padding:7px 12px; font-size:12px; }
+    .rowsay { padding:4px 9px; font-size:10px; margin-left:0; }
+
+    /* Tables become cards. thead goes; each row stacks; each score cell prints
+       the label the header used to carry. */
+    .tblwrap { overflow-x:visible; }
+    .tblwrap thead { display:none; }
+    .tblwrap table, .tblwrap tbody { display:block; width:100%; }
+    .tblwrap tbody, .tblwrap tr { min-width:0; }
+    .tblwrap tr { display:block; width:auto; padding:14px 15px;
+                  border-bottom:1px solid var(--rule); }
+    .tblwrap tr:last-child { border-bottom:none; }
+    .tblwrap td { display:block; width:auto; padding:0; border:0; }
+    .tblwrap td.p { font-size:15px; font-weight:650; margin-bottom:9px; }
+    .tblwrap td.s { display:inline-block; width:auto; margin:0 8px 9px 0; padding:2px 7px;
+                    font-size:11.5px; text-align:left; border-radius:2px; }
+    .tblwrap td.s::before { content:attr(data-l) " "; font-size:9.5px; letter-spacing:.09em;
+                            text-transform:uppercase; color:var(--ink-3); }
+    .tblwrap td.s.sc-crit::before, .tblwrap td.s.sc-warn::before { color:inherit; opacity:.75; }
+    .tblwrap td:nth-child(5) { margin-bottom:9px; }
+    .tblwrap td.n { font-size:13px; }
+    .tblwrap caption { position:static; padding:14px 15px 11px; }
+
+    .filter input { min-width:0; }
+    .fbpanel { max-height:82vh; overflow-y:auto; }
+    .fbdock { bottom:12px; left:12px; right:12px; }
+  }
+
+  /* Long unbroken strings — repo paths in the footer, URLs in notes — were
+     pushing the whole document 40px wider than the viewport. */
+  code, td.n a, .res a, footer p { overflow-wrap:anywhere; }
 
   @media print { .fbdock, .authbar, .vote, .rowsay { display:none !important; } }
 </style>
@@ -939,6 +1022,7 @@
       <button type="button" class="fbx" id="fbx" aria-label="Close">&times;</button>
     </div>
     <div class="fbbody">
+      <div class="fbthread" id="fbthread" hidden></div>
       <div id="fbform">
         <label class="fbl" for="fbproc">Which process</label>
         <select id="fbproc">

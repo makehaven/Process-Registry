@@ -136,8 +136,9 @@ function forgetDrupal() {
 const state = {
   fb: null,        // { auth, db, api }
   user: null,      // Firebase user
-  profile: null,   // { uid, name, email, roles }
-  votes: new Map(),   // pid -> { up, down, mine }
+  profile: null,   // { uid, name, roles, staff }
+  votes: new Map(),      // pid -> { up, down, mine }
+  comments: new Map(),   // pid ("__general__" for site-wide) -> [comment, …]
   processes: [],
   ready: false,
 };
@@ -192,7 +193,6 @@ async function buildProfile(user) {
   return {
     uid: user.uid,
     name: c.name || c.display_name || user.displayName || "Unknown",
-    email: c.email || user.email || null,
     // The bridge maps Drupal roles to claims. Which ones exist is deployment
     // config, so read whatever is there rather than hard-coding a list.
     roles: Object.keys(c).filter((k) => c[k] === true && !RESERVED.has(k)).sort(),
@@ -241,7 +241,6 @@ async function castVote(pid, value) {
       value,
       uid: p.uid,
       name: p.name,
-      email: p.email,
       roles: p.roles,
       updatedAt: new Date().toISOString(),
     });
@@ -269,10 +268,41 @@ async function sendComment({ pid, kind, text }) {
     text: text.trim().slice(0, 4000),
     uid: p.uid,
     name: p.name,
-    email: p.email,
     roles: p.roles,
     status: "new",
     createdAt: new Date().toISOString(),
+  });
+  await loadComments();
+}
+
+/** Comments are readable by every signed-in member, so they are loaded and shown
+ *  rather than filed away. A suggestion box nobody can see into gets the silence
+ *  it was built to fix. */
+async function loadComments() {
+  const { db, api } = await loadFirebase();
+  const snap = await api.getDocs(api.collection(db, "feedback"));
+  const byPid = new Map();
+  snap.forEach((d) => {
+    const c = d.data();
+    if (!c || !c.text) return;
+    const key = c.processId || "__general__";
+    if (!byPid.has(key)) byPid.set(key, []);
+    byPid.get(key).push(c);
+  });
+  byPid.forEach((list) => list.sort((a, b) =>
+    (b.createdAt || "").localeCompare(a.createdAt || "")));
+  state.comments = byPid;
+  paintCommentCounts();
+}
+
+/** A count on the button is what tells someone there is anything to read. */
+function paintCommentCounts() {
+  document.querySelectorAll("[data-pid]").forEach((el) => {
+    const n = (state.comments.get(el.dataset.pid) || []).length;
+    el.querySelectorAll(".rowsay, .vt.say").forEach((b) => {
+      b.textContent = n ? `Comments ${n}` : "Comment";
+      b.classList.toggle("has", n > 0);
+    });
   });
 }
 
@@ -384,7 +414,51 @@ function openPanel(pid) {
   $("fberr").hidden = true;
   panel.hidden = false;
   $("fbpill").setAttribute("aria-expanded", "true");
+  renderThread(sel.value);
   setTimeout(() => $("fbtext").focus(), 40);
+}
+
+const KIND_LABEL = {
+  correction: "Says this is wrong",
+  changed: "Says they changed it",
+  missing: "Says something is missing",
+  priority: "Disagrees with the priority",
+  context: "Adds context",
+};
+
+/** What everyone else already said about this process, above the form — so
+ *  people answer each other rather than each filing the same note. */
+function renderThread(pid) {
+  const box = $("fbthread");
+  const list = state.comments.get(pid || "__general__") || [];
+  box.textContent = "";
+  box.hidden = !list.length;
+  if (!list.length) return;
+
+  const h = document.createElement("span");
+  h.className = "fbl";
+  h.textContent = list.length === 1 ? "1 comment so far" : `${list.length} comments so far`;
+  box.appendChild(h);
+
+  list.slice(0, 12).forEach((c) => {
+    const item = document.createElement("div");
+    item.className = "fbc";
+    const meta = document.createElement("b");
+    meta.textContent = `${c.name || "Unknown"} — ${KIND_LABEL[c.kind] || c.kind}`;
+    const when = document.createElement("i");
+    when.textContent = (c.createdAt || "").slice(0, 10);
+    const body = document.createElement("p");
+    body.textContent = c.text;   // textContent, never innerHTML: this is user input
+    item.append(meta, when, body);
+    box.appendChild(item);
+  });
+
+  if (list.length > 12) {
+    const more = document.createElement("span");
+    more.className = "fbmore";
+    more.textContent = `+${list.length - 12} older, in the digest`;
+    box.appendChild(more);
+  }
 }
 
 function closePanel() {
@@ -436,6 +510,7 @@ function wireUI() {
   });
 
   $("fbsend").addEventListener("click", submitComment);
+  $("fbproc").addEventListener("change", (e) => renderThread(e.target.value));
   $("fbtext").addEventListener("keydown", (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") submitComment();
   });
@@ -461,6 +536,7 @@ async function submitComment() {
     $("fbtext").value = "";
     $("fbform").hidden = true;
     $("fbdone").hidden = false;
+    renderThread($("fbproc").value);
     setTimeout(() => { if (!$("fbpanel").hidden) closePanel(); }, 2200);
   } catch (e) {
     console.error(e);
@@ -518,7 +594,7 @@ async function boot() {
     setAuthBar("in");
     dock.hidden = false;
     document.body.classList.add("signed-in");
-    await loadVotes();
+    await Promise.all([loadVotes(), loadComments()]);
     applyVotes();
     document.querySelectorAll(".rowsay").forEach((b) => { b.hidden = false; });
   } catch (e) {
