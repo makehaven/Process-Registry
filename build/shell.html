@@ -120,6 +120,27 @@
   .rank-row .what > em em { display:inline; font-style:italic; }
   .rank-row .grp { display:inline-block; margin-top:5px; font-family:var(--mono); font-size:10px;
                    letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); }
+  /* Docs on the ranking. Quieter than the note above it — a pointer to what is
+     written down, not a second description. */
+  .rank-row .rdocs { display:block; margin-top:5px; font-size:12px; line-height:1.65; }
+  .rank-row .rdocs b { font-family:var(--mono); font-size:9.5px; letter-spacing:.11em;
+                       text-transform:uppercase; color:var(--ink-3); font-weight:600;
+                       margin-right:7px; }
+
+  /* Unanswered comments, inline on a row. Amber because it is the same signal as
+     `watch`: not broken, but owed a response. Clickable through to the thread. */
+  .pending { display:block; margin-top:8px; padding:7px 10px; cursor:pointer;
+             border-left:2px solid var(--s-watch); background:var(--s-watch-bg);
+             border-radius:0 2px 2px 0; }
+  .pending:hover { filter:brightness(0.98); }
+  .pending .pl { display:block; font-family:var(--mono); font-size:9px; letter-spacing:.11em;
+                 text-transform:uppercase; font-weight:700; color:var(--s-watch); }
+  .pending .pc { margin-top:5px; font-size:12.5px; line-height:1.55; color:var(--ink-2); }
+  .pending .pc b { display:block; font-family:var(--mono); font-size:9.5px; letter-spacing:.06em;
+                   text-transform:uppercase; font-weight:600; color:var(--ink-3); }
+  .pending em { display:block; margin-top:5px; font-style:normal; font-family:var(--mono);
+                font-size:10px; color:var(--ink-3); }
+  @media print { .pending { display:none !important; } }
   .rank-row .score { font-family:var(--mono); font-size:13px; font-weight:700; font-variant-numeric:tabular-nums;
                      color:var(--crimson); white-space:nowrap; }
   .rank-row .score small { display:block; font-size:10px; font-weight:500; color:var(--ink-3);

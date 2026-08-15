@@ -333,6 +333,73 @@ function paintCommentCounts() {
       b.classList.toggle("has", n > 0);
     });
   });
+  paintPending();
+}
+
+/** `new` until digest.py exports it and flips it to `reviewed`, which is the same
+ *  line the digest draws. Anything not yet reviewed is still owed an answer. */
+const isPending = (c) => c.status !== "reviewed";
+
+/**
+ * Unanswered comments, on the row itself.
+ *
+ * A count behind a button says something was said; it does not say what, and on
+ * the Next tab that is the difference that matters — this is where the room
+ * decides what to work on, and an unresolved objection to a row's rank is
+ * exactly what should be readable while deciding rather than one click away.
+ *
+ * Only pending ones. Once a comment has been folded into the inventory and
+ * marked reviewed it is history, and leaving it here would make every row look
+ * permanently contested. The full thread, reviewed included, stays in the panel.
+ */
+function paintPending() {
+  document.querySelectorAll(".rank-row[data-pid], .flux-row[data-pid]").forEach((row) => {
+    const existing = row.querySelector(".pending");
+    if (existing) existing.remove();
+
+    const list = (state.comments.get(row.dataset.pid) || []).filter(isPending);
+    if (!list.length) return;
+
+    const box = document.createElement("div");
+    box.className = "pending";
+
+    const head = document.createElement("span");
+    head.className = "pl";
+    head.textContent = list.length === 1 ? "1 unanswered" : `${list.length} unanswered`;
+    box.appendChild(head);
+
+    // Three is enough to show a row is contested; the rest are a click away.
+    list.slice(0, 3).forEach((c) => {
+      const item = document.createElement("div");
+      item.className = "pc";
+      const who = document.createElement("b");
+      who.textContent = `${c.name || "Unknown"} — ${KIND_LABEL[c.kind] || c.kind}`;
+      const txt = document.createElement("span");
+      txt.textContent = c.text;
+      item.append(who, txt);
+      box.appendChild(item);
+    });
+
+    if (list.length > 3) {
+      const more = document.createElement("em");
+      more.textContent = `+${list.length - 3} more`;
+      box.appendChild(more);
+    }
+
+    // Clicking anywhere in the block opens the thread it is summarising.
+    box.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openPanel(row.dataset.pid);
+    });
+
+    // Both layouts are grids, and the roomy column is a different one in each:
+    // on the ranking it is `.what`, while a flux row keeps `.what` to a narrow
+    // 240px and gives the remaining width to its notes cell.
+    const target = row.classList.contains("flux-row")
+      ? row.querySelector(".n")
+      : row.querySelector(".what");
+    (target || row).appendChild(box);
+  });
 }
 
 /* ------------------------------------------------------------------ ranking  */

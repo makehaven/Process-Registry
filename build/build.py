@@ -498,9 +498,15 @@ rank_html = []
 for n, (score, _, r) in enumerate(top, 1):
     extra = "" if n <= SHOWN else " rank-extra"
     boost = f'<span class="plan-adj">+{r["plan_boost"]}</span>' if r["plan_boost"] else ""
+    # The policy or procedure behind a row is most useful precisely here. This is
+    # the tab where the room argues about what to do next, and "is anything even
+    # written down?" is half that argument — a question the inventory answers two
+    # tabs away. Same field as the inventory's Docs line, same links.
+    rdocs = parse_note(r["note"]).get("docs")
+    docs_html = f'<span class="rdocs"><b>Docs</b>{md(rdocs)}</span>' if rdocs else ""
     rank_html.append(f"""      <div class="rank-row{extra}" data-pid="{r['pid']}" data-base="{r['base']}" data-plan="{r['plan_boost']}" data-rank="{n}"{'' if n <= SHOWN else ' hidden'}><div class="n">{n:02d}</div>
         <div class="what"><b>{md(r['name'])}</b><em>{md(plain_note(r['note']))}</em>
-        <span class="grp">{html.escape(r['group'])}{plan_chip(r)}</span>
+        <span class="grp">{html.escape(r['group'])}{plan_chip(r)}</span>{docs_html}
         <div class="vote" data-pid="{r['pid']}" hidden>
           <button type="button" class="vt up" data-v="1" aria-label="More important than ranked">&#9650;<span class="c">0</span></button>
           <button type="button" class="vt down" data-v="-1" aria-label="Less important than ranked">&#9660;<span class="c">0</span></button>
