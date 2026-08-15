@@ -1,8 +1,8 @@
 # MakeHaven Process Registry
 
-A standing map of every operational process at MakeHaven — what it is, who owns
-it, how manual it is, how well documented, how much it costs us when it breaks,
-and whether it is changing right now.
+A standing map of every operational process at MakeHaven — what it is, how
+manual it is, how well documented, how much it costs us when it breaks, and
+whether it is changing right now.
 
 **Live:** `process.makehaven.org` — see [SETUP.md](SETUP.md) to publish
 **Track:** `makehaven-website/conductor/tracks/process_stabilization_20260814/`

@@ -203,6 +203,10 @@
                 padding:2px 7px; border-radius:2px; margin-right:7px; }
   .scorekey .k-crit { color:var(--s-degraded); background:var(--s-degraded-bg); }
   .scorekey .k-warn { color:var(--s-watch); background:var(--s-watch-bg); }
+  .scorekey span { display:inline-flex; align-items:center; gap:5px; }
+  .scorekey b { font-family:var(--mono); font-size:10px; letter-spacing:.1em;
+                text-transform:uppercase; color:var(--ink-3); font-weight:600; margin-right:2px; }
+  .scorekey .knote { display:block; flex:1 1 100%; color:var(--ink-2); }
 
   .coverage { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1px;
               margin:0 0 30px; background:var(--rule); border:1px solid var(--rule);
@@ -232,7 +236,7 @@
   .res.strat b { color:var(--crimson); }
   .res.strat { border-top-style:solid; }
   .res.code b { color:var(--s-changing); }
-  /* Owner / reviewed: provenance, deliberately quieter than the content above it. */
+  /* Reviewed date: provenance, deliberately quieter than the content above it. */
   .res.meta { border-top:0; margin-top:5px; padding-top:0; font-size:11px; color:var(--ink-3); }
   .res.meta b { margin-right:5px; }
   .res.meta .never { font-style:normal; color:var(--s-watch); font-weight:600; }
@@ -612,10 +616,19 @@
 
 <div class="panel" id="p-next" role="tabpanel" aria-labelledby="t-next" hidden>
 
-  <p class="lead">Where effort pays best next, ranked by <strong>impact × how manual it still is</strong> — then adjusted by the people who actually run these processes. A prioritisation aid, not a verdict.</p>
+  <p class="lead">The <strong>{{NRANK}} processes with something actually wrong with them</strong>, ranked by <strong>impact × how manual it still is</strong> and then adjusted by the people who run them. A prioritisation aid, not a verdict.</p>
 
   <section>
     <h2>Where to automate next</h2>
+    <p class="sec-note">
+      <strong>{{NRANK}} of {{N}} processes are here; {{NSETTLED}} are not.</strong> A row earns a
+      place by having something actually wrong with it — it is
+      <span class="pill degraded" style="padding:1px 5px">degraded</span> or
+      <span class="pill unoptimized" style="padding:1px 5px">unoptimized</span>, or it is not yet
+      both automated and documented and it matters enough to be worth someone's week. A process
+      that is automated, documented and working is finished, not merely un-started, and putting it
+      on a list called <em>next</em> only makes the list longer.
+    </p>
     <p class="sec-note">
       The base score is <strong>impact × how manual it still is</strong>, out of 20. That is
       arithmetic, and arithmetic does not know which of these actually hurts on a Tuesday.
@@ -656,10 +669,10 @@
       <span class="cl">Linked to code</span>
       <span class="cs">Rows naming the module that implements them, so a change in the website
       repo can be traced to the processes it touches.</span></div>
-    <div><span class="cn">{{NOWNER}}<small>/{{N}}</small></span>
-      <span class="cl">Have an owner</span>
-      <span class="cs">The field exists and nothing fills it yet. Until it does, no row can
-      tell you who to ask.</span></div>
+    <div><span class="cn">{{NNEVER}}<small>/{{N}}</small></span>
+      <span class="cl">Never verified</span>
+      <span class="cs">Inferred from the codebase, the plan or the dashboards, and never
+      confirmed by a person. The registry's own staleness, kept in plain sight.</span></div>
   </div>
 
   <section>
@@ -722,13 +735,14 @@
     <p class="sec-note">
       All {{N}} rows, grouped operationally and mapped to the strategic plan's six goals.
       <strong>?</strong> means genuinely unknown — please do not guess it in review, ask the person
-      who does it. Owners are omitted throughout because we do not have any; assigning them is the
-      biggest single improvement still available here.
+      who does it. There is no owner column: most of what happens here is collaborative or
+      automated, and a single name per process described neither who does the work nor who can
+      judge whether it is right.
     </p>
     <p class="scorekey">
-      <span><i class="k-crit">1</i> worst on that axis — A1 tribal, D0 nothing written, I5 safety or legal</span>
-      <span><i class="k-warn">2</i> second worst</span>
-      <span>Colour marks a deficit only, so it means the same thing in all three columns.</span>
+      {{SCOREKEY}}
+      <span class="knote">Colour marks a deficit and nothing else: the two worst values on each
+      scale, whichever end of it they sit at. Everything else stays plain ink.</span>
     </p>
     <div class="filter">
       <input id="inv-filter" type="search" autocomplete="off"
@@ -859,7 +873,6 @@
         <tbody>
           <tr><td class="p">A flat list of documents</td><td class="n">Documents attached to the process that uses them</td></tr>
           <tr><td class="p">No dates — cannot tell current from abandoned</td><td class="n">A <code>reviewed</code> date per row — <strong>{{NREVIEWED}} of {{N}} carry one</strong>, so the registry's own staleness is visible rather than hidden</td></tr>
-          <tr><td class="p">No owner per document</td><td class="n">An <code>owner</code> field per process — <strong>supported, and currently empty on every row.</strong> Filling it is the biggest improvement still available here</td></tr>
           <tr><td class="p">At least one broken link</td><td class="n">Link-checkable in the build</td></tr>
           <tr><td class="p">Back half is an unrelated field-trip photo log</td><td class="n">Scoped to operations</td></tr>
           <tr><td class="p">Nothing says whether the document is <em>followed</em></td><td class="n">The A, D and I scores say exactly that</td></tr>

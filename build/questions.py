@@ -22,7 +22,7 @@ import argparse, pathlib, re, sys
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SRC = ROOT / "data" / "inventory.md"
 QDIR = ROOT / "questions"
-SIGILS = "⚑◷⚙⚠⟐‖"
+SIGILS = "◷⚙⚠⟐‖"
 
 
 def load():
@@ -39,7 +39,7 @@ def load():
             continue
         note = c[5]
         f = {}
-        for sig, key in zip(SIGILS, ["owner", "reviewed", "code", "raised", "strategy", "docs"]):
+        for sig, key in zip(SIGILS, ["reviewed", "code", "raised", "strategy", "docs"]):
             if sig in note:
                 f[key] = re.split(f"[{SIGILS}]", note.split(sig, 1)[1])[0].strip()
         rows.append(dict(group=group, name=re.sub(r"\*", "", c[0]).strip(),
@@ -85,11 +85,6 @@ def questions(rows):
                         f"Is this description accurate? — \"{r['prose'][:110]}\"",
                         f"I{i} and no person has ever confirmed it. Inferred from the "
                         "codebase or the plan, never checked."))
-
-        if not r.get("owner") and i >= 4:
-            out.append((base + 20, "No owner", nm,
-                        "Who owns this, and who covers it when they are away?",
-                        f"I{i} with no named owner. If it fails, there is no one to call."))
 
         if r["a"].isdigit() and int(r["a"]) <= 2 and r["d"] in ("0", "1") and i >= 3:
             out.append((base + 15, "Manual and unwritten", nm,
@@ -145,8 +140,8 @@ def main():
     rows = load()
     qs = questions(rows)[:a.limit]
     if not qs:
-        sys.exit("Nothing worth asking — no uncharacterised, degraded, unoptimized, "
-                 "unverified or unowned high-impact rows.")
+        sys.exit("Nothing worth asking — no uncharacterised, degraded, unoptimized "
+                 "or unverified high-impact rows.")
     text, n = render(qs, rows)
     if a.write:
         QDIR.mkdir(exist_ok=True)

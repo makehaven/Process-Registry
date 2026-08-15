@@ -126,12 +126,39 @@ def strip_history(note):
 
 # Colour flags a deficit and nothing else. The three axes have different ranges
 # and opposite polarity — Auto 1-5 and Doc 0-3 are better when high, Impact 1-5
-# is worse when high — so tinting "good" values made the same digit green in one
-# column and amber in the next, which read as a bug rather than a meaning.
-# Only the ends that need attention are coloured; everything else stays ink.
-SEV = {"a": {"1": "crit", "2": "warn"},
-       "d": {"0": "crit", "1": "warn"},
-       "i": {"5": "crit", "4": "warn"}}
+# is worse when high — so a hand-written table of which digits to tint had to be
+# read against three different scales to check, and the printed key claimed
+# "1 = worst" while the Impact column coloured 5.
+#
+# So it is derived instead. Each scale declares its range and which end is the
+# deficit; severity is the position along that scale normalised to 0-1, and the
+# same two thresholds apply to all three. Adding a scale, or changing a range,
+# cannot now produce a column that is coloured on a different rule from its
+# neighbours — and the key on the page is generated from this, so it cannot
+# describe something the table is not doing.
+SCALES = {
+    "a": {"label": "Auto",   "lo": 1, "hi": 5, "worst": "low"},
+    "d": {"label": "Doc",    "lo": 0, "hi": 3, "worst": "low"},
+    "i": {"label": "Impact", "lo": 1, "hi": 5, "worst": "high"},
+}
+CRIT, WARN = 0.80, 0.55
+
+
+def deficit(axis, v):
+    """How far this value sits toward the bad end of its own scale, 0.0-1.0."""
+    s = SCALES[axis]
+    frac = (int(v) - s["lo"]) / (s["hi"] - s["lo"])
+    return 1 - frac if s["worst"] == "low" else frac
+
+
+def band(axis, v):
+    d = deficit(axis, v)
+    return "crit" if d >= CRIT else "warn" if d >= WARN else "ok"
+
+
+SEV = {ax: {str(v): band(ax, v)
+            for v in range(s["lo"], s["hi"] + 1) if band(ax, v) != "ok"}
+       for ax, s in SCALES.items()}
 
 # On a phone the table becomes a stack of cards and the column headers go away,
 # which would leave three bare digits meaning nothing. Each score cell carries
@@ -146,9 +173,9 @@ def score_cell(axis, v):
 
 # Optional fields, each introduced by its own sigil so the note stays one cell
 # and rows that omit a field cost nothing. Order in the source is by convention
-# description ⚑owner ◷reviewed ⚙code ⟐strategy ‖docs, but parsing does not
+# description ◷reviewed ⚙code ⟐strategy ‖docs, but parsing does not
 # depend on that order.
-SIGILS = {"⚑": "owner", "◷": "reviewed", "⚙": "code", "⚠": "raised",
+SIGILS = {"◷": "reviewed", "⚙": "code", "⚠": "raised",
           "⟐": "strategy", "‖": "docs"}
 
 def parse_note(raw):
@@ -188,21 +215,48 @@ def note_cell(raw):
         out += f'<span class="res strat"><b>Strategy</b>{md(p["strategy"])}</span>'
     if p.get("docs"):
         out += f'<span class="res"><b>Docs</b>{md(p["docs"])}</span>'
-    meta = []
-    if p.get("owner"):
-        meta.append(f'<b>Owner</b> {md(p["owner"])}')
-    meta.append(f'<b>Reviewed</b> {md(p["reviewed"])}' if p.get("reviewed")
-                else '<b>Reviewed</b> <i class="never">never</i>')
-    out += f'<span class="res meta">{" · ".join(meta)}</span>'
+    # Only rows a person actually confirmed carry a line. How much is unverified
+    # is reported once, in the inventory header, rather than stamped on ninety-odd
+    # rows as a reproach.
+    if p.get("reviewed"):
+        out += f'<span class="res meta"><b>Reviewed</b> {md(p["reviewed"])}</span>'
     return out
 
 # ---- automation ranking ----------------------------------------------------
+# Membership is a separate question from order, and it used to be neither: the
+# only filter was score > 0, and since nothing in the registry is A5 the term
+# (5 - A) is never zero, so 186 of 187 processes "made" the list. A ranking that
+# contains everything is a sorted inventory, not a shortlist.
+#
+# A row now has to have something actually wrong with it:
+#   - a named deficit (degraded or unoptimized) always keeps its place, or
+#   - it is not yet both automated and documented, and it matters enough that
+#     fixing it is worth someone's week.
+# Automated *and* documented is the definition of done here — A4 is "automated,
+# humans handle exceptions" and D2 is "current SOP exists" — so those rows are
+# finished, not merely un-started. And an I1 or I2 annoyance is a real thing to
+# improve one day, but it is not what "where should effort go next" is asking.
+FINISHED_A, FINISHED_D, WORTH_IT_I = 4, 2, 3
+
+
+def needs_work(r):
+    if r["state"] in ("degraded", "unoptimized"):
+        return True
+    if not (r["a"].isdigit() and r["i"].isdigit()):
+        return False
+    if int(r["a"]) >= FINISHED_A and r["d"].isdigit() and int(r["d"]) >= FINISHED_D:
+        return False
+    return int(r["i"]) >= WORTH_IT_I
+
+
 ranked = []
 for r in rows:
-    if r["a"].isdigit() and r["i"].isdigit():
+    if needs_work(r) and r["a"].isdigit() and r["i"].isdigit():
         score = int(r["i"]) * (5 - int(r["a"]))
         if score > 0:
             ranked.append((score, int(r["i"]), r))
+
+n_settled = N - len(ranked)
 ranked.sort(key=lambda t: (-t[0], -t[1], t[2]["name"]))
 # A dedicated tab has room for more than a dozen. Show 30 and keep the rest
 # one click away rather than truncating silently.
@@ -331,7 +385,6 @@ n_manual_undoc = sum(1 for r in rows if r["a"].isdigit() and int(r["a"]) <= 2
                      and r["d"].isdigit() and int(r["d"]) <= 1)
 n_d3 = sum(1 for r in rows if r["d"] == "3")
 fields = [parse_note(r["note"]) for r in rows]
-n_owner    = sum(1 for f in fields if f.get("owner"))
 n_reviewed = sum(1 for f in fields if f.get("reviewed"))
 n_code     = sum(1 for f in fields if f.get("code"))
 n_never    = N - n_reviewed
@@ -345,16 +398,28 @@ manifest = json.dumps(
      for r in sorted(rows, key=lambda r: (r["group"], r["name"]))],
     ensure_ascii=False, separators=(",", ":"))
 
+# The key used to be hand-written and said "1 — worst on that axis", which is
+# true for Auto and Doc and wrong for Impact, where 5 is the bad end. Generated
+# from SCALES it shows the actual digits each column tints.
+key_bits = []
+for _ax, _s in SCALES.items():
+    _vals = sorted((v for v in range(_s["lo"], _s["hi"] + 1) if band(_ax, v) != "ok"),
+                   key=lambda v: -deficit(_ax, v))
+    _chips = "".join(f'<i class="k-{band(_ax, v)}">{v}</i>' for v in _vals)
+    key_bits.append(f'<span><b>{_s["label"]}</b>{_chips}</span>')
+scorekey = "".join(key_bits)
+
 page = TPL.read_text()
 for key, val in [("TILES", tiles), ("LEGEND", legend), ("BOARD", "\n".join(board)),
                  ("NRES", str(nres)), ("NGROUPS", str(len(by_group))),
                  ("NAUTO", str(n_auto)), ("NMANUAL", str(n_manual)),
                  ("NMANUALUNDOC", str(n_manual_undoc)), ("ND3", str(n_d3)),
-                 ("NFLOORED", str(n_floored)), ("NOWNER", str(n_owner)),
+                 ("NFLOORED", str(n_floored)),
                  ("NREVIEWED", str(n_reviewed)), ("NCODE", str(n_code)),
                  ("NNEVER", str(n_never)), ("NRANK", str(len(top))), ("NSHOWN", str(SHOWN)),
                  ("NMORE", str(max(0, len(top) - SHOWN))), ("RAISED", raised_html),
-                 ("MANIFEST", manifest),
+                 ("MANIFEST", manifest), ("SCOREKEY", scorekey),
+                 ("NSETTLED", str(n_settled)),
                  ("NRAISED", str(len(raised))),
                  ("RANK", "\n".join(rank_html)), ("TABLES", "\n".join(tables)),
                  ("UNRANK", unrank_html), ("INFLUX", influx), ("N", str(N)),
@@ -371,5 +436,5 @@ if left:
 OUT.parent.mkdir(parents=True, exist_ok=True)
 OUT.write_text(page)
 print(f"resource-linked rows: {nres}; D2 floor applied to {n_floored} code-run rows")
-print(f"coverage — owner {n_owner}/{N}, reviewed {n_reviewed}/{N}, code {n_code}/{N}")
+print(f"coverage — reviewed {n_reviewed}/{N}, code {n_code}/{N}")
 print(f"wrote {OUT} — {N} processes, {len(tables)} groups, change load {change_load}, can't-say {cant_say}")

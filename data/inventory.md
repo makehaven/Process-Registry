@@ -18,7 +18,7 @@ trusting an un-annotated number.
 ## How to read it
 
 - **A** = automation, A1 tribal → A5 autonomous + monitored
-- **D** = documentation, D0 none → D3 proven by someone other than the owner
+- **D** = documentation, D0 none → D3 proven by someone other than the person who wrote it
 - **I** = impact when it fails, I1 annoyance → I5 safety/legal/existential
 - **State** = `stable` · `changing` · `watch` · `planned` · `unoptimized` ·
   `degraded` · `undefined` · `unknown`
@@ -31,8 +31,12 @@ trusting an un-annotated number.
   person who does it. `undefined` means the *process* has no defined shape;
   `unknown` means it runs but we cannot currently characterise it.
 
-Full scale definitions are in `plan.md`. Owners are omitted throughout because
-we do not have them; assigning them is the main output of the Phase 0 session.
+Full scale definitions are in `plan.md`. There is deliberately no owner field:
+most work here is collaborative or automated — the optimization and digitization
+is often done by JR or by AI, while the person who tests it and says whether it
+actually works is someone else — so one name per process described neither role
+honestly. `◷ reviewed` records that a person confirmed the row, which is the
+accountability that turned out to be real.
 
 ---
 
