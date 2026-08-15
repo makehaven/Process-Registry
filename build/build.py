@@ -29,16 +29,35 @@ GOAL = {
 ORDER = list(GOAL)
 """State vocabulary, ordered from settled to least settled.
 
-`degraded` and `unoptimized` are both deficits, but they are different problems
-and were previously collapsed into one word. `degraded` means the thing fails:
+`broken` and `optimizable` are both deficits, but they are different problems
+and were previously collapsed into one word. `broken` means the thing fails:
 something that is supposed to happen does not, whether it broke or never once
-fired. `unoptimized` means the thing does what it was built to do and was simply
-never built far enough. Calling the second one "degraded" implied a regression
-that never happened, and made 27 rows look like an emergency when 17 of them are
-ordinary unfinished work.
+fired. `optimizable` means the thing does what it was built to do and was simply
+never built to its end goal. Collapsing the second into the first implied a
+regression that never happened, and made 27 rows look like an emergency when 17
+of them are ordinary unfinished work.
+
+These words are the whole vocabulary — the tiles on the front page use them
+verbatim rather than a friendlier synonym. They used to differ ("Failing now"
+over `degraded`, "Never built out" over `unoptimized`), which meant the number a
+reader saw on the front page named a state they could not then find, because the
+inventory filter matches the row text and the row said something else.
+
+`optimizable` is deliberately narrow: the thing runs and was never built to its
+end goal. It does not mean "could be improved" — read that way it would cover
+nearly all 188 rows and the count would stop carrying information. A row where
+nothing exists yet is `planned`, not `optimizable`.
 """
 STATES = ["stable", "watch", "changing", "planned",
-          "unoptimized", "degraded", "undefined", "unknown"]
+          "optimizable", "broken", "undefined", "unknown"]
+
+# Front-page tiles and inventory badges must name a state identically or the
+# filter cannot find what the tile is counting; TILE_COPY keeps the gloss beside
+# the word instead of replacing it.
+TILE_COPY = {
+    "broken":      "Something that should happen does not — nobody currently fixing",
+    "optimizable": "Runs, but was never built to its end goal — not merely improvable",
+}
 
 # ---- parse -----------------------------------------------------------------
 rows, group, blurbs, cur_blurb = [], None, {}, []
@@ -58,16 +77,25 @@ for ln in SRC.read_text().split("\n"):
                              state=c[4], note=c[5]))
 
 # ---- documentation floor ----------------------------------------------------
-# A process that runs as code (A4+) has a maintained implementation, and that
+# A process that runs as code has a maintained implementation, and that
 # implementation is a current description of what happens — better than most
 # SOPs, because it cannot drift from the behaviour it defines. Such rows are
-# floored at D2. Applied here rather than edited into inventory.md so the raw
+# floored at D3. Applied here rather than edited into inventory.md so the raw
 # assessment stays intact and the rule is visible and reversible in one place.
-# The floor stops at D2: D3 needs a second person to have worked from it.
+# The floor stops at D3: D4 needs a second person to have worked from it.
+#
+# It requires a named module, not just an A4 score. Half the rows this rule used
+# to raise (13 of 26) named no module anywhere — so "the implementation is the
+# description" was asserting a description that nothing in the registry pointed
+# at. Comped / sliding-scale / sponsored memberships was one of them: A4 because
+# the join form is automated, floored to "a durable description exists" when the
+# eligibility policy is written down nowhere. An A4 score says a process runs
+# itself; only a module says where to read what it does.
 n_floored = 0
 for r in rows:
-    if r["a"].isdigit() and int(r["a"]) >= 4 and r["d"].isdigit() and int(r["d"]) < 2:
-        r["d"], r["d_floored"] = "2", True
+    if (r["a"].isdigit() and int(r["a"]) >= 4 and "⚙" in r["note"]
+            and r["d"].isdigit() and int(r["d"]) < 3):
+        r["d"], r["d_floored"] = "3", True
         n_floored += 1
 
 by_group = collections.OrderedDict((g, [r for r in rows if r["group"] == g]) for g in ORDER)
@@ -109,49 +137,97 @@ def md(s):
     s = re.sub(r"`(.+?)`", r"<code>\1</code>", s)
     return s
 
+# How a row's score got to where it is belongs to the registry's own history, not
+# to the process. A reader meeting a row for the first time wants to know what the
+# thing is and where it stands; "Corrected from `unknown`", "Upgraded from
+# `degraded`" and "Corrected twice" all describe edits to this file instead. The
+# source keeps the full text — the audit trail is real and worth having — and only
+# the rendered page is cleaned.
+PROVENANCE = re.compile(
+    r"""^(?:Corrected|Upgraded|Downgraded|Re-?scored|Revised|Reclassified)
+         (?:\s+(?:from|to)\s*`[^`]*`)?          # ...from `unknown`
+         (?:\s*(?:twice|\d+\s*times))?          # ...twice
+         (?:\s*to\s+a\s+named\s+weak\s+point)?
+      """, re.X | re.I)
+
+
 def strip_history(note):
-    """Drop drafting provenance ("Corrected from `unknown`.", "(JR, round 2)")
-    while keeping any substantive clause that was riding along with it. The
-    source file keeps the full text; only the rendered page is cleaned."""
+    """Drop drafting provenance while keeping any substantive clause riding along.
+
+    "**Corrected from `unknown` — better automated than assumed.** Instructors
+    submit hours..." keeps the judgement and the description, losing only the
+    fact that this cell used to read `unknown`.
+    """
     def fix(m):
-        rest = re.sub(r"^Corrected from\s*`[^`]*`(\s*to a named weak point)?", "", m.group(1))
-        rest = rest.lstrip(" .,;—-")
+        rest = PROVENANCE.sub("", m.group(1)).lstrip(" .,;—-")
         return f"**{rest[0].upper()}{rest[1:]}**" if rest else ""
-    note = re.sub(r"\*\*(Corrected from[^*]*?)\*\*", fix, note)
+    note = re.sub(r"\*\*([^*]*?)\*\*",
+                  lambda m: fix(m) if PROVENANCE.match(m.group(1)) else m.group(0), note)
+    # The same sentence unbolded, and the roadmap boilerplate that only restates
+    # the `planned` badge sitting next to it.
+    note = PROVENANCE.sub("", note)
+    note = re.sub(r"Confirmed by JR as an intention we have not started\s*—\s*"
+                  r"a roadmap item, not a broken process\.?", "", note)
     note = re.sub(r"\s*\*?\(JR,\s*round\s*\d\)\*?", "", note)
     note = re.sub(r"^[\s.,;—-]+", "", note)
     note = re.sub(r"\s{2,}", " ", note)
     note = re.sub(r"\s+([.,])", r"\1", note).strip()
     return note[0].upper() + note[1:] if note else note
 
-# Colour flags a deficit and nothing else. The three axes have different ranges
-# and opposite polarity — Auto 1-5 and Doc 0-3 are better when high, Impact 1-5
-# is worse when high — so a hand-written table of which digits to tint had to be
-# read against three different scales to check, and the printed key claimed
-# "1 = worst" while the Impact column coloured 5.
+# Colour flags a deficit and nothing else, and only two of the three axes carry
+# one. Auto and Doc are deficit scales and they run the same way — low is bad —
+# so a single sentence covers both: the two lowest values are flagged, red for
+# the worse of the two. The reader never has to know that the ranges differ.
 #
-# So it is derived instead. Each scale declares its range and which end is the
-# deficit; severity is the position along that scale normalised to 0-1, and the
-# same two thresholds apply to all three. Adding a scale, or changing a range,
-# cannot now produce a column that is coloured on a different rule from its
-# neighbours — and the key on the page is generated from this, so it cannot
-# describe something the table is not doing.
+# Impact used to be in that set and should not have been. I5 is "safety, legal
+# or existential": that is how much a process matters, not something wrong with
+# it, and needs_work() below already treats it as the multiplier on urgency
+# rather than the fault. Tinting it made a well-run safety process show a red
+# cell, and put "fix this" and "this matters" in the same visual channel while
+# the key above the table claimed colour meant a deficit and nothing else. It
+# also forced the key to explain itself with "whichever end of the scale they
+# sit at", and to print 1 2 under one column and 5 4 under the next.
+#
+# So Impact is marked by weight instead: I4 and I5 sit in full-strength ink, and
+# the alarm palette is left to mean exactly one thing. Both markings are derived
+# from the table below rather than hand-written, and the key on the page is
+# generated from the same source, so it cannot describe something the table is
+# not doing.
+# Auto and Doc now share a range as well as a direction. Doc used to run 0-3
+# against Auto's 1-5, so the same position on the two scales meant different
+# things and the printed key had to name different digits for each column. On a
+# common 1-5 they flag the same two values and the rule collapses to one line.
+# The top band was the part that had to be invented rather than relabelled, and
+# it is defined to mirror A5: A5 is "runs itself and tells us when it fails",
+# D5 is "documented and we would know if it went stale". Both are empty today.
 SCALES = {
-    "a": {"label": "Auto",   "lo": 1, "hi": 5, "worst": "low"},
-    "d": {"label": "Doc",    "lo": 0, "hi": 3, "worst": "low"},
-    "i": {"label": "Impact", "lo": 1, "hi": 5, "worst": "high"},
+    "a": {"label": "Auto",   "lo": 1, "hi": 5, "mark": "deficit"},
+    "d": {"label": "Doc",    "lo": 1, "hi": 5, "mark": "deficit"},
+    "i": {"label": "Impact", "lo": 1, "hi": 5, "mark": "weight"},
 }
 CRIT, WARN = 0.80, 0.55
 
+DEFICIT_AXES = [ax for ax, s in SCALES.items() if s["mark"] == "deficit"]
+
+
+def _frac(axis, v):
+    """Where this value sits in its own range: 0.0 at the low end, 1.0 at the high."""
+    s = SCALES[axis]
+    return (int(v) - s["lo"]) / (s["hi"] - s["lo"])
+
 
 def deficit(axis, v):
-    """How far this value sits toward the bad end of its own scale, 0.0-1.0."""
-    s = SCALES[axis]
-    frac = (int(v) - s["lo"]) / (s["hi"] - s["lo"])
-    return 1 - frac if s["worst"] == "low" else frac
+    """How far this value sits toward the bad end of a deficit scale, 0.0-1.0.
+
+    Only meaningful for the axes in DEFICIT_AXES, which are all low-is-bad.
+    """
+    return 1 - _frac(axis, v)
 
 
 def band(axis, v):
+    """The class a value earns: severity on a deficit scale, emphasis on Impact."""
+    if SCALES[axis]["mark"] == "weight":
+        return "hi" if _frac(axis, v) >= WARN else "ok"
     d = deficit(axis, v)
     return "crit" if d >= CRIT else "warn" if d >= WARN else "ok"
 
@@ -176,7 +252,7 @@ def score_cell(axis, v):
 # description ◷reviewed ⚙code ⟐strategy ‖docs, but parsing does not
 # depend on that order.
 SIGILS = {"◷": "reviewed", "⚙": "code", "⚠": "raised",
-          "⟐": "strategy", "‖": "docs"}
+          "⟐": "strategy", "‖": "docs", "◊": "drafted"}
 
 def parse_note(raw):
     """Split a note cell into its prose and whichever optional fields it carries."""
@@ -220,6 +296,14 @@ def note_cell(raw):
     # rows as a reproach.
     if p.get("reviewed"):
         out += f'<span class="res meta"><b>Reviewed</b> {md(p["reviewed"])}</span>'
+    # A description written from the row's name, module and strategy rather than
+    # by someone who runs the process. This is a separate claim from `reviewed`,
+    # which on several of these rows is true of the state and scores but was never
+    # true of the prose — those rows had no prose at all. Marked per row because
+    # the sentence reads exactly like a confirmed one otherwise.
+    if p.get("drafted"):
+        out += (f'<span class="res draft"><b>Description inferred</b> '
+                f'{md(p["drafted"])} — not confirmed by anyone who runs it</span>')
     return out
 
 # ---- the strategic plan as a ranking input ----------------------------------
@@ -246,7 +330,6 @@ if STRAT_CSV.exists():
     with STRAT_CSV.open(newline="") as fh:
         for _r in csv.DictReader(fh):
             strategies[_norm(_r["Strategy Title"])] = {
-                "id": _r["Strategy ID"].strip(),
                 "title": _r["Strategy Title"].strip(),
                 "priority": _r["Priority"].strip(),
                 "work": _r["Next Work Type"].strip(),
@@ -280,18 +363,18 @@ n_unmatched = sum(1 for r in rows if not r["strat"] and "⟐" in r["note"])
 # contains everything is a sorted inventory, not a shortlist.
 #
 # A row now has to have something actually wrong with it:
-#   - a named deficit (degraded or unoptimized) always keeps its place, or
+#   - a named deficit (broken or optimizable) always keeps its place, or
 #   - it is not yet both automated and documented, and it matters enough that
 #     fixing it is worth someone's week.
 # Automated *and* documented is the definition of done here — A4 is "automated,
-# humans handle exceptions" and D2 is "current SOP exists" — so those rows are
+# humans handle exceptions" and D3 is "current SOP exists" — so those rows are
 # finished, not merely un-started. And an I1 or I2 annoyance is a real thing to
 # improve one day, but it is not what "where should effort go next" is asking.
-FINISHED_A, FINISHED_D, WORTH_IT_I = 4, 2, 3
+FINISHED_A, FINISHED_D, WORTH_IT_I = 4, 3, 3
 
 
 def needs_work(r):
-    if r["state"] in ("degraded", "unoptimized"):
+    if r["state"] in ("broken", "optimizable"):
         return True
     # A P1 commitment belongs on the list whatever its scores say — that is what
     # the board choosing it means.
@@ -358,12 +441,18 @@ influx = "".join(
         <div class="n">{md(plain_note(r['note']))}</div></div>""" for r in flux)
 
 # ---- fragments -------------------------------------------------------------
+# Every tile that counts a single state is an anchor carrying that state's exact
+# word, so clicking it lands in the inventory already filtered to the rows it was
+# counting. Before, the tiles named states the inventory did not use, so a reader
+# who saw "11 failing now" had nothing to type to find those eleven rows.
+# "In flux" spans two states and "Processes mapped" is the whole set, so those
+# two stay plain divs rather than pretending to a filter they cannot express.
 tiles = f"""
       <div class="tile"><span class="num">{N}</span><span class="lbl">Processes mapped</span><span class="sub">Across 13 groups · {st_tot['stable']} running normally</span></div>
-      <div class="tile bad"><span class="num">{st_tot['degraded']}</span><span class="lbl">Failing now</span><span class="sub">Something that should happen does not — nobody currently fixing</span></div>
-      <div class="tile unopt"><span class="num">{st_tot['unoptimized']}</span><span class="lbl">Never built out</span><span class="sub">Works as far as it goes; the work was just never finished</span></div>
+      <a class="tile bad" href="#inventory" data-filter="state:broken"><span class="num">{st_tot['broken']}</span><span class="lbl">Broken</span><span class="sub">{TILE_COPY['broken']}</span></a>
+      <a class="tile unopt" href="#inventory" data-filter="state:optimizable"><span class="num">{st_tot['optimizable']}</span><span class="lbl">Optimizable</span><span class="sub">{TILE_COPY['optimizable']}</span></a>
       <div class="tile accent"><span class="num">{change_load}</span><span class="lbl">In flux</span><span class="sub">{st_tot['watch']} being watched, {st_tot['changing']} actively changing</span></div>
-      <div class="tile plan"><span class="num">{planned}</span><span class="lbl">Planned, not started</span><span class="sub">Intentions on the roadmap — not failures</span></div>
+      <a class="tile plan" href="#inventory" data-filter="state:planned"><span class="num">{planned}</span><span class="lbl">Planned</span><span class="sub">Not started — intentions on the roadmap, not failures</span></a>
       <div class="tile gap"><span class="num">{cant_say}</span><span class="lbl">Still unknown</span><span class="sub">No agreed shape yet — ask the person who runs it</span></div>"""
 
 legend = "".join(
@@ -392,7 +481,7 @@ def plan_chip(r):
     # No "Plan" label on the chip: a P2 strategy whose next work type is PLAN
     # rendered as "Plan P2 Plan". The priority and the work type carry it, and
     # the full strategy name lives in the tooltip.
-    tip = f'{st["id"]} · {st["title"]} · {st["work"].title()} next'
+    tip = f'{st["title"]} · {st["work"].title()} next'
     return (f'<span class="plan {cls}" title="{html.escape(tip, quote=True)}">'
             f'<b>{html.escape(st["priority"])}</b>'
             f'<i>{html.escape(st["work"].title())}</i></span>')
@@ -418,7 +507,11 @@ for g, rs in by_group.items():
     c = collections.Counter(r["state"] for r in rs)
     blurb = f'<p class="tnote">{md(blurbs[g])}</p>' if g in blurbs else ""
     body = "".join(
-        f"""<tr data-pid="{r['pid']}"><td class="p">{md(r['name'])}"""
+        # data-state carries the state as data rather than as prose to be matched.
+        # A text search for "broken" also hits three rows that use the word in a
+        # note — a broken item, a broken clause — so a tile counting 11 would land
+        # the reader on 14. `state:` queries read this attribute instead.
+        f"""<tr data-pid="{r['pid']}" data-state="{r['state']}"><td class="p">{md(r['name'])}"""
         f"""<button type="button" class="rowsay" data-pid="{r['pid']}" """
         f"""aria-label="Comment on {html.escape(r['name'], quote=True)}">Comment</button></td>"""
         f"""{score_cell('a', r['a'])}{score_cell('d', r['d'])}{score_cell('i', r['i'])}"""
@@ -452,12 +545,35 @@ else:
 
 nres = sum(1 for r in rows if "‖" in r["note"])
 n_auto   = sum(1 for r in rows if r["a"].isdigit() and int(r["a"]) >= 4)
+# A4 says a process runs itself; only a named module says where to read what it
+# does. The gap between these two is what the documentation floor now respects.
+n_auto_nocode = sum(1 for r in rows if r["a"].isdigit() and int(r["a"]) >= 4
+                    and "⚙" not in r["note"])
+n_auto_code   = n_auto - n_auto_nocode
 n_manual = sum(1 for r in rows if r["a"].isdigit() and int(r["a"]) <= 2)
 n_manual_undoc = sum(1 for r in rows if r["a"].isdigit() and int(r["a"]) <= 2
-                     and r["d"].isdigit() and int(r["d"]) <= 1)
-n_d3 = sum(1 for r in rows if r["d"] == "3")
+                     and r["d"].isdigit() and int(r["d"]) <= 2)
+# The "proven by a second person" band, D3 before the scales were aligned.
+n_d3 = sum(1 for r in rows if r["d"] == "4")
+
+# The A4 -> A5 claim is generated rather than written, because the sentence that
+# used to sit here argued from two incidents that no row in this file records —
+# one of them a "door-sync outage" that was a UniFi add-on sync error and not an
+# access-control failure at all. An unsourced anecdote cannot be checked against
+# the data and so survives every rewrite; a sentence computed from the data goes
+# stale loudly, the first time someone earns an A5.
+n_a4 = sum(1 for r in rows if r["a"] == "4")
+n_a5 = sum(1 for r in rows if r["a"] == "5")
+if n_a5 == 0:
+    a5gap = (f"<strong>{n_a4} processes run themselves and not one of them tells us "
+             f"when it stops.</strong> A5 is empty.")
+else:
+    a5gap = (f"<strong>{n_a4} processes run themselves; {n_a5} also tell us when they "
+             f"stop.</strong>")
+
 fields = [parse_note(r["note"]) for r in rows]
 n_reviewed = sum(1 for f in fields if f.get("reviewed"))
+n_drafted  = sum(1 for f in fields if f.get("drafted"))
 n_code     = sum(1 for f in fields if f.get("code"))
 n_never    = N - n_reviewed
 
@@ -472,9 +588,12 @@ manifest = json.dumps(
 
 # The key used to be hand-written and said "1 — worst on that axis", which is
 # true for Auto and Doc and wrong for Impact, where 5 is the bad end. Generated
-# from SCALES it shows the actual digits each column tints.
+# from SCALES it shows the actual digits each column tints — and now that only
+# the two deficit axes are tinted, it is two entries reading the same way rather
+# than three that had to be checked against three different scales.
 key_bits = []
-for _ax, _s in SCALES.items():
+for _ax in DEFICIT_AXES:
+    _s = SCALES[_ax]
     _vals = sorted((v for v in range(_s["lo"], _s["hi"] + 1) if band(_ax, v) != "ok"),
                    key=lambda v: -deficit(_ax, v))
     _chips = "".join(f'<i class="k-{band(_ax, v)}">{v}</i>' for v in _vals)
@@ -484,7 +603,8 @@ scorekey = "".join(key_bits)
 page = TPL.read_text()
 for key, val in [("TILES", tiles), ("LEGEND", legend), ("BOARD", "\n".join(board)),
                  ("NRES", str(nres)), ("NGROUPS", str(len(by_group))),
-                 ("NAUTO", str(n_auto)), ("NMANUAL", str(n_manual)),
+                 ("NAUTO", str(n_auto)), ("NMANUAL", str(n_manual)), ("A5GAP", a5gap),
+                 ("NAUTONOCODE", str(n_auto_nocode)), ("NAUTOCODE", str(n_auto_code)),
                  ("NMANUALUNDOC", str(n_manual_undoc)), ("ND3", str(n_d3)),
                  ("NFLOORED", str(n_floored)),
                  ("NREVIEWED", str(n_reviewed)), ("NCODE", str(n_code)),
@@ -498,8 +618,8 @@ for key, val in [("TILES", tiles), ("LEGEND", legend), ("BOARD", "\n".join(board
                  ("UNRANK", unrank_html), ("INFLUX", influx), ("N", str(N)),
                  ("NCHANGING", str(st_tot["changing"])), ("NWATCH", str(st_tot["watch"])),
                  ("CHANGELOAD", str(change_load)), ("CANTSAY", str(cant_say)),
-                 ("DEGRADED", str(st_tot["degraded"])), ("UNOPT", str(st_tot["unoptimized"])),
-                 ("DEFICIT", str(st_tot["degraded"] + st_tot["unoptimized"])),
+                 ("DEGRADED", str(st_tot["broken"])), ("UNOPT", str(st_tot["optimizable"])),
+                 ("DEFICIT", str(st_tot["broken"] + st_tot["optimizable"])),
                  ("UNDEF", str(st_tot["undefined"])),
                  ("STABLE", str(st_tot["stable"])), ("PLANNED", str(planned)), ("WITHSTRAT", str(with_strat)), ("NP1", str(len(p1_rows)))]:
     page = page.replace("{{" + key + "}}", val)
@@ -508,7 +628,9 @@ if left:
     raise SystemExit(f"unrendered placeholders: {sorted(set(left))}")
 OUT.parent.mkdir(parents=True, exist_ok=True)
 OUT.write_text(page)
-print(f"resource-linked rows: {nres}; D2 floor applied to {n_floored} code-run rows")
-print(f"coverage — reviewed {n_reviewed}/{N}, code {n_code}/{N}")
+print(f"resource-linked rows: {nres}; D3 floor applied to {n_floored} rows "
+      f"that run as code and name the module")
+print(f"coverage — reviewed {n_reviewed}/{N}, code {n_code}/{N}, "
+      f"descriptions inferred {n_drafted}/{N}")
 print(f"plan — {n_strat_matched} rows matched a strategy ({n_p1} P1), {n_unmatched} named a strategy not in strategies.csv")
 print(f"wrote {OUT} — {N} processes, {len(tables)} groups, change load {change_load}, can't-say {cant_say}")

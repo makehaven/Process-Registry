@@ -103,11 +103,11 @@ died because they needed someone to remember them.
 |---|---|---|
 | **pantheon-deploy** — close-out | Mark affected processes `changing`; add rows for processes the work revealed | Staging a feature |
 | **pantheon-deploy** — after live | Flip shipped processes to `watch` with what to watch for | Every release |
-| **weekly-triage** | Mark `degraded` when the pulse finds something actually failing; close watches whose window passed clean | Weekly, only on real signal |
+| **weekly-triage** | Mark `broken` when the pulse finds something actually failing; close watches whose window passed clean | Weekly, only on real signal |
 | **digest review** | Read what staff and members said and voted; apply what holds up | Whenever the digest is non-empty |
-| **cycle-review** | Resolve expired watches, add processes the cycle revealed, re-check the `degraded` list, sanity-check change load | Biweekly |
+| **cycle-review** | Resolve expired watches, add processes the cycle revealed, re-check the `broken` list, sanity-check change load | Biweekly |
 | **flow-check** | A flow walk maps one-to-one onto processes — mark or close accordingly | Per flow |
-| **security-audit** | Confirmed findings that leave a process unreliable → `degraded`, pointing at the ledger | Quarterly |
+| **security-audit** | Confirmed findings that leave a process unreliable → `broken`, pointing at the ledger | Quarterly |
 
 All of them defer to the **`process-registry` skill** in the website repo
 (`.claude/skills/process-registry/`) rather than restating the how-to.
@@ -137,27 +137,50 @@ through triage or a flow walk.
 
 ## Scales
 
+All three axes run **1–5**, and Automation and Documentation are read the same
+way — the same number means the same distance from finished on either.
+
 | | Automation | Documentation | Impact |
 |---|---|---|---|
-| 1 / 0 | Tribal — lives in someone's head | Nothing written | Internal annoyance |
-| 2 / 1 | Documented, executed by hand | Informal notes | Staff time, minor friction |
-| 3 / 2 | Assisted — tooling helps, human drives | Current SOP exists | Member experience or revenue |
-| 4 / 3 | Automated, humans handle exceptions | Proven — someone else has run it from the doc | Significant revenue, trust, data |
-| 5 / — | Autonomous **and tells us when it fails** | — | Safety, legal, existential |
+| 1 | Tribal — lives in someone's head | Nothing written | Internal annoyance |
+| 2 | Documented, executed by hand | Informal notes only | Staff time, minor friction |
+| 3 | Assisted — tooling helps, human drives | Current SOP **or** maintained module | Member experience or revenue |
+| 4 | Automated, humans handle exceptions | Proven — someone else has run it from the doc | Significant revenue, trust, data |
+| 5 | Autonomous **and tells us when it fails** | Proven **and kept current** — owner and review date | Safety, legal, existential |
 
-Documentation deliberately matches the CT Makerspace Network Standards of
-Excellence 0–3 evidence scale, so a maintained registry produces that
-self-assessment as a by-product.
+The top row is the matched pair worth noticing. **A5 tells us when the process
+stops; D5 tells us when its description has gone stale.** Both are empty today:
+nothing here is monitored, and nothing here has a documentation owner.
 
-**States:** `stable` · `changing` · `watch` · `planned` · `unoptimized` ·
-`degraded` · `undefined` · `unknown`
+D used to run 0–3 against A's 1–5, which put two different rulers in adjacent
+columns and made the colour rule need a different sentence for each. Documentation
+still maps onto the CT Makerspace Network Standards of Excellence 0–3 evidence
+scale — Absent/Foundational/Operational/Sustained land on D1/D2/D3/D5 — so a
+maintained registry still produces that self-assessment as a by-product. D4 is
+ours alone: the Standards never ask whether a second person could work from the
+document unaided.
 
-`degraded` and `unoptimized` are both deficits and are not the same problem.
-**`degraded` means it fails** — something that is supposed to happen does not,
-whether it broke or never once fired. **`unoptimized` means it does what it was
-built to do and was never built further.** The distinction matters because a
-single word made 27 rows read as an emergency when 17 of them are ordinary
-unfinished work, and because only one of the two is a reason to drop everything.
+**States:** `stable` · `changing` · `watch` · `planned` · `optimizable` ·
+`broken` · `undefined` · `unknown`
+
+`broken` and `optimizable` are both deficits and are not the same problem.
+**`broken` means it fails** — something that is supposed to happen does not,
+whether it broke or never once fired. **`optimizable` means it does what it was
+built to do and was never built to its end goal.** The distinction matters
+because a single word made 27 rows read as an emergency when 17 of them are
+ordinary unfinished work, and because only one of the two is a reason to drop
+everything.
+
+`optimizable` is narrow on purpose. Nearly any process here *could* be improved;
+these are the ones with a defined end state nobody reached. Used loosely it would
+cover most of the registry and stop telling anyone anything. Where nothing exists
+yet the state is `planned`, not `optimizable` — that distinction is what
+separates "improve this" from "build this".
+
+These words are also the page's whole vocabulary. The front-page tiles name each
+state with the same word the inventory badge uses, and clicking one opens the
+inventory filtered to exactly the rows it counted. They previously read "Failing
+now" and "Never built out", which named states the inventory did not have.
 
 ## Participation
 

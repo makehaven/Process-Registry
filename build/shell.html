@@ -8,9 +8,9 @@
     --ink:#191619; --ink-2:#4b4642; --ink-3:#7d766e;
     --rule:#dcd8d1; --rule-2:#c6c1b8; --crimson:#8b1919;
     --s-stable:#3d6b52; --s-watch:#9c6a0c; --s-changing:#2d5b87;
-    --s-unoptimized:#7d5a91; --s-degraded:#a01f1f; --s-undefined:#6b6560; --s-unknown:#a9a29a; --s-planned:#4a5a7a;
+    --s-optimizable:#7d5a91; --s-broken:#a01f1f; --s-undefined:#6b6560; --s-unknown:#a9a29a; --s-planned:#4a5a7a;
     --s-stable-bg:#e5efe8; --s-watch-bg:#f6ecd8; --s-changing-bg:#e2ebf4;
-    --s-unoptimized-bg:#efe8f3; --s-degraded-bg:#f6e3e3; --s-undefined-bg:#e9e6e2; --s-unknown-bg:#eeebe7; --s-planned-bg:#e7ebf2;
+    --s-optimizable-bg:#efe8f3; --s-broken-bg:#f6e3e3; --s-undefined-bg:#e9e6e2; --s-unknown-bg:#eeebe7; --s-planned-bg:#e7ebf2;
     --sans: ui-sans-serif, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
     --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
     --maxw: 1200px;
@@ -21,9 +21,9 @@
       --ink:#eae6e2; --ink-2:#b3ada6; --ink-3:#8b847c;
       --rule:#322e34; --rule-2:#423d45; --crimson:#d96a6a;
       --s-stable:#7cc39a; --s-watch:#dfae52; --s-changing:#7bacd8;
-      --s-unoptimized:#c0a0d4; --s-degraded:#e58080; --s-undefined:#9a938b; --s-unknown:#6e6862; --s-planned:#93a6c4;
+      --s-optimizable:#c0a0d4; --s-broken:#e58080; --s-undefined:#9a938b; --s-unknown:#6e6862; --s-planned:#93a6c4;
       --s-stable-bg:#1e3129; --s-watch-bg:#33280f; --s-changing-bg:#1c2b3a;
-      --s-unoptimized-bg:#2c2333; --s-degraded-bg:#38201f; --s-undefined-bg:#2a2725; --s-unknown-bg:#232120; --s-planned-bg:#20262f;
+      --s-optimizable-bg:#2c2333; --s-broken-bg:#38201f; --s-undefined-bg:#2a2725; --s-unknown-bg:#232120; --s-planned-bg:#20262f;
     }
   }
   :root[data-theme="dark"] {
@@ -31,9 +31,9 @@
     --ink:#eae6e2; --ink-2:#b3ada6; --ink-3:#8b847c;
     --rule:#322e34; --rule-2:#423d45; --crimson:#d96a6a;
     --s-stable:#7cc39a; --s-watch:#dfae52; --s-changing:#7bacd8;
-    --s-unoptimized:#c0a0d4; --s-degraded:#e58080; --s-undefined:#9a938b; --s-unknown:#6e6862; --s-planned:#93a6c4;
+    --s-optimizable:#c0a0d4; --s-broken:#e58080; --s-undefined:#9a938b; --s-unknown:#6e6862; --s-planned:#93a6c4;
     --s-stable-bg:#1e3129; --s-watch-bg:#33280f; --s-changing-bg:#1c2b3a;
-    --s-unoptimized-bg:#2c2333; --s-degraded-bg:#38201f; --s-undefined-bg:#2a2725; --s-unknown-bg:#232120; --s-planned-bg:#20262f;
+    --s-optimizable-bg:#2c2333; --s-broken-bg:#38201f; --s-undefined-bg:#2a2725; --s-unknown-bg:#232120; --s-planned-bg:#20262f;
   }
   * { box-sizing: border-box; }
   body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans);
@@ -70,14 +70,24 @@
   .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(172px,1fr)); gap:1px;
            background:var(--rule); border:1px solid var(--rule); border-radius:2px; overflow:hidden; }
   .tile { background:var(--surface); padding:18px; }
+  /* Tiles counting a single state are anchors into the filtered inventory. They
+     must not read as links — the number is the point — so only the hover and
+     focus states admit to being clickable. */
+  a.tile { display:block; text-decoration:none; color:inherit; cursor:pointer;
+           transition:background .12s ease; }
+  a.tile:hover, a.tile:focus-visible { background:var(--sunken); outline:none; }
+  a.tile:focus-visible { box-shadow:inset 0 0 0 2px var(--s-changing); }
+  a.tile .lbl { text-decoration:underline; text-decoration-color:var(--rule-2);
+                text-underline-offset:3px; }
+  a.tile:hover .lbl { text-decoration-color:var(--ink-3); }
   .tile .num { font-family:var(--mono); font-size:34px; font-weight:700; letter-spacing:-.03em;
                line-height:1; font-variant-numeric:tabular-nums; display:block; }
   .tile .lbl { display:block; margin-top:9px; font-family:var(--mono); font-size:10.5px; letter-spacing:.1em;
                text-transform:uppercase; color:var(--ink-3); font-weight:600; }
   .tile .sub { display:block; margin-top:5px; font-size:12.5px; color:var(--ink-2); }
   .tile.accent .num { color:var(--s-watch); }
-  .tile.bad .num { color:var(--s-degraded); }
-  .tile.unopt .num { color:var(--s-unoptimized); }
+  .tile.bad .num { color:var(--s-broken); }
+  .tile.unopt .num { color:var(--s-optimizable); }
   .tile.gap .num { color:var(--s-undefined); }
   .tile.plan .num { color:var(--s-planned); }
 
@@ -148,10 +158,10 @@
     .flux-row { grid-template-columns:1fr; gap:6px; }
   }
 
-  .unranked { margin-top:22px; padding:18px 20px; background:var(--s-degraded-bg);
-              border:1px solid var(--s-degraded); border-left-width:5px; border-radius:2px; }
+  .unranked { margin-top:22px; padding:18px 20px; background:var(--s-broken-bg);
+              border:1px solid var(--s-broken); border-left-width:5px; border-radius:2px; }
   .unranked h3 { margin:0 0 8px; font-family:var(--mono); font-size:11px; letter-spacing:.12em;
-                 text-transform:uppercase; color:var(--s-degraded); }
+                 text-transform:uppercase; color:var(--s-broken); }
   .unranked p { margin:0 0 10px; font-size:14px; color:var(--ink-2); max-width:76ch; }
   .unranked ul { margin:0; padding-left:18px; font-size:13.5px; color:var(--ink); }
   .unranked li { margin-bottom:5px; }
@@ -189,24 +199,33 @@
   .tblwrap th:nth-child(4) { padding-right:12px; }
   td.p { font-weight:600; }
   td.s { font-family:var(--mono); font-size:12.5px; text-align:center; font-variant-numeric:tabular-nums; color:var(--ink-2); }
-  /* Auto / Doc / Impact carry a status colour keyed to severity, not to the raw
-     number: low automation, no documentation and high impact all read as the same
-     kind of problem. The digit is always shown, so colour is a second encoding
-     rather than the only one. Contrast against both surfaces is >= 3:1. */
-  td.s.sc-crit { color:var(--s-degraded); font-weight:700; background:var(--s-degraded-bg); }
+  /* Only Auto and Doc carry the alarm colour, and they run the same way: low is
+     bad, so the two lowest values are tinted and crit is the worse of the pair.
+     Impact is not a deficit — I5 is how much a process matters, not a fault — so
+     it is marked by weight instead, and the red/amber pair is left meaning one
+     thing. The digit is always shown, so colour is a second encoding rather than
+     the only one. Contrast against both surfaces is >= 3:1. */
+  td.s.sc-crit { color:var(--s-broken); font-weight:700; background:var(--s-broken-bg); }
   td.s.sc-warn { color:var(--s-watch);    font-weight:600; background:var(--s-watch-bg); }
+  td.s.sc-hi   { color:var(--ink);        font-weight:700; }
   td.s.sc-ok   { color:var(--ink-2); }
   td.s.sc-q    { color:var(--s-unknown); }
-  .scorekey { display:flex; flex-wrap:wrap; gap:8px 20px; align-items:center; margin:0 0 20px;
-              font-size:12.5px; color:var(--ink-2); }
+  /* Block flow rather than flex: the note below needs a readable measure, and as
+     a flex item a max-width lets it shrink back up onto the chips' own line. */
+  .scorekey { margin:0 0 20px; font-size:12.5px; color:var(--ink-2); }
   .scorekey i { font-style:normal; font-family:var(--mono); font-size:12px; font-weight:700;
                 padding:2px 7px; border-radius:2px; margin-right:7px; }
-  .scorekey .k-crit { color:var(--s-degraded); background:var(--s-degraded-bg); }
+  .scorekey .k-crit { color:var(--s-broken); background:var(--s-broken-bg); }
   .scorekey .k-warn { color:var(--s-watch); background:var(--s-watch-bg); }
-  .scorekey span { display:inline-flex; align-items:center; gap:5px; }
+  .scorekey span { display:inline-flex; align-items:center; gap:5px; margin-right:22px; }
   .scorekey b { font-family:var(--mono); font-size:10px; letter-spacing:.1em;
                 text-transform:uppercase; color:var(--ink-3); font-weight:600; margin-right:2px; }
-  .scorekey .knote { display:block; flex:1 1 100%; color:var(--ink-2); }
+  /* The chips sit on one line and the sentence explaining them wraps below. It is
+     marked with <strong> rather than <b> so it does not inherit the mono column
+     labels above. */
+  .scorekey .knote { display:block; margin:9px 0 0; color:var(--ink-2); max-width:82ch;
+                     line-height:1.5; }
+  .scorekey .knote strong { color:var(--ink); font-weight:650; }
 
   .coverage { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1px;
               margin:0 0 30px; background:var(--rule); border:1px solid var(--rule);
@@ -240,6 +259,10 @@
   .res.meta { border-top:0; margin-top:5px; padding-top:0; font-size:11px; color:var(--ink-3); }
   .res.meta b { margin-right:5px; }
   .res.meta .never { font-style:normal; color:var(--s-watch); font-weight:600; }
+  /* Same weight as the reviewed line: a caveat on the sentence above it, not a
+     warning about the process. It reads as unverified without shouting. */
+  .res.draft { border-top:0; margin-top:5px; padding-top:0; font-size:11px; color:var(--ink-3); }
+  .res.draft b { margin-right:5px; color:var(--s-unknown); }
   .res b { font-family:var(--mono); font-size:9.5px; letter-spacing:.11em; text-transform:uppercase;
            color:var(--ink-3); font-weight:600; margin-right:8px; }
   td.n code { font-family:var(--mono); font-size:11.5px; background:var(--sunken); padding:1px 4px;
@@ -250,8 +273,8 @@
   .pill.stable{color:var(--s-stable);background:var(--s-stable-bg);border-color:var(--s-stable)}
   .pill.watch{color:var(--s-watch);background:var(--s-watch-bg);border-color:var(--s-watch)}
   .pill.changing{color:var(--s-changing);background:var(--s-changing-bg);border-color:var(--s-changing)}
-  .pill.unoptimized{color:var(--s-unoptimized);background:var(--s-unoptimized-bg);border-color:var(--s-unoptimized)}
-  .pill.degraded{color:var(--s-degraded);background:var(--s-degraded-bg);border-color:var(--s-degraded)}
+  .pill.optimizable{color:var(--s-optimizable);background:var(--s-optimizable-bg);border-color:var(--s-optimizable)}
+  .pill.broken{color:var(--s-broken);background:var(--s-broken-bg);border-color:var(--s-broken)}
   .pill.undefined{color:var(--s-undefined);background:var(--s-undefined-bg);border-color:var(--s-undefined)}
   .pill.planned{color:var(--s-planned);background:var(--s-planned-bg);border-color:var(--s-planned)}
   .pill.unknown{color:var(--s-unknown);background:var(--s-unknown-bg);border-color:var(--s-unknown)}
@@ -350,25 +373,30 @@
   .vote .vt .c { font-variant-numeric:tabular-nums; color:var(--ink-3); }
   .vote .up.on { color:var(--s-stable); border-color:var(--s-stable); background:var(--s-stable-bg); }
   .vote .up.on .c { color:var(--s-stable); }
-  .vote .down.on { color:var(--s-degraded); border-color:var(--s-degraded); background:var(--s-degraded-bg); }
-  .vote .down.on .c { color:var(--s-degraded); }
+  .vote .down.on { color:var(--s-broken); border-color:var(--s-broken); background:var(--s-broken-bg); }
+  .vote .down.on .c { color:var(--s-broken); }
   .vote .say { color:var(--ink-3); }
   .movecue { font-family:var(--mono); font-size:10px; letter-spacing:.08em;
              text-transform:uppercase; color:var(--s-watch); }
   .rank-row .score .adj { font-weight:700; }
   .rank-row .score .adj.up { color:var(--s-stable); }
-  .rank-row .score .adj.down { color:var(--s-degraded); }
+  .rank-row .score .adj.down { color:var(--s-broken); }
   /* Plan alignment. P1 is what the board actually committed to, so it is the
-     only one that gets colour; P2 is context, not a klaxon. */
-  .plan { display:inline-flex; align-items:center; gap:5px; margin-left:10px; padding:1px 6px;
+     only one that gets colour; P2 is context, not a klaxon.
+
+     Scoped to span. The roadmap tile up in "Where we stand" is a div carrying
+     .tile.plan, and an unscoped .plan sits later in this sheet than .tile, so it
+     won the cascade and laid that tile out as an inline-flex pill — number, label
+     and sub in a row, with the pill's own left margin showing as a stray gap. */
+  span.plan { display:inline-flex; align-items:center; gap:5px; margin-left:10px; padding:1px 6px;
           border:1px solid var(--rule); border-radius:2px; font-family:var(--mono);
           font-size:9.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-3); }
-  .plan b { font-weight:600; color:var(--ink-3); }
-  .plan i { font-style:normal; color:var(--ink-3); opacity:.8; }
-  .plan.p1 { color:var(--crimson); border-color:var(--crimson); }
-  .plan.p1 b, .plan.p1 i { color:var(--crimson); }
+  span.plan b { font-weight:600; color:var(--ink-3); }
+  span.plan i { font-style:normal; color:var(--ink-3); opacity:.8; }
+  span.plan.p1 { color:var(--crimson); border-color:var(--crimson); }
+  span.plan.p1 b, span.plan.p1 i { color:var(--crimson); }
   .rank-row .score .plan-adj { color:var(--crimson); font-weight:700; margin-left:6px; }
-  @media (max-width:640px) { .plan { margin-left:0; margin-top:5px; } }
+  @media (max-width:640px) { span.plan { margin-left:0; margin-top:5px; } }
 
   .rowsay { appearance:none; cursor:pointer; font:inherit; font-family:var(--mono);
             font-size:9.5px; letter-spacing:.09em; text-transform:uppercase; font-weight:600;
@@ -428,7 +456,7 @@
             font-size:11px; letter-spacing:.09em; text-transform:uppercase; font-weight:700;
             color:#fff; background:var(--crimson); border:0; border-radius:3px; padding:9px 18px; }
   #fbsend:disabled { opacity:.6; cursor:progress; }
-  .fberr { margin:11px 0 0; font-size:12.5px; color:var(--s-degraded); }
+  .fberr { margin:11px 0 0; font-size:12.5px; color:var(--s-broken); }
   /* What other members already said, above the form. Capped in height so a busy
      process cannot push the textarea off a phone screen. */
   .fbthread { max-height:34vh; overflow-y:auto; margin:0 0 14px; padding:0 0 12px;
@@ -502,7 +530,8 @@
                     font-size:11.5px; text-align:left; border-radius:2px; }
     .tblwrap td.s::before { content:attr(data-l) " "; font-size:9.5px; letter-spacing:.09em;
                             text-transform:uppercase; color:var(--ink-3); }
-    .tblwrap td.s.sc-crit::before, .tblwrap td.s.sc-warn::before { color:inherit; opacity:.75; }
+    .tblwrap td.s.sc-crit::before, .tblwrap td.s.sc-warn::before,
+    .tblwrap td.s.sc-hi::before { color:inherit; opacity:.75; }
     .tblwrap td:nth-child(5) { margin-bottom:9px; }
     .tblwrap td.n { font-size:13px; }
     .tblwrap caption { position:static; padding:14px 15px 11px; }
@@ -534,7 +563,7 @@
     </div>
     <div class="meta-line">
       <span>{{N}} processes · {{NGROUPS}} groups</span>
-      <span>{{STABLE}} running normally · {{DEGRADED}} failing · {{UNOPT}} never built out</span>
+      <span>{{STABLE}} running normally · {{DEGRADED}} broken · {{UNOPT}} optimizable</span>
       <span>Draft — not yet staff-reviewed</span>
     </div>
   </div>
@@ -556,12 +585,13 @@
 <div class="panel" id="p-overview" role="tabpanel" aria-labelledby="t-overview">
 
   <p class="lead">
-    <strong>The automated half of MakeHaven documents itself. The hand-run half doesn&rsquo;t.</strong>
-    {{NAUTO}} processes run as code, where the module <em>is</em> the description and cannot
-    drift from what actually happens. But {{NMANUAL}} still take a human at every step, and
-    {{NMANUALUNDOC}} of those have nothing written beyond scattered notes. Only {{ND3}} process in
-    {{N}} has documentation a second person has actually worked from — which is the real gap,
-    and it applies to the code too.
+    <strong>The automated half of MakeHaven documents itself &mdash; where we can say which code
+    does it.</strong> {{NAUTO}} processes run themselves, but only {{NAUTOCODE}} name the module that
+    runs them, and only those can claim the implementation <em>is</em> the description. The other
+    {{NAUTONOCODE}} run as code nobody has pointed at. Meanwhile {{NMANUAL}} take a human at every
+    step, and {{NMANUALUNDOC}} of those have nothing written beyond scattered notes. Only
+    {{ND3}} process in {{N}} has documentation a second person has actually worked from &mdash;
+    which is the real gap, and it applies to the code too.
   </p>
 
   <section>
@@ -585,14 +615,17 @@
     </div>
     <p class="sec-note" style="margin-top:22px">
       Read the bars as four separate problems, not one. <strong>{{DEGRADED}} processes are
-      <span class="pill degraded" style="padding:1px 5px">degraded</span></strong> — something that
+      <span class="pill broken" style="padding:1px 5px">broken</span></strong> — something that
       is supposed to happen does not, and that is the list to act on first. <strong>{{UNOPT}} are
-      <span class="pill unoptimized" style="padding:1px 5px">unoptimized</span></strong> — they do
-      what they were built to do and were simply never built further, which is ordinary unfinished
-      work rather than a failure. {{CHANGELOAD}} are in flux, and {{PLANNED}} are
+      <span class="pill optimizable" style="padding:1px 5px">optimizable</span></strong> — they do
+      what they were built to do and were never built to their end goal, which is ordinary
+      unfinished work rather than a failure. That is a narrow word here, not a general one: nearly
+      any process <em>could</em> be improved, but these are the ones with a defined end state
+      nobody reached. {{CHANGELOAD}} are in flux, and {{PLANNED}} are
       <span class="pill planned" style="padding:1px 5px">planned</span> — intentions we have not
-      started. Keeping these four apart is what makes the chart fair to read: collapsing them would
-      show {{DEFICIT}} things wrong when {{DEGRADED}} of them are actually broken.
+      started, where nothing exists to improve yet. Keeping these four apart is what makes the
+      chart fair to read: collapsing them would show {{DEFICIT}} things wrong when only
+      {{DEGRADED}} of them are actually broken.
     </p>
   </section>
 </div>
@@ -634,8 +667,8 @@
     <p class="sec-note">
       <strong>{{NRANK}} of {{N}} processes are here; {{NSETTLED}} are not.</strong> A row earns a
       place by having something actually wrong with it — it is
-      <span class="pill degraded" style="padding:1px 5px">degraded</span> or
-      <span class="pill unoptimized" style="padding:1px 5px">unoptimized</span>, or it is not yet
+      <span class="pill broken" style="padding:1px 5px">broken</span> or
+      <span class="pill optimizable" style="padding:1px 5px">optimizable</span>, or it is not yet
       both automated and documented and it matters enough to be worth someone's week. A process
       that is automated, documented and working is finished, not merely un-started, and putting it
       on a list called <em>next</em> only makes the list longer.
@@ -706,6 +739,15 @@
       Three axes, defined tightly enough that two people should land on the same number.
       If they don't, the fix is the wording of the scale — not the score.
     </p>
+    <p class="sec-note">
+      <strong>Automation and Documentation run 1–5 and read the same way</strong>, so a 2 means the
+      same distance from finished on either. They used to be A1–A5 against D0–D3, which made the
+      two columns look comparable while measuring on different rulers. The top bands are the
+      matched pair worth noticing: <strong>A5 is "runs itself and tells us when it fails", D5 is
+      "written down and we would know if it went stale."</strong> Both are empty. Impact is a
+      1–5 scale too, but it is not a maturity axis — it says how much a shortfall on the other two
+      would cost.
+    </p>
     <div class="scales">
       <div class="scale"><h3>Automation · A1–A5</h3><dl>
         <dt>A1 Tribal</dt><dd>Lives in someone's head. Nothing written.</dd>
@@ -714,13 +756,15 @@
         <dt>A4 Automated</dt><dd>Runs itself; humans handle exceptions only.</dd>
         <dt>A5 Monitored</dt><dd>Runs itself <em>and tells us when it fails.</em></dd>
       </dl></div>
-      <div class="scale"><h3>Documentation · D0–D3</h3><dl>
-        <dt>D0</dt><dd>Nothing written.</dd>
-        <dt>D1</dt><dd>Informal only — scattered notes, Slack threads, tribal memory.</dd>
-        <dt>D2</dt><dd>A durable, current description exists: <em>either</em> a written SOP
+      <div class="scale"><h3>Documentation · D1–D5</h3><dl>
+        <dt>D1 Nothing</dt><dd>Nothing written.</dd>
+        <dt>D2 Informal</dt><dd>Scattered notes, Slack threads, tribal memory.</dd>
+        <dt>D3 Durable</dt><dd>A current description exists: <em>either</em> a written SOP
           <em>or</em> a maintained implementation — the module, repo or README that runs it.</dd>
-        <dt>D3</dt><dd>Proven — someone other than the author has run the process, or changed
+        <dt>D4 Proven</dt><dd>Someone other than the author has run the process, or changed
           the code, working from that description alone.</dd>
+        <dt>D5 Maintained</dt><dd>Proven <em>and</em> kept current — a named owner and a review
+          date, so we would find out it had gone stale <em>before</em> someone needed it.</dd>
       </dl></div>
       <div class="scale"><h3>Impact · I1–I5</h3><dl>
         <dt>I1</dt><dd>Internal annoyance.</dd>
@@ -734,24 +778,39 @@
       <div class="tag">Scale<br>rule</div>
       <div>
         <p><strong>Code counts as documentation.</strong> An earlier version of this scale filed
-        code alongside Slack threads at D1, which scored our best-described processes as though
+        code alongside Slack threads, which scored our best-described processes as though
         nobody had written anything. A maintained module is a better description than most SOPs:
         it is precise, and it cannot drift from what actually happens, because it <em>is</em> what
         happens.</p>
-        <p>So any process that runs as code — <strong>A4 or above</strong> — is floored at
-        <strong>D2</strong>: the implementation is the current description. <strong>{{NFLOORED}}
-        processes are raised by this rule.</strong> It applies only from A4; at A3 and below a
-        human still drives steps the code does not capture, so the tooling does not describe the
-        whole process.</p>
-        <p>What code does <em>not</em> earn is D3. That still takes a second person working from
+        <p>So a process that runs as code — <strong>A4 or above</strong> — <em>and names the
+        module that runs it</em> is floored at <strong>D3</strong>: the implementation is the
+        current description. <strong>{{NFLOORED}} processes are raised by this rule.</strong> It
+        applies only from A4; at A3 and below a human still drives steps the code does not
+        capture, so the tooling does not describe the whole process.</p>
+        <p><strong>Naming the module is part of the rule, not a formality.</strong> It used to
+        raise any A4 row, and half of those named no module anywhere — so the registry claimed a
+        description existed while pointing at nothing. Sliding-scale membership was the clearest
+        case: A4 because the join form is automated, floored to "a durable description exists"
+        when who qualifies is written down nowhere. An A4 score says a process runs itself; only
+        a module says where to read what it does.</p>
+        <p>What code does <em>not</em> earn is D4. That still takes a second person working from
         it unaided — and by that test the codebase is as unproven as the paperwork.</p>
       </div>
     </div>
     <p class="sec-note" style="margin-top:20px">
-      The gap that matters most is <strong>A4 → A5</strong>. The door-sync integration was down for
-      a month before anyone noticed; a calendar webhook dropped three months of activity records
-      silently. Both were A4 processes everyone believed were A5. "Runs itself" and "tells us when
-      it stops" are different products.
+      The gap that matters most is <strong>A4 → A5</strong>, and the registry states it plainly:
+      {{A5GAP}} "Runs itself" and "tells us when it stops" are different products, and every
+      automated process here is currently the first without being the second — so the way we find
+      out that something broke is that a person notices.
+    </p>
+    <p class="sec-note">
+      An earlier draft of this paragraph argued the point with two incidents instead, one of them a
+      door-sync outage. That was wrong, and wrong in a way worth recording: <strong>UniFi is an
+      add-on beside access control, not the system itself</strong> — a UniFi sync error is not a
+      door outage, and the home-built access control has been running throughout, as
+      <code>/access/log</code> shows. Neither incident was ever entered as a row, which is exactly
+      how an unsourced claim survives a rewrite. If A5 needs an example, it should be one the
+      inventory can produce on demand.
     </p>
   </section>
 
@@ -766,12 +825,15 @@
     </p>
     <p class="scorekey">
       {{SCOREKEY}}
-      <span class="knote">Colour marks a deficit and nothing else: the two worst values on each
-      scale, whichever end of it they sit at. Everything else stays plain ink.</span>
+      <span class="knote"><strong>1 and 2 are flagged, on both.</strong> Auto and Doc run 1–5 the
+      same way — low is bad — so one rule covers them, red for the worse of the two. Everything
+      else stays plain ink. <strong>Impact carries no colour</strong>: a high impact is not a
+      fault, it is what decides whether a deficit is worth fixing. I4 and I5 sit in stronger ink
+      for that reason, not as a warning.</span>
     </p>
     <div class="filter">
       <input id="inv-filter" type="search" autocomplete="off"
-             placeholder="Filter processes — name, note, state…"
+             placeholder="Filter processes — name, note, or state:broken"
              aria-label="Filter the inventory">
       <span class="hits" id="inv-hits" role="status" aria-live="polite"></span>
     </div>
@@ -814,14 +876,14 @@
         <em>Priority</em>.</strong> The registry does not replace the plan: the plan is edited by
         committees, holds owners and year-by-year sequencing, and should stay where it is.</p>
 
-        <p><strong>These used to read as coded identifiers</strong> — <code>OUT O#3 S#3 · GROW</code>
-        and the like. The codes are how the sequence sheet indexes its strategies, not something
-        anyone should have to decode to use this page, so each one is now resolved to the strategy
-        it actually names. The lookup lives in <code>data/strategies.csv</code>; if the plan renames
-        a strategy, correct it there and every row follows.</p>
+        <p><strong>A strategy is identified here by its name, not by a code.</strong> The retired plan
+        indexed its strategies with objective-and-strategy numbers; the plan now under development has
+        no identifiers yet, so carrying the old ones would point rows at a document that no longer
+        governs. The lookup lives in <code>data/strategies.csv</code>; if the plan renames a strategy,
+        correct it there and every row follows.</p>
         <p>What the link buys is two questions neither system answers alone: <em>which processes does
-        this strategy actually touch?</em> and — the more useful one — <em>which of our degraded and
-        unoptimized processes has no strategy pointed at it at all?</em> The sequence sheet is entirely
+        this strategy actually touch?</em> and — the more useful one — <em>which of our broken and
+        optimizable processes has no strategy pointed at it at all?</em> The sequence sheet is entirely
         forward-looking; every one of its states describes work someone intends to do. It has no way
         to say <strong>this is broken right now and nobody is on it</strong>, which is what the
         registry supplies.</p>
@@ -847,10 +909,11 @@
         <caption>Documentation scale, aligned<b>score once, use twice</b></caption>
         <thead><tr><th style="width:34%">Standards of Excellence</th><th style="width:20%">Registry</th><th>Evidence test</th></tr></thead>
         <tbody>
-          <tr><td class="p">0 · Absent</td><td class="s">D0</td><td class="n">No reliable practice or evidence</td></tr>
-          <tr><td class="p">1 · Foundational</td><td class="s">D1</td><td class="n">Basic practice exists; informal or inconsistent</td></tr>
-          <tr><td class="p">2 · Operational</td><td class="s">D2</td><td class="n">Written, assigned, consistently implemented, current evidence</td></tr>
-          <tr><td class="p">3 · Sustained</td><td class="s">D3</td><td class="n">Effectiveness reviewed; improvements documented; history supports continuity</td></tr>
+          <tr><td class="p">0 · Absent</td><td class="s">D1</td><td class="n">No reliable practice or evidence</td></tr>
+          <tr><td class="p">1 · Foundational</td><td class="s">D2</td><td class="n">Basic practice exists; informal or inconsistent</td></tr>
+          <tr><td class="p">2 · Operational</td><td class="s">D3</td><td class="n">Written, assigned, consistently implemented, current evidence</td></tr>
+          <tr><td class="p"><em>no equivalent</em></td><td class="s">D4</td><td class="n">Our own test: a second person has worked from the description unaided. The Standards do not ask this separately</td></tr>
+          <tr><td class="p">3 · Sustained</td><td class="s">D5</td><td class="n">Effectiveness reviewed; improvements documented; history supports continuity</td></tr>
         </tbody>
       </table>
     </div>
@@ -909,7 +972,7 @@
       <strong>member conduct &amp; discipline</strong> — warning and termination procedures exist
       as documents, but whether they are followed or logged is unknown — and
       <strong>harassment &amp; conduct complaints</strong>, a public policy with an invisible intake.
-      It also sharpens what D0–D3 means: "a current SOP exists" is a claim you can only check
+      It also sharpens what D1–D5 means: "a current SOP exists" is a claim you can only check
       against a link.
     </p>
   </section>
@@ -983,7 +1046,7 @@
   <div class="wrap">
     <p>
       Draft · not yet staff-reviewed<br>
-      Generated from <code>data/inventory.md</code> — {{N}} processes, {{STABLE}} stable, {{DEGRADED}} degraded, {{UNOPT}} unoptimized, {{CANTSAY}} uncharacterised<br>
+      Generated from <code>data/inventory.md</code> — {{N}} processes, {{STABLE}} stable, {{DEGRADED}} broken, {{UNOPT}} optimizable, {{CANTSAY}} uncharacterised<br>
       Plan, schema and phases: <code>conductor/tracks/process_stabilization_20260814/plan.md</code>
     </p>
   </div>
@@ -1019,6 +1082,24 @@
   var want = document.getElementById('t' + location.hash.replace('#', '-'));
   if (want) select(want);
 
+  // A tile that counts one state opens the inventory already filtered to it.
+  // Wired here rather than left to the href alone: the hash is only read on
+  // load, and the filter box needs its input event to actually apply.
+  Array.prototype.forEach.call(document.querySelectorAll('.tile[data-filter]'),
+    function (t) {
+      t.addEventListener('click', function (e) {
+        var inv = document.getElementById('t-inventory'),
+            box = document.getElementById('inv-filter');
+        if (!inv || !box) return;          // let the href fall through instead
+        e.preventDefault();
+        select(inv);
+        box.value = t.dataset.filter;
+        box.dispatchEvent(new Event('input'));
+        window.scrollTo(0, 0);
+        box.focus();
+      });
+    });
+
   // Ranking: reveal the tail on demand rather than truncating it silently.
   var more = document.getElementById('rank-more');
   if (more) {
@@ -1044,10 +1125,16 @@
 
   function apply() {
     var q = box.value.trim().toLowerCase(), shown = 0;
+    // "state:broken" matches the state column exactly. Plain text still searches
+    // the whole row, but a bare state word cannot do this job: "broken" appears
+    // in three notes about broken items and clauses, so the front-page tile
+    // counting 11 would have landed the reader on 14 rows.
+    var st = /^state:\s*([a-z]+)$/.exec(q), want = st && st[1];
     tables.forEach(function (w) {
       var any = false;
       Array.prototype.forEach.call(w.querySelectorAll('tbody tr'), function (tr) {
-        var hit = !q || tr.textContent.toLowerCase().indexOf(q) !== -1;
+        var hit = !q || (want ? tr.dataset.state === want
+                              : tr.textContent.toLowerCase().indexOf(q) !== -1);
         tr.hidden = !hit;
         if (hit) { any = true; shown++; }
       });

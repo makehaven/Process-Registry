@@ -9,7 +9,7 @@ Excellence** standards it implements, and vice versa.
 
 - **Standard → processes** answers *"what would we actually have to change to
   move S023 from 1 to 2?"* — the drill-down the standards tool cannot do alone.
-- **Process → standards** answers *"is this degraded row anybody's problem
+- **Process → standards** answers *"is this broken row anybody's problem
   outside MakeHaven?"* — and, where the answer is no, whether that is because
   the process is ours alone or because **the standards are missing something**.
 
@@ -288,7 +288,7 @@ Best-covered group in the inventory. S040–S045 map almost one to one.
 | Process | Standards | Note |
 |---|---|---|
 | Feature planning | — exec | — |
-| Deploy pipeline | S037 | The A4/D3 model row — what "proven" documentation looks like |
+| Deploy pipeline | S037 | The A4/D4 model row — what "proven" documentation looks like |
 | Config reconciliation | S037 | — |
 | Security audit | **P2** | The quarterly audit exists; no standard asks for it |
 | Weekly pulse triage | S037 | — |
