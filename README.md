@@ -167,6 +167,20 @@ attack it directly.
 
 Anyone with a MakeHaven account — staff, board or member — can sign in and:
 
+The **Next** tab ranks on three inputs, all of them shown on the row so the
+order can be argued with:
+
+| Input | What it is | Weight |
+|---|---|---|
+| Arithmetic | impact × how manual it still is | base, 1–20 |
+| The plan | P1/P2 from `data/strategies.csv`, matched by strategy name | +4 / +1 |
+| The room | net votes from staff and members | ±5 |
+
+A P1 also earns a place on the tab regardless of its scores, because that is
+what the board choosing it meant. `strategies.csv` is read at build time rather
+than copied into rows, so when the plan is finalised — it is heading for a
+shorter priority list — replacing that one file re-ranks everything.
+
 - **Vote a row up or down on the Next tab.** The base score is arithmetic
   (impact × how manual something still is). Net votes move it by up to ±5, which
   is enough to lift a row several places but not enough for a few early clicks to

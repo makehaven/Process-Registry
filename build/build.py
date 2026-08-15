@@ -222,6 +222,57 @@ def note_cell(raw):
         out += f'<span class="res meta"><b>Reviewed</b> {md(p["reviewed"])}</span>'
     return out
 
+# ---- the strategic plan as a ranking input ----------------------------------
+# The plan already assigns each strategy a P1/P2 priority, and 76 rows already
+# name the strategy acting on them, but the two never met: the ranking was pure
+# arithmetic and would happily put a P1 commitment below an unprioritised row.
+# A registry that ignores what the board committed to is at odds with the plan
+# it is supposed to serve.
+#
+# strategies.csv is therefore read at build time rather than baked into the
+# inventory. The plan is a live draft heading for a shorter priority list, so
+# when it changes the update is one file swap and a rebuild — no row edits.
+STRAT_CSV = SRC.with_name("strategies.csv")
+PLAN_BOOST = {"P1": 4, "P2": 1}
+
+
+def _norm(t):
+    return re.sub(r"[^a-z0-9]+", " ", t.lower()).strip()
+
+
+strategies = {}
+if STRAT_CSV.exists():
+    import csv
+    with STRAT_CSV.open(newline="") as fh:
+        for _r in csv.DictReader(fh):
+            strategies[_norm(_r["Strategy Title"])] = {
+                "id": _r["Strategy ID"].strip(),
+                "title": _r["Strategy Title"].strip(),
+                "priority": _r["Priority"].strip(),
+                "work": _r["Next Work Type"].strip(),
+            }
+
+
+def strategy_of(r):
+    """The plan entry acting on this process, or None."""
+    f = parse_note(r["note"]).get("strategy")
+    if not f:
+        return None
+    # Rows read "Priority · Some Strategy — building next"; the prefix and the
+    # trailing work-type clause are presentation, the title is the key.
+    title = re.sub(r"^Priority\s*·\s*", "", f)
+    title = re.sub(r"\s*—\s*.*$", "", title).strip()
+    return strategies.get(_norm(title))
+
+
+for r in rows:
+    r["strat"] = strategy_of(r)
+    r["plan_boost"] = PLAN_BOOST.get(r["strat"]["priority"], 0) if r["strat"] else 0
+
+n_strat_matched = sum(1 for r in rows if r["strat"])
+n_p1 = sum(1 for r in rows if r["strat"] and r["strat"]["priority"] == "P1")
+n_unmatched = sum(1 for r in rows if not r["strat"] and "⟐" in r["note"])
+
 # ---- automation ranking ----------------------------------------------------
 # Membership is a separate question from order, and it used to be neither: the
 # only filter was score > 0, and since nothing in the registry is A5 the term
@@ -242,6 +293,10 @@ FINISHED_A, FINISHED_D, WORTH_IT_I = 4, 2, 3
 def needs_work(r):
     if r["state"] in ("degraded", "unoptimized"):
         return True
+    # A P1 commitment belongs on the list whatever its scores say — that is what
+    # the board choosing it means.
+    if r["plan_boost"] >= PLAN_BOOST["P1"]:
+        return True
     if not (r["a"].isdigit() and r["i"].isdigit()):
         return False
     if int(r["a"]) >= FINISHED_A and r["d"].isdigit() and int(r["d"]) >= FINISHED_D:
@@ -252,9 +307,10 @@ def needs_work(r):
 ranked = []
 for r in rows:
     if needs_work(r) and r["a"].isdigit() and r["i"].isdigit():
-        score = int(r["i"]) * (5 - int(r["a"]))
-        if score > 0:
-            ranked.append((score, int(r["i"]), r))
+        base = int(r["i"]) * (5 - int(r["a"]))
+        if base > 0:
+            r["base"] = base
+            ranked.append((base + r["plan_boost"], int(r["i"]), r))
 
 n_settled = N - len(ranked)
 ranked.sort(key=lambda t: (-t[0], -t[1], t[2]["name"]))
@@ -327,19 +383,35 @@ for g, rs in by_group.items():
 
 # The rank rows carry their base score as data so the client can re-sort them
 # once votes load, without a second copy of the arithmetic living in JS.
+def plan_chip(r):
+    """The plan's own priority on the row, so a boost is never invisible."""
+    st = r["strat"]
+    if not st:
+        return ""
+    cls = "p1" if st["priority"] == "P1" else "p2"
+    # No "Plan" label on the chip: a P2 strategy whose next work type is PLAN
+    # rendered as "Plan P2 Plan". The priority and the work type carry it, and
+    # the full strategy name lives in the tooltip.
+    tip = f'{st["id"]} · {st["title"]} · {st["work"].title()} next'
+    return (f'<span class="plan {cls}" title="{html.escape(tip, quote=True)}">'
+            f'<b>{html.escape(st["priority"])}</b>'
+            f'<i>{html.escape(st["work"].title())}</i></span>')
+
+
 rank_html = []
 for n, (score, _, r) in enumerate(top, 1):
     extra = "" if n <= SHOWN else " rank-extra"
-    rank_html.append(f"""      <div class="rank-row{extra}" data-pid="{r['pid']}" data-base="{score}" data-rank="{n}"{'' if n <= SHOWN else ' hidden'}><div class="n">{n:02d}</div>
+    boost = f'<span class="plan-adj">+{r["plan_boost"]}</span>' if r["plan_boost"] else ""
+    rank_html.append(f"""      <div class="rank-row{extra}" data-pid="{r['pid']}" data-base="{r['base']}" data-plan="{r['plan_boost']}" data-rank="{n}"{'' if n <= SHOWN else ' hidden'}><div class="n">{n:02d}</div>
         <div class="what"><b>{md(r['name'])}</b><em>{md(plain_note(r['note']))}</em>
-        <span class="grp">{html.escape(r['group'])}</span>
+        <span class="grp">{html.escape(r['group'])}{plan_chip(r)}</span>
         <div class="vote" data-pid="{r['pid']}" hidden>
           <button type="button" class="vt up" data-v="1" aria-label="More important than ranked">&#9650;<span class="c">0</span></button>
           <button type="button" class="vt down" data-v="-1" aria-label="Less important than ranked">&#9660;<span class="c">0</span></button>
           <button type="button" class="vt say" aria-label="Comment on this process">Comment</button>
           <span class="movecue"></span>
         </div></div>
-        <div class="score"><span class="final">{score}</span><small>I{r['i']} &times; A{r['a']}<span class="adj"></span></small></div></div>""")
+        <div class="score"><span class="final">{score}</span><small>I{r['i']} &times; A{r['a']}{boost}<span class="adj"></span></small></div></div>""")
 
 tables = []
 for g, rs in by_group.items():
@@ -419,7 +491,8 @@ for key, val in [("TILES", tiles), ("LEGEND", legend), ("BOARD", "\n".join(board
                  ("NNEVER", str(n_never)), ("NRANK", str(len(top))), ("NSHOWN", str(SHOWN)),
                  ("NMORE", str(max(0, len(top) - SHOWN))), ("RAISED", raised_html),
                  ("MANIFEST", manifest), ("SCOREKEY", scorekey),
-                 ("NSETTLED", str(n_settled)),
+                 ("NSETTLED", str(n_settled)), ("NP1ROWS", str(n_p1)),
+                 ("NSTRAT", str(n_strat_matched)),
                  ("NRAISED", str(len(raised))),
                  ("RANK", "\n".join(rank_html)), ("TABLES", "\n".join(tables)),
                  ("UNRANK", unrank_html), ("INFLUX", influx), ("N", str(N)),
@@ -437,4 +510,5 @@ OUT.parent.mkdir(parents=True, exist_ok=True)
 OUT.write_text(page)
 print(f"resource-linked rows: {nres}; D2 floor applied to {n_floored} code-run rows")
 print(f"coverage — reviewed {n_reviewed}/{N}, code {n_code}/{N}")
+print(f"plan — {n_strat_matched} rows matched a strategy ({n_p1} P1), {n_unmatched} named a strategy not in strategies.csv")
 print(f"wrote {OUT} — {N} processes, {len(tables)} groups, change load {change_load}, can't-say {cant_say}")

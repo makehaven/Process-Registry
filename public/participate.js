@@ -321,13 +321,17 @@ function applyVotes() {
   const rows = Array.from(list.querySelectorAll(".rank-row"));
   if (!rows.length) return;
 
+  // Three inputs, kept separate so the row can show its own arithmetic:
+  // the scores, what the strategic plan committed to, and what people voted.
   const scored = rows.map((el) => {
     const pid = el.dataset.pid;
     const base = Number(el.dataset.base);
+    const plan = Number(el.dataset.plan) || 0;
     const t = state.votes.get(pid) || { up: 0, down: 0, mine: 0 };
     const net = t.up - t.down;
     const adj = Math.max(-VOTE_CAP, Math.min(VOTE_CAP, net));
-    return { el, pid, base, t, adj, final: base + adj, was: Number(el.dataset.rank) };
+    return { el, pid, base, plan, t, adj,
+             final: base + plan + adj, was: Number(el.dataset.rank) };
   });
 
   scored.sort((a, b) =>

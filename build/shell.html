@@ -358,6 +358,17 @@
   .rank-row .score .adj { font-weight:700; }
   .rank-row .score .adj.up { color:var(--s-stable); }
   .rank-row .score .adj.down { color:var(--s-degraded); }
+  /* Plan alignment. P1 is what the board actually committed to, so it is the
+     only one that gets colour; P2 is context, not a klaxon. */
+  .plan { display:inline-flex; align-items:center; gap:5px; margin-left:10px; padding:1px 6px;
+          border:1px solid var(--rule); border-radius:2px; font-family:var(--mono);
+          font-size:9.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-3); }
+  .plan b { font-weight:600; color:var(--ink-3); }
+  .plan i { font-style:normal; color:var(--ink-3); opacity:.8; }
+  .plan.p1 { color:var(--crimson); border-color:var(--crimson); }
+  .plan.p1 b, .plan.p1 i { color:var(--crimson); }
+  .rank-row .score .plan-adj { color:var(--crimson); font-weight:700; margin-left:6px; }
+  @media (max-width:640px) { .plan { margin-left:0; margin-top:5px; } }
 
   .rowsay { appearance:none; cursor:pointer; font:inherit; font-family:var(--mono);
             font-size:9.5px; letter-spacing:.09em; text-transform:uppercase; font-weight:600;
@@ -637,9 +648,23 @@
       enough for a handful of early clicks to bury a safety process nobody happened to vote on.
     </p>
     <p class="sec-note">
-      Both halves stay on the row: <code>I4 × A2</code> is the formula, <code>+2</code> is the room.
-      If a row moved, it says so. The column still missing from all of this is effort in staff
-      hours, and it is the one that would change this order most.
+      <strong>The plan gets a say too.</strong> {{NSTRAT}} rows name the strategy acting on them,
+      and {{NP1ROWS}} of those sit under a <span class="plan p1"><b>P1</b></span> commitment —
+      the board's own short list. A P1 lifts a row by 4 and puts it on this tab whatever its scores
+      say, because that is what choosing it meant. P2 adds 1. A registry that ranked purely on its
+      own arithmetic would happily bury something the organisation had just committed to.
+    </p>
+    <p class="sec-note">
+      So three things decide the order, and all three stay visible on the row:
+      <code>I4 × A2</code> is the arithmetic, <code>+4</code> is the plan, <code>+2</code> is the
+      room. If a row moved, it says so. The input still missing is effort in staff hours, and it is
+      the one that would change this order most.
+    </p>
+    <p class="sec-note">
+      Priorities come from <code>data/strategies.csv</code>, read at build time rather than copied
+      into rows. <strong>The plan is a live draft heading for a shorter priority list</strong>, so
+      when it is finalised the update is that one file and a rebuild — no row-by-row re-tagging,
+      and every score on this tab moves with it.
     </p>
     <div class="rank" id="rank-list">
 {{RANK}}
@@ -894,9 +919,19 @@
     <p class="sec-note">
       This is the third attempt at something like this. The previous two were fully specified
       and never operated — they each needed a new human discipline that nobody sustained.
-      So the maintenance model is the design, not an afterthought: <strong>a scheduled AI pass
-      proposes updates with evidence, and a human merges them.</strong> It works here because most
-      improvements at MakeHaven are code, or have a data component that can be checked.
+      So the maintenance model is the design, not an afterthought: <strong>a scheduled review
+      pulls from the systems that already know, proposes updates with evidence, and a human merges
+      them.</strong> It works here because most of what happens at MakeHaven leaves a trace
+      somewhere machine-readable.
+    </p>
+    <p class="sec-note">
+      Two streams feed each review. <strong>The first is the digital systems</strong> — module
+      history in the website repo, live Stripe and Chargebee state, Drupal webform and badge
+      counts, the KPI dashboards, document edit dates. That is what caught storage billing leaking
+      $565 a month and the acknowledgement email that had never fired across 129 submissions;
+      neither was reported by anyone, both were found by counting. <strong>The second is the
+      people</strong> — the votes and comments left on this page, exported into one digest that a
+      person reads against the inventory. Neither stream writes to the registry on its own.
     </p>
     <div class="caveats">
       <div class="caveat"><h3>Tier 1 · applied automatically</h3>
@@ -907,9 +942,10 @@
         <p>"Seven storage assignments still have no subscription — query returns 7 rows."
         The pass opens a diff citing its evidence and does not merge itself.</p></div>
       <div class="caveat"><h3>Tier 3 · flagged, never guessed</h3>
-        <p>Who owns it, whether it is genuinely tribal, whether an SOP is <em>current</em> rather
-        than merely present. Roughly a third of the inventory lives here — the processes with no
-        code behind them at all.</p></div>
+        <p>Whether something is genuinely tribal, whether an SOP is <em>current</em> rather than
+        merely present, whether a change actually improved anything. Roughly a third of the
+        inventory lives here — the processes with no code behind them at all — and this is the
+        tier the comments on this page exist to answer.</p></div>
       <div class="caveat"><h3>The guard rails</h3>
         <p>The pass may not create or delete processes, only update fields. Scores move one step
         per pass. A confidently wrong maintainer is worse than a stale registry, because it
@@ -924,10 +960,11 @@
         <p>This draft knows what the strategic plan wants those processes to be. It does not know
         what actually happens. A plan saying "conduct annual drills" is not evidence that drills
         happen.</p></div>
-      <div class="caveat"><h3>Aspiration is mixed with operation</h3>
-        <p>"Planned giving programme" and "Made at MakeHaven marketplace" are intentions with no
-        current operation. <code>undefined</code> currently conflates <em>running badly</em> with
-        <em>not started</em>. Splitting those two apart is the first correction this draft needs.</p></div>
+      <div class="caveat"><h3>The plan is still a draft</h3>
+        <p>Priorities on the <em>Next</em> tab come from the strategic plan's current working
+        sheet, which is heading for a shorter list. Treat the <span class="plan p1"><b>P1</b></span>
+        marks as a demonstration of the mechanism rather than a settled answer; when the plan lands,
+        <code>data/strategies.csv</code> is replaced and every score moves with it.</p></div>
       <div class="caveat"><h3>Staff hours are missing entirely</h3>
         <p>The field that would most improve the automation ranking, and the one no codebase can
         supply. The plan's Year 1 estimates are a forecast, not a measurement.</p></div>
