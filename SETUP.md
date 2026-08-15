@@ -116,53 +116,56 @@ Already done, nothing to do:
 - Firebase web app registered; its config is in `public/registry-config.js`
 - The client — `public/participate.js`
 
-### 6a. Register the app with the Drupal bridge
+### 6a. Register the app with the Drupal bridge — ✅ config committed
 
-The `makerspace_firebase_auth` module is already generic — one module, any number
-of apps, `app_id` as a route parameter. **No Drupal code change is needed**, only
-config.
+The `makerspace_firebase_auth` module is already generic and **already live** —
+`/api/firebase-token/process_registry` answers 403 rather than 404, which means
+the route exists and only the app registration was missing. No Drupal code
+change was needed.
 
-1. Firebase Console → `makehaven-process-registry` → Project Settings → Service
-   Accounts → **Generate new private key**.
-2. Upload it to Drupal's private files as
-   `private://firebase/process-registry-sa.json`.
-3. At `/admin/config/services/firebase-auth`, add:
+Committed in `makehaven-website` (local only — **not pushed**, because master
+there is 14 commits ahead of Pantheon already and pushing deploys to dev):
 
-   ```yaml
-   process_registry:
-     project_id: makehaven-process-registry
-     service_account_key: 'private://firebase/process-registry-sa.json'
-     token_ttl: 3600
-     claim_rules:
-       - type: role
-         role: administrator
-         claim: admin
-         value: true
-       - type: role
-         role: manager
-         claim: staff
-         value: true
-       - type: email_domain
-         domain: makehaven.org
-         claim: staff
-         value: true
-   ```
+| File | What |
+|---|---|
+| `config/makerspace_firebase_auth.settings.yml` | the `process_registry` app entry |
+| `config/simple_oauth.oauth2_scope.process_registry.yml` | the OAuth scope, granted to `authenticated` |
+| `web/sites/default/services.yml` | `https://process.makehaven.org` in the CORS allow-list |
 
-   These claims decide **only who can triage** — move a comment to reviewed and
-   attach an admin note. Everything else is open to any signed-in account:
-   voting, commenting, and reading what everyone else said. That is why there is
-   no `board` role here and no rule granting members anything; being signed in
-   is the whole qualification. If it needs narrowing later, tighten the `read`
-   line in `firestore.rules` and add a claim rule to match.
+It follows `grant_research` in reading the key from a **Pantheon secret** rather
+than a `private://` upload, so the credential never sits in the filesystem:
 
-   Note that **no document stores an email address**. Comments are readable by
-   the whole membership, and Firestore rules are per-document rather than
-   per-field, so there is no way to show the text while hiding the address.
-   `uid` resolves to the Drupal account for anyone who needs to follow up.
+```yaml
+process_registry:
+  project_id: makehaven-process-registry
+  service_account_key: 'secret://process_registry_sa_json'
+```
 
-4. `lando drush cex` so the registration lands in git.
+The claim rules only decide **who can triage comments**. Voting, commenting and
+reading what others said need nothing beyond a signed-in account, which is why
+the scope is granted to `authenticated` rather than a named role, and why there
+is no `board` role anywhere in this.
 
-### 6b. Create the OAuth consumer
+**What is left here:** push that repo, deploy, and `drush cim`.
+
+### 6b. Set the Pantheon secret
+
+The service-account key has been generated and is at
+`process-registry-sa.json` in this session's scratchpad. **Do not commit it.**
+
+```bash
+terminus secret:site:set <site>.live process_registry_sa_json \
+  "$(cat process-registry-sa.json)" --scope=web
+```
+
+Note that `terminus remote:drush` and `terminus secret:*` could not be run from
+this machine — `appserver.<id>.drush.in` does not resolve here, though the git
+remote does. Run these where terminus works.
+
+If the key ever needs replacing:
+`gcloud iam service-accounts keys create out.json --iam-account=firebase-adminsdk-fbsvc@makehaven-process-registry.iam.gserviceaccount.com`
+
+### 6c. Create the OAuth consumer
 
 At `/admin/config/services/consumer`, add a consumer:
 
@@ -170,28 +173,38 @@ At `/admin/config/services/consumer`, add a consumer:
 |---|---|
 | Label | Process Registry |
 | Redirect URI | `https://process.makehaven.org/` |
-| Scopes | `process_registry` (create it if absent) |
+| Scopes | `process_registry` — already created by the config in 6a |
 | Confidential | **no** — this is a public PKCE client, no secret |
 
-Add `https://process.makehaven.org` to the site's CORS allow-list, alongside the
-entries for `sponsorship` and `phonebank`.
+The CORS entry is already in the committed `services.yml`, so there is nothing
+to add there.
 
-Then paste the consumer's **client id** into `public/registry-config.js`:
+A consumer has to be created here rather than in config because consumers are
+content entities, not configuration — that is the one part of this that cannot
+be committed.
+
+### 6d. Turn it on
+
+Paste the consumer's **client id** into `public/registry-config.js` in this
+repo:
 
 ```js
 export const OAUTH_CLIENT_ID = "…";
 ```
 
-Commit and push. That deploy is what makes the sign-in control appear.
+Commit and push. That deploy is what makes the sign-in control appear; until
+then the page reads *"participation is not configured for this deployment yet"*,
+which is the expected state rather than a fault.
 
-### 6c. Check it
+### 6e. Check it
 
 Open `process.makehaven.org`, sign in, and confirm four things: the arrows on
 the **Next** tab move a row and the score shows `+n` beside the formula; a
 **Comment** button appears on inventory rows; the pill at bottom right opens the
 panel; and after filing one comment, re-opening the panel shows it back with
 your name on it. If sign-in reports *"not registered with the Drupal Firebase
-bridge yet"*, step 6a has not been exported to the live site.
+bridge yet"*, the config from 6a has not been deployed and imported yet; if it
+reports a 500, the Pantheon secret from 6b is missing or malformed.
 
 ---
 
