@@ -216,6 +216,24 @@ your name on it. If sign-in reports *"not registered with the Drupal Firebase
 bridge yet"*, the config from 6a has not been deployed and imported yet; if it
 reports a 500, the Pantheon secret from 6b is missing or malformed.
 
+If the page still says *"participation is not configured for this deployment
+yet"* after the deploy is live, that is your browser holding a cached
+`registry-config.js` — hard-reload (Ctrl/Cmd+Shift+R). Check what the server is
+actually sending before believing the page:
+
+```bash
+curl -s https://process.makehaven.org/registry-config.js | grep OAUTH_CLIENT_ID
+```
+
+The `headers` block in `firebase.json` exists for this. It originally scoped the
+short max-age to `**/*.html`, which never matched anything: `cleanUrls` 301s
+`/index.html` to `/`, so the only path a browser requests is `/`, and every file
+— HTML and JS alike — fell through to Firebase's default one-hour cache. The
+rules now key on `/` and `**/*.js`, and the JS is `max-age=0, must-revalidate`
+because these files are unversioned and one of them decides whether sign-in
+exists at all. A revalidation on a 2 KB file is cheap; an hour of stale auth
+config is not.
+
 ---
 
 ## 7. Reading what people said
