@@ -165,13 +165,14 @@ remote does. Run these where terminus works.
 If the key ever needs replacing:
 `gcloud iam service-accounts keys create out.json --iam-account=firebase-adminsdk-fbsvc@makehaven-process-registry.iam.gserviceaccount.com`
 
-### 6c. Create the OAuth consumer
+### 6c. Create the OAuth consumer — ✅ done
 
 At `/admin/config/services/consumer`, add a consumer:
 
 | Field | Value |
 |---|---|
 | Label | Process Registry |
+| Client ID | `process_registry` — you type this; it is not generated |
 | Redirect URI | `https://process.makehaven.org/` |
 | Scopes | `process_registry` — already created by the config in 6a |
 | Confidential | **no** — this is a public PKCE client, no secret |
@@ -183,18 +184,27 @@ A consumer has to be created here rather than in config because consumers are
 content entities, not configuration — that is the one part of this that cannot
 be committed.
 
-### 6d. Turn it on
+### 6d. Turn it on — ✅ done
 
-Paste the consumer's **client id** into `public/registry-config.js` in this
-repo:
+The consumer's **client id** is `process_registry`, set in
+`public/registry-config.js`:
 
 ```js
-export const OAUTH_CLIENT_ID = "…";
+export const OAUTH_CLIENT_ID = "process_registry";
 ```
 
-Commit and push. That deploy is what makes the sign-in control appear; until
-then the page reads *"participation is not configured for this deployment yet"*,
-which is the expected state rather than a fault.
+Note this is a value you choose, not one Drupal generates: on `consumers` 1.x
+`client_id` is a required text field, "an arbitrary unique field, like a machine
+name". It is the same string as `FIREBASE_APP_ID` and the OAuth scope on purpose.
+
+It is **not** a secret and does not belong in GitHub secrets — it is a public
+PKCE client id served to every visitor, and the deploy workflow does no
+substitution anyway: it builds `index.html` and ships `public/` verbatim.
+
+Verified against the live site before committing: `/oauth/authorize` with this
+client id and `https://process.makehaven.org/` as the redirect URI returns a 302
+to the login page, while an unknown client id or a wrong redirect URI returns
+`401 invalid_client`.
 
 ### 6e. Check it
 

@@ -14,7 +14,9 @@
 export const DRUPAL_BASE_URL = "https://www.makehaven.org";
 
 // Drupal consumer for this app. See SETUP.md → "Participation".
-export const OAUTH_CLIENT_ID = "";
+// Deliberately the same string as FIREBASE_APP_ID and the OAuth scope: consumers
+// let you choose the client id, so one name is carried through rather than three.
+export const OAUTH_CLIENT_ID = "process_registry";
 
 // Scope requested at /oauth/authorize. `process_registry` narrows the grant;
 // it does not replace the permission checks Drupal makes on the token route.
