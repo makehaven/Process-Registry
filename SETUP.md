@@ -148,19 +148,38 @@ is no `board` role anywhere in this.
 
 **What is left here:** push that repo, deploy, and `drush cim`.
 
-### 6b. Set the Pantheon secret
+### 6b. Set the Pantheon secret — ✅ done
 
 The service-account key has been generated and is at
 `process-registry-sa.json` in this session's scratchpad. **Do not commit it.**
 
 ```bash
-terminus secret:site:set <site>.live process_registry_sa_json \
-  "$(cat process-registry-sa.json)" --scope=web
+terminus secret:site:set makehaven-website process_registry_sa_json \
+  "$(cat process-registry-sa.json)" --type=runtime --scope=web
 ```
 
-Note that `terminus remote:drush` and `terminus secret:*` could not be run from
-this machine — `appserver.<id>.drush.in` does not resolve here, though the git
-remote does. Run these where terminus works.
+**Target the site, not the environment.** `secret:site:set <site>.live` fails
+with *"Secret 'x' does not exist. You should create the default secret value
+first"* — the environment form only overrides a secret that already exists at
+site level. `grant_researcher_sa_json` is site-level (`env-values: []`) and this
+one matches it.
+
+Earlier revisions of this file said `terminus remote:drush` and `terminus
+secret:*` could not be run from JR's machine. That is no longer true — both work,
+authenticated as `jr@progressable.com`. The site is `makehaven-website`.
+
+Verify with the module's own drush command rather than by re-testing in a
+browser, since it exercises the same minting path and prints the real error:
+
+```bash
+terminus remote:drush makehaven-website.live -- firebase-auth:mint process_registry 1
+```
+
+Expect `Token: eyJ…`. A *"Pantheon secret … is empty or not set"* here means the
+secret has not propagated to the appserver yet; it is not instant, and a
+`drush cr` does not speed it up. `firebase-auth:mint grant_research 1` is a
+useful control — if that mints and this one does not, the bridge and the scope
+are fine and only this secret is missing.
 
 If the key ever needs replacing:
 `gcloud iam service-accounts keys create out.json --iam-account=firebase-adminsdk-fbsvc@makehaven-process-registry.iam.gserviceaccount.com`
