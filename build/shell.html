@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Process Stabilization Registry</title>
 <style>
   :root {
@@ -101,7 +104,10 @@
               background:var(--surface); padding:12px 16px; }
   .rank-row .n { font-family:var(--mono); font-size:12px; color:var(--ink-3); font-variant-numeric:tabular-nums; }
   .rank-row .what b { font-weight:650; font-size:14.5px; }
-  .rank-row .what em { font-style:normal; color:var(--ink-2); display:block; font-size:13px; margin-top:2px; }
+  /* Direct child only: the note itself is a block, but *italics* inside it
+     render as nested <em> and were being forced onto their own lines. */
+  .rank-row .what > em { font-style:normal; color:var(--ink-2); display:block; font-size:13px; margin-top:2px; }
+  .rank-row .what > em em { display:inline; font-style:italic; }
   .rank-row .grp { display:inline-block; margin-top:5px; font-family:var(--mono); font-size:10px;
                    letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); }
   .rank-row .score { font-family:var(--mono); font-size:13px; font-weight:700; font-variant-numeric:tabular-nums;
@@ -363,6 +369,7 @@
             pointer-events:none; }
   @media (min-width:760px) { .fbdock { left:auto; right:22px; bottom:22px; } }
   .fbdock > * { pointer-events:auto; }
+  .fbdock[hidden] { display:none; }
   .fbpill { appearance:none; cursor:pointer; font:inherit; font-family:var(--mono);
             font-size:11px; letter-spacing:.09em; text-transform:uppercase; font-weight:700;
             color:#fff; background:var(--crimson); border:0; border-radius:999px;
@@ -454,7 +461,7 @@
 
   <section>
     <h2>Where we stand</h2>
-    <p class="sec-note">Five numbers, all of which should move over the next year.</p>
+    <p class="sec-note">Six numbers, all of which should move over the next year.</p>
     <div class="tiles">{{TILES}}
     </div>
   </section>
@@ -948,7 +955,7 @@
         </div>
 
         <div class="fbfoot">
-          <span class="hint">&#8984;&#8629; to send</span>
+          <span class="hint">Ctrl + Enter to send</span>
           <button type="button" id="fbsend">Send</button>
         </div>
         <p class="fberr" id="fberr" hidden></p>

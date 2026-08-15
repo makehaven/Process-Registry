@@ -362,6 +362,11 @@ function setAuthBar(status, detail) {
   } else if (status === "busy") {
     who.textContent = detail || "Signing in…";
     btn.hidden = true;
+  } else if (status === "off") {
+    // Configured-off, or the bridge is unreachable. Offering a button that
+    // cannot work is worse than offering none, so say why and stop.
+    who.textContent = detail || "Participation is not available right now";
+    btn.hidden = true;
   } else {
     who.textContent = detail || "Sign in with your MakeHaven account to vote and comment";
     btn.textContent = "Sign in";
@@ -517,8 +522,12 @@ async function boot() {
     applyVotes();
     document.querySelectorAll(".rowsay").forEach((b) => { b.hidden = false; });
   } catch (e) {
+    // An expired session is not an exception — signInToFirebase returns null for
+    // that and the bar offers sign-in. Reaching here means something is wrong
+    // with the setup or the network, where another sign-in attempt would just
+    // fail the same way, so state the reason and let a reload be the retry.
     console.error(e);
-    setAuthBar("out", e.message || "Sign-in is unavailable right now");
+    setAuthBar("off", e.message || "Sign-in is unavailable right now");
   }
 }
 
