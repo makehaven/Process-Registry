@@ -27,7 +27,18 @@ GOAL = {
     "Platform & Meta": "6 Organizational effectiveness",
 }
 ORDER = list(GOAL)
-STATES = ["stable", "watch", "changing", "planned", "degraded", "undefined", "unknown"]
+"""State vocabulary, ordered from settled to least settled.
+
+`degraded` and `unoptimized` are both deficits, but they are different problems
+and were previously collapsed into one word. `degraded` means the thing fails:
+something that is supposed to happen does not, whether it broke or never once
+fired. `unoptimized` means the thing does what it was built to do and was simply
+never built far enough. Calling the second one "degraded" implied a regression
+that never happened, and made 27 rows look like an emergency when 17 of them are
+ordinary unfinished work.
+"""
+STATES = ["stable", "watch", "changing", "planned",
+          "unoptimized", "degraded", "undefined", "unknown"]
 
 # ---- parse -----------------------------------------------------------------
 rows, group, blurbs, cur_blurb = [], None, {}, []
@@ -212,7 +223,8 @@ influx = "".join(
 # ---- fragments -------------------------------------------------------------
 tiles = f"""
       <div class="tile"><span class="num">{N}</span><span class="lbl">Processes mapped</span><span class="sub">Across 13 groups · {st_tot['stable']} running normally</span></div>
-      <div class="tile bad"><span class="num">{st_tot['degraded']}</span><span class="lbl">Need attention</span><span class="sub">Known broken or unreliable, nobody currently fixing</span></div>
+      <div class="tile bad"><span class="num">{st_tot['degraded']}</span><span class="lbl">Failing now</span><span class="sub">Something that should happen does not — nobody currently fixing</span></div>
+      <div class="tile unopt"><span class="num">{st_tot['unoptimized']}</span><span class="lbl">Never built out</span><span class="sub">Works as far as it goes; the work was just never finished</span></div>
       <div class="tile accent"><span class="num">{change_load}</span><span class="lbl">In flux</span><span class="sub">{st_tot['watch']} being watched, {st_tot['changing']} actively changing</span></div>
       <div class="tile plan"><span class="num">{planned}</span><span class="lbl">Planned, not started</span><span class="sub">Intentions on the roadmap — not failures</span></div>
       <div class="tile gap"><span class="num">{cant_say}</span><span class="lbl">Still unknown</span><span class="sub">No agreed shape yet — ask the person who runs it</span></div>"""
@@ -301,7 +313,9 @@ for key, val in [("TILES", tiles), ("LEGEND", legend), ("BOARD", "\n".join(board
                  ("UNRANK", unrank_html), ("INFLUX", influx), ("N", str(N)),
                  ("NCHANGING", str(st_tot["changing"])), ("NWATCH", str(st_tot["watch"])),
                  ("CHANGELOAD", str(change_load)), ("CANTSAY", str(cant_say)),
-                 ("DEGRADED", str(st_tot["degraded"])), ("UNDEF", str(st_tot["undefined"])),
+                 ("DEGRADED", str(st_tot["degraded"])), ("UNOPT", str(st_tot["unoptimized"])),
+                 ("DEFICIT", str(st_tot["degraded"] + st_tot["unoptimized"])),
+                 ("UNDEF", str(st_tot["undefined"])),
                  ("STABLE", str(st_tot["stable"])), ("PLANNED", str(planned)), ("WITHSTRAT", str(with_strat)), ("NP1", str(len(p1_rows)))]:
     page = page.replace("{{" + key + "}}", val)
 left = re.findall(r"\{\{[A-Z]+\}\}", page)

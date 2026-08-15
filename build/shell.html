@@ -5,9 +5,9 @@
     --ink:#191619; --ink-2:#4b4642; --ink-3:#7d766e;
     --rule:#dcd8d1; --rule-2:#c6c1b8; --crimson:#8b1919;
     --s-stable:#3d6b52; --s-watch:#9c6a0c; --s-changing:#2d5b87;
-    --s-degraded:#a01f1f; --s-undefined:#6b6560; --s-unknown:#a9a29a; --s-planned:#4a5a7a;
+    --s-unoptimized:#7d5a91; --s-degraded:#a01f1f; --s-undefined:#6b6560; --s-unknown:#a9a29a; --s-planned:#4a5a7a;
     --s-stable-bg:#e5efe8; --s-watch-bg:#f6ecd8; --s-changing-bg:#e2ebf4;
-    --s-degraded-bg:#f6e3e3; --s-undefined-bg:#e9e6e2; --s-unknown-bg:#eeebe7; --s-planned-bg:#e7ebf2;
+    --s-unoptimized-bg:#efe8f3; --s-degraded-bg:#f6e3e3; --s-undefined-bg:#e9e6e2; --s-unknown-bg:#eeebe7; --s-planned-bg:#e7ebf2;
     --sans: ui-sans-serif, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
     --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
     --maxw: 1200px;
@@ -18,9 +18,9 @@
       --ink:#eae6e2; --ink-2:#b3ada6; --ink-3:#8b847c;
       --rule:#322e34; --rule-2:#423d45; --crimson:#d96a6a;
       --s-stable:#7cc39a; --s-watch:#dfae52; --s-changing:#7bacd8;
-      --s-degraded:#e58080; --s-undefined:#9a938b; --s-unknown:#6e6862; --s-planned:#93a6c4;
+      --s-unoptimized:#c0a0d4; --s-degraded:#e58080; --s-undefined:#9a938b; --s-unknown:#6e6862; --s-planned:#93a6c4;
       --s-stable-bg:#1e3129; --s-watch-bg:#33280f; --s-changing-bg:#1c2b3a;
-      --s-degraded-bg:#38201f; --s-undefined-bg:#2a2725; --s-unknown-bg:#232120; --s-planned-bg:#20262f;
+      --s-unoptimized-bg:#2c2333; --s-degraded-bg:#38201f; --s-undefined-bg:#2a2725; --s-unknown-bg:#232120; --s-planned-bg:#20262f;
     }
   }
   :root[data-theme="dark"] {
@@ -28,9 +28,9 @@
     --ink:#eae6e2; --ink-2:#b3ada6; --ink-3:#8b847c;
     --rule:#322e34; --rule-2:#423d45; --crimson:#d96a6a;
     --s-stable:#7cc39a; --s-watch:#dfae52; --s-changing:#7bacd8;
-    --s-degraded:#e58080; --s-undefined:#9a938b; --s-unknown:#6e6862; --s-planned:#93a6c4;
+    --s-unoptimized:#c0a0d4; --s-degraded:#e58080; --s-undefined:#9a938b; --s-unknown:#6e6862; --s-planned:#93a6c4;
     --s-stable-bg:#1e3129; --s-watch-bg:#33280f; --s-changing-bg:#1c2b3a;
-    --s-degraded-bg:#38201f; --s-undefined-bg:#2a2725; --s-unknown-bg:#232120; --s-planned-bg:#20262f;
+    --s-unoptimized-bg:#2c2333; --s-degraded-bg:#38201f; --s-undefined-bg:#2a2725; --s-unknown-bg:#232120; --s-planned-bg:#20262f;
   }
   * { box-sizing: border-box; }
   body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans);
@@ -74,6 +74,7 @@
   .tile .sub { display:block; margin-top:5px; font-size:12.5px; color:var(--ink-2); }
   .tile.accent .num { color:var(--s-watch); }
   .tile.bad .num { color:var(--s-degraded); }
+  .tile.unopt .num { color:var(--s-unoptimized); }
   .tile.gap .num { color:var(--s-undefined); }
   .tile.plan .num { color:var(--s-planned); }
 
@@ -239,6 +240,7 @@
   .pill.stable{color:var(--s-stable);background:var(--s-stable-bg);border-color:var(--s-stable)}
   .pill.watch{color:var(--s-watch);background:var(--s-watch-bg);border-color:var(--s-watch)}
   .pill.changing{color:var(--s-changing);background:var(--s-changing-bg);border-color:var(--s-changing)}
+  .pill.unoptimized{color:var(--s-unoptimized);background:var(--s-unoptimized-bg);border-color:var(--s-unoptimized)}
   .pill.degraded{color:var(--s-degraded);background:var(--s-degraded-bg);border-color:var(--s-degraded)}
   .pill.undefined{color:var(--s-undefined);background:var(--s-undefined-bg);border-color:var(--s-undefined)}
   .pill.planned{color:var(--s-planned);background:var(--s-planned-bg);border-color:var(--s-planned)}
@@ -323,7 +325,7 @@
     </p>
     <div class="meta-line">
       <span>{{N}} processes · {{NGROUPS}} groups</span>
-      <span>{{STABLE}} running normally · {{DEGRADED}} need attention</span>
+      <span>{{STABLE}} running normally · {{DEGRADED}} failing · {{UNOPT}} never built out</span>
       <span>Draft — not yet staff-reviewed</span>
     </div>
   </div>
@@ -373,11 +375,15 @@
 {{BOARD}}
     </div>
     <p class="sec-note" style="margin-top:22px">
-      Read the bars as three separate problems, not one: <strong>{{DEGRADED}} processes need
-      attention</strong>, {{CHANGELOAD}} are in flux, and {{PLANNED}} are marked
+      Read the bars as four separate problems, not one. <strong>{{DEGRADED}} processes are
+      <span class="pill degraded" style="padding:1px 5px">degraded</span></strong> — something that
+      is supposed to happen does not, and that is the list to act on first. <strong>{{UNOPT}} are
+      <span class="pill unoptimized" style="padding:1px 5px">unoptimized</span></strong> — they do
+      what they were built to do and were simply never built further, which is ordinary unfinished
+      work rather than a failure. {{CHANGELOAD}} are in flux, and {{PLANNED}} are
       <span class="pill planned" style="padding:1px 5px">planned</span> — intentions we have not
-      started yet. Planned is not a failure, and keeping it out of the degraded count is what makes
-      this chart fair to read.
+      started. Keeping these four apart is what makes the chart fair to read: collapsing them would
+      show {{DEFICIT}} things wrong when {{DEGRADED}} of them are actually broken.
     </p>
   </section>
 </div>
@@ -574,8 +580,8 @@
         it actually names. The lookup lives in <code>data/strategies.csv</code>; if the plan renames
         a strategy, correct it there and every row follows.</p>
         <p>What the link buys is two questions neither system answers alone: <em>which processes does
-        this strategy actually touch?</em> and — the more useful one — <em>which of our degraded
-        processes has no strategy pointed at it at all?</em> The sequence sheet is entirely
+        this strategy actually touch?</em> and — the more useful one — <em>which of our degraded and
+        unoptimized processes has no strategy pointed at it at all?</em> The sequence sheet is entirely
         forward-looking; every one of its states describes work someone intends to do. It has no way
         to say <strong>this is broken right now and nobody is on it</strong>, which is what the
         registry supplies.</p>
@@ -726,7 +732,7 @@
   <div class="wrap">
     <p>
       Draft · not yet staff-reviewed<br>
-      Generated from <code>data/inventory.md</code> — {{N}} processes, {{STABLE}} stable, {{DEGRADED}} degraded, {{CANTSAY}} uncharacterised<br>
+      Generated from <code>data/inventory.md</code> — {{N}} processes, {{STABLE}} stable, {{DEGRADED}} degraded, {{UNOPT}} unoptimized, {{CANTSAY}} uncharacterised<br>
       Plan, schema and phases: <code>conductor/tracks/process_stabilization_20260814/plan.md</code>
     </p>
   </div>

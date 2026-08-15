@@ -20,7 +20,13 @@ trusting an un-annotated number.
 - **A** = automation, A1 tribal → A5 autonomous + monitored
 - **D** = documentation, D0 none → D3 proven by someone other than the owner
 - **I** = impact when it fails, I1 annoyance → I5 safety/legal/existential
-- **State** = `stable` · `changing` · `watch` · `degraded` · `undefined` · `unknown`
+- **State** = `stable` · `changing` · `watch` · `planned` · `unoptimized` ·
+  `degraded` · `undefined` · `unknown`
+- `degraded` and `unoptimized` are both deficits and are not the same problem.
+  **`degraded` means it fails** — something that is supposed to happen does not,
+  whether it broke or never once fired. **`unoptimized` means it does what it was
+  built to do and was never built further.** Do not use `degraded` for work that
+  was simply never finished; that was the error this vocabulary corrects.
 - **?** in a score column = genuinely unknown. Do not guess it in review — ask the
   person who does it. `undefined` means the *process* has no defined shape;
   `unknown` means it runs but we cannot currently characterise it.
@@ -92,19 +98,21 @@ should adopt that vocabulary rather than invent a parallel one:
 | GROW | `changing` |
 | REFINE | `watch` |
 | MAINTAIN | `stable` |
+| — *(no equivalent)* | **`unoptimized`** |
 | — *(no equivalent)* | **`degraded`** |
 
-**That last row is the point.** The strategy sheet is entirely forward-looking:
-every state describes work someone intends to do. It has no way to say *this is
-broken right now and nobody is on it* — which is 27 of our 186 processes. The
-two systems are complementary rather than duplicative, and that gap is the
-clearest justification for the registry existing alongside the plan.
+**Those last two rows are the point.** The strategy sheet is entirely
+forward-looking: every state describes work someone intends to do. It has no way
+to say *this is broken right now and nobody is on it* (10 processes), nor *this
+was never built far enough and no strategy is pointed at it* (17). The two
+systems are complementary rather than duplicative, and that gap is the clearest
+justification for the registry existing alongside the plan.
 
 Each process therefore carries the strategy that acts on it, named as the plan names it, rather than
 absorbing the strategy sheet. That makes two questions answerable that neither
 system can answer alone: *which processes does this strategy touch?* and — more
-useful for the 680-hour problem — *which of our degraded processes has no
-strategy pointed at it?*
+useful for the 680-hour problem — *which of our degraded and unoptimized
+processes has no strategy pointed at it?*
 
 ### Group → strategic goal mapping
 
@@ -242,7 +250,8 @@ sources plus the dashboards to find the second half of the list.
 | | v4 (guessed) | round 1 | round 2 | round 3 |
 |---|---:|---:|---:|---:|
 | `stable` | 40 | 86 | 116 | **118** |
-| `degraded` | 28 | 31 | 27 | 27 |
+| `unoptimized` | — | — | — | **17** |
+| `degraded` | 28 | 31 | 27 | **10** |
 | `watch` | 12 | 13 | 13 | 13 |
 | `changing` | 8 | 11 | 14 | 14 |
 | `planned` | — | — | 14 | 14 |
@@ -290,13 +299,19 @@ of this page, and it was JR's triage that made it possible.
   because the denominator doubled. Until the inventory stabilises, **track the
   count, not the ratio** — the ratio keeps moving for reasons that have nothing
   to do with how much is actually changing.
-- **`degraded` more than doubled, 13 → 28.** Almost nothing broke; Outreach,
-  Development and Governance were simply invisible in v1.
+- **`degraded` split into `degraded` and `unoptimized`, 27 → 10 + 17.** The
+  single word was doing two jobs and implied a regression that mostly had not
+  happened. Only 10 processes actually fail — the interlock controller locking
+  up, the instructor acknowledgement that never fires, $565/month of storage
+  billing that never reconciles. The other 17 — planned giving, board–member
+  engagement, guest-waiver follow-up — do what they were built to do and were
+  never built further. That is ordinary unfinished work, and calling it
+  degraded made the page read as an emergency it is not.
 - **23 rows have no automation score**, and 16 are I5 (safety, legal, or
   existential). Three are both — unrankable and highest-impact: youth & school
   custodial partnerships, insurance/lease/compliance renewals, and backup &
   disaster recovery. (Incident reporting left this list in v3 — see below.)
-- **Tool access control is now the single most consequential degraded row**:
+- **Tool access control is the single most consequential `degraded` row**:
   I5, actively broken, and sharing a root cause with the door.
 - **Roughly half the strategic plan's Year 1 strategies are requests to build a
   process that does not exist yet.** The registry's `undefined` rows and the
@@ -326,12 +341,12 @@ of this page, and it was JR's triage that made it possible.
 
 | Process | A | D | I | State | Notes |
 |---|---|---|---|---|---|
-| Instructor recruitment funnel | 3 | 1 | 3 | degraded | Menu consolidation shipped 08-12, **reverted 08-13** after staff objection. No CiviCRM link on instructor interest ⟐ Diverse Instructors and Inclusive Marketing — scaling next |
+| Instructor recruitment funnel | 3 | 1 | 3 | unoptimized | Menu consolidation shipped 08-12, **reverted 08-13** after staff objection. No CiviCRM link on instructor interest ⟐ Diverse Instructors and Inclusive Marketing — scaling next |
 | Instructor proposal review | 3 | 1 | 3 | watch | `/admin/education` console — the half that survived the rollback |
 | Instructor agreement signing | 2 | 1 | 3 | changing | Now staff-sent; orientation video + quiz switched off. 2 quiz questions contradict our own docs ‖ [Instructor Agreement](https://docs.google.com/document/d/1yd48GRRl0vHfPRcHiC-GEWXssXxcl0210_ps7qiyrC4/edit) |
 | Instructor interest acknowledgement | 1 | 0 | 3 | degraded | Ack email never worked, across 129 submissions |
 | Instructor development & peer observation | 1 | 0 | 3 | planned | Confirmed by JR as an intention we have not started — a roadmap item, not a broken process. *(JR, round 2)* ◷ 2026-08-14 ⟐ Instructor Development and Diversity Pipeline — building next |
-| Instructor evaluation & coaching | 2 | 1 | 3 | degraded | The education manager reviews evaluations as they arrive, but JR: "we can do much better to aggregate, and actually to get people to do the evaluations." Both halves — response rate and trend analysis — are weak ⟐ Quality Assurance and Continuous Improvement — planning next |
+| Instructor evaluation & coaching | 2 | 1 | 3 | unoptimized | The education manager reviews evaluations as they arrive, but JR: "we can do much better to aggregate, and actually to get people to do the evaluations." Both halves — response rate and trend analysis — are weak ⟐ Quality Assurance and Continuous Improvement — planning next |
 | Class scheduling & publishing | 2 | 1 | 4 | changing | **Corrected from `unknown`.** The education manager engages a contractor who schedules. JR has self-serve scheduling in the pipeline, particularly for repeat instructors ◷ 2026-08-14 ⟐ Data-Driven and Automated Learning Systems — building next ‖ [Class Proposal Form](https://www.makehaven.org/Propose-a-class) |
 | Class registration | 4 | ? | 4 | stable | CiviCRM |
 | Class promotion / seat fill | 4 | 1 | 3 | watch | Targeted empty-seats email still unbuilt ⟐ Personalized Engagement Tools — building next |
@@ -363,7 +378,7 @@ operating processes around them mostly do not._
 | Incubator workspace intake & graduation | 2 | 1 | 3 | stable | **Intake corrected from `undefined`**: applicants apply and the director decides, with live availability published. **Graduation remains undefined** — nothing defines when a venture should move on ⟐ Incubator Workspace Program — scaling next ‖ [Workspaces](https://www.makehaven.org/workspaces) |
 | Entrepreneurship milestone tracking | 1 | 0 | 3 | planned | Not started. Signup goal data is used for grant reporting and occasional outreach filtering, but no milestone tracking exists. *(JR, round 2)* ◷ 2026-08-14 ⟐ Metrics and Ecosystem Tracking — building next |
 | Mentor & advisor matching | 1 | 0 | 3 | planned | Tried and abandoned: "it just did not work well, we would need to do redesign from ground up." A prior attempt exists as evidence, so any restart should begin from why it failed. *(JR, round 2)* ◷ 2026-08-14 ⟐ Entrepreneurship Coordination and Network Building — scaling next |
-| Entrepreneurship events programming | 2 | 0 | 3 | degraded | **23 participants against a 300 goal.** The gap is 13× ⟐ Entrepreneurship Events and Community Education — scaling next |
+| Entrepreneurship events programming | 2 | 0 | 3 | unoptimized | **23 participants against a 300 goal.** The gap is 13× ⟐ Entrepreneurship Events and Community Education — scaling next |
 | Cohort programs (Ecolab-style) | 1 | 0 | 3 | planned | Confirmed by JR as an intention we have not started — a roadmap item, not a broken process. *(JR, round 2)* ◷ 2026-08-14 ⟐ Cohort-Based Entrepreneurship Programs — planning next |
 | "Made at MakeHaven" marketplace | 1 | 0 | 2 | stable | Runs at a very light level: a Slack channel where members share design files. Nothing resembling the retail or pop-up presence in the strategic plan. *(JR, round 2)* ◷ 2026-08-14 ⟐ Maker Marketplace and Retail Presence — planning next |
 | Ecosystem partner data alignment | 1 | 0 | 2 | planned | Actively being worked on — shared data standards with ClimateHaven, Collab and the Community Foundation. *(JR, round 2)* ◷ 2026-08-14 ⟐ Makerspace Network Integration and Collaboration — scaling next |
@@ -375,7 +390,7 @@ operating processes around them mostly do not._
 | Tool acquisition & commissioning | 2 | 1 | 3 | stable | **Corrected from `undefined`.** Budget first, then the member wishlist, then consultation with area experts; final call sits with the shop manager and executive director ◷ 2026-08-14 ‖ [Asset inventory](https://www.makehaven.org/asset/inventory) · [Asset Disposal Policy](https://docs.google.com/document/d/1D5d7KUBJr8kXA6f1ShQME3BPIrHW7ClzXyQ2wUS63Fc/edit) · [Wishes](https://www.makehaven.org/wishes) |
 | Tool downtime & repair tracking | 3 | 1 | 4 | watch | **Major correction — v2 and v3 called this a failed attempt; it is live.** `asset_log_entry` holds 117 records and members report faults that feed the KPIs, with a tool-quality report checking configuration. The earlier "did not get traction" note was historical. **New concern from the data: logging has fallen off a cliff** — roughly 29/month across April–June, then 5 in July and 3 so far in August. Either faults dropped or reporting did, and those need different responses ‖ [Asset maintenance queue (staff)](https://www.makehaven.org/admin/content/asset-maintenance) · [Tool quality report (staff)](https://www.makehaven.org/admin/reports/tool-quality) |
 | Preventive maintenance schedule | 2 | 1 | 4 | changing | **Corrected from `undefined`.** The shop manager keeps a spreadsheet of recurring tasks for the shop tech. Intent is to formalise it into `/tasks`; extending it to members is gated on first building a way to certify who is competent to repair what ◷ 2026-08-14 ⟐ Tool Maintenance and Replacement Planning — building next |
-| Equipment depreciation & replacement planning | 2 | 1 | 3 | degraded | **Currently driven by the CPA, not by us.** Once a year they ask what was acquired over $1,000 and what was disposed of. Additions are recorded in the site's equipment inventory. JR wants this connected to actual asset lifetimes so replacement is forecast rather than discovered. *(JR, round 2)* ◷ 2026-08-14 ⟐ Tool Maintenance and Replacement Planning — building next ‖ [Asset inventory](https://www.makehaven.org/asset/inventory) |
+| Equipment depreciation & replacement planning | 2 | 1 | 3 | unoptimized | **Currently driven by the CPA, not by us.** Once a year they ask what was acquired over $1,000 and what was disposed of. Additions are recorded in the site's equipment inventory. JR wants this connected to actual asset lifetimes so replacement is forecast rather than discovered. *(JR, round 2)* ◷ 2026-08-14 ⟐ Tool Maintenance and Replacement Planning — building next ‖ [Asset inventory](https://www.makehaven.org/asset/inventory) |
 | Shop budget adherence | 2 | 1 | 3 | stable | **Corrected from `unknown`.** A shop budget line exists; the shop manager works within it and the executive director and finance committee monitor. *(JR, round 2)* ◷ 2026-08-14 |
 | Consumable restock | 3 | 1 | 2 | stable | **Corrected from `undefined`.** Store material pages let members flag an item as out; QR codes in the space feed a webform to the operations manager; store inventory has reorder thresholds. **Remaining gap: the free supplies out in the space have no system at all** ◷ 2026-08-14 |
 | Physical inventory count | 4 | 1 | 3 | stable | **Corrected from `unknown`.** Used every month; JR reports staff like it and consider it well developed ◷ 2026-08-14 ‖ [Asset inventory](https://www.makehaven.org/asset/inventory) |
@@ -423,7 +438,7 @@ storage, and workspaces) for cost recovery and mission alignment."_
 | Battery tracking | 3 | 1 | 2 | stable | — |
 | Missing / lost item handling | 3 | 0 | 3 | degraded | Marking an on-loan item missing silently closes the loan and orphans the battery |
 | Item repair & retirement | 2 | 1 | 2 | stable | A broken library item is removed from circulation. JR's intent is for lending fees to eventually fund replacement, which they do not today. *(JR, round 2)* ◷ 2026-08-14 |
-| Librarian role administration | ? | 0 | 2 | degraded | Granting a new librarian has been open for weeks |
+| Librarian role administration | ? | 0 | 2 | unoptimized | Granting a new librarian has been open for weeks |
 | Lending budget review | 3 | 1 | 2 | stable | — |
 | Storage assignment | 3 | 1 | 3 | stable | — ‖ [Storage Policy](https://www.makehaven.org/storage) · [Storage ticketing](https://docs.google.com/document/d/1GNGAhenJNU_GsO86tsB6_4jQJ2zuh4FHYYODaGKkMBo/edit) |
 | Storage billing | 2 | 1 | 4 | degraded | **Worse than v4 recorded.** A re-audit against live Stripe on 2026-08-14 found **24 active assignments, roughly $565/month uncollected** — not the 7 and ~$225 previously logged. Seven were never linked and seventeen point at dead, cancelled or expired subscriptions. This is ongoing rather than legacy (two failed this week) and the root cause is that nothing feeds subscription state back: there is no webhook or cron reconciliation and the status field was never created. No member has been over-billed. *(JR, round 2)* ◷ 2026-08-14 |
@@ -446,7 +461,7 @@ storage, and workspaces) for cost recovery and mission alignment."_
 | Exit survey & ending-reason capture | 4 | 1 | 4 | stable | **Corrected from `degraded`.** Reason is captured at cancellation in Chargebee and flows through to the profile, so it is automatic rather than a survey anyone has to chase ◷ 2026-08-14 |
 | Rejoin / recapture campaign | 2 | 0 | 3 | stable | Runs: a contractor does outreach and rejoin buttons exist in the product. What has not happened recently is any larger marketing push to lapsed members. *(JR, round 2)* ◷ 2026-08-14 ⟐ Priority · Rejoin and Recapture Pathways — planning next |
 | Comped / sliding-scale / sponsored memberships | 4 | 1 | 3 | stable | **Corrected from `unknown`.** Applicants self-certify on the join form with an online signature — no approval queue by design ◷ 2026-08-14 ⟐ Sliding Scale Scholarships and Financial Flexibility — refining next ‖ [Scholarship application](https://www.makehaven.org/makehaven-scholarship-application) · [Pricing Policy](https://docs.google.com/document/d/10mGYDuvO_J4AAgWRHIXb3WEO1dU2OQKCnxm2w_0JYpk/edit) |
-| Stripe customer linkage | 2 | 1 | 3 | degraded | 656 unlinked; field only written by manual backfills ⚙ mh_stripe |
+| Stripe customer linkage | 2 | 1 | 3 | unoptimized | 656 unlinked; field only written by manual backfills ⚙ mh_stripe |
 | Membership pricing review | 2 | 2 | 4 | stable | **Corrected from `unknown`.** Board policy sets an annual inflation-linked default; the executive director holds the authority to apply it ◷ 2026-08-14 ⟐ Sustainable and Equitable Membership Revenue — scaling next ‖ [Pricing Policy](https://docs.google.com/document/d/10mGYDuvO_J4AAgWRHIXb3WEO1dU2OQKCnxm2w_0JYpk/edit) |
 | Workspace rental agreement | 4 | 2 | 3 | watch | Signing flow live 07-29; retire gate live 08-12 ⚙ workspace_rental ‖ [Workspace Use Agreement (link broken in source)](https://docs.google.com/document/d/1AShT2j-Cc24Q0cxVqJLD8OxZ9V9erV2kCCfyYk49K0c/edit) · [Workspaces](https://www.makehaven.org/workspaces) |
 | Workspace rental billing | 2 | 1 | 3 | stable | **Corrected from `undefined`, and verified: 14 of 15 workspaces now carry a price** — Kate filled them. Many tenants are paying, invoiced through Xero today, with migration to the in-product system intended later. *(JR, round 2)* ◷ 2026-08-14 ⚙ workspace_rental ‖ [Workspaces](https://www.makehaven.org/workspaces) |
@@ -457,7 +472,7 @@ storage, and workspaces) for cost recovery and mission alignment."_
 |---|---|---|---|---|---|
 | Onboarding nudge / stalled-join recovery | 4 | 2 | 3 | watch | Live 08-11. Efficacy unproven — before widening, 0 of 5 nudged progressed ⟐ Priority · Structured Onboarding and Early Engagement — refining next |
 | Orientation scheduling | 3 | 1 | 3 | stable | Calendly. A webhook outage lost Apr–Jun records; orientations never backfilled ‖ [Orientation video / process](https://www.makehaven.org/orientation-video) |
-| First-badge-in-28-days promotion | 3 | 1 | 4 | degraded | **Measured but not managed** — JR: "now just measured and we work against it." 67% against an 80% goal. Current experiment: sending a free GEMS course to members who appear stuck. *(JR, round 2)* ◷ 2026-08-14 ⚠ Staff, 2026-08-14 — part of the badge-earning flow, which staff see as a major driver of retention and a strong candidate for review soon |
+| First-badge-in-28-days promotion | 3 | 1 | 4 | unoptimized | **Measured but not managed** — JR: "now just measured and we work against it." 67% against an 80% goal. Current experiment: sending a free GEMS course to members who appear stuck. *(JR, round 2)* ◷ 2026-08-14 ⚠ Staff, 2026-08-14 — part of the badge-earning flow, which staff see as a major driver of retention and a strong candidate for review soon |
 | Interest capture + Slack invite | 4 | 1 | 2 | watch | Live 08-07 |
 | Member success outreach queue | 3 | 2 | 3 | stable | — ⚙ makerspace_member_success |
 | At-risk early-warning detection | 4 | 2 | 4 | stable | Year 1 list marks this "(done, improve?)" — the one strategy already built ⟐ Priority · Early Engagement Monitoring — building next |
@@ -481,18 +496,18 @@ whole conversion funnel._
 | Process | A | D | I | State | Notes |
 |---|---|---|---|---|---|
 | Tour booking & delivery | 3 | 1 | 4 | stable | **Corrected from `unknown`.** All staff sit on a published tour schedule. JR is considering moving tours to a volunteer corps, which would change both the capacity and the training need ◷ 2026-08-14 ‖ [Tour booking](https://www.makehaven.org/tour) |
-| Tour follow-up & conversion | 2 | 1 | 4 | degraded | Conversion-Focused Marketing and Follow-Ups wants automated personalised follow-up. Currently manual or absent |
-| Guest waiver → member conversion | 1 | 0 | 3 | degraded | **2.4% against a 5% goal** on 218 waivers. No defined follow-up at all |
-| Workshop participant → member conversion | 2 | 0 | 4 | degraded | JR: it *should* send an email and re-invite attendees, but that needs verifying and is undeveloped either way. 6.4% conversion against a 10% goal, and the strategic plan carries its own note that this is not properly measured. *(JR, round 2)* ◷ 2026-08-14 ⟐ Conversion-Focused Marketing and Follow-Ups — planning next |
+| Tour follow-up & conversion | 2 | 1 | 4 | unoptimized | Conversion-Focused Marketing and Follow-Ups wants automated personalised follow-up. Currently manual or absent |
+| Guest waiver → member conversion | 1 | 0 | 3 | unoptimized | **2.4% against a 5% goal** on 218 waivers. No defined follow-up at all |
+| Workshop participant → member conversion | 2 | 0 | 4 | unoptimized | JR: it *should* send an email and re-invite attendees, but that needs verifying and is undeveloped either way. 6.4% conversion against a 10% goal, and the strategic plan carries its own note that this is not properly measured. *(JR, round 2)* ◷ 2026-08-14 ⟐ Conversion-Focused Marketing and Follow-Ups — planning next |
 | Discovery source capture | 3 | 1 | 2 | stable | "How you heard" is collected and discussed in the outreach and marketing committee. Self-reported, so treated as directional rather than reliable. *(JR, round 2)* ◷ 2026-08-14 |
-| Referral / bring-a-friend | 2 | 1 | 3 | degraded | **Corrected from `unknown` — it runs, but by hand.** Members do refer; JR names it explicitly as an area for technical process improvement ◷ 2026-08-14 ⟐ Member Referral and Ambassador Programs — scaling next ‖ [Referral program](https://www.makehaven.org/member-referral-program) |
+| Referral / bring-a-friend | 2 | 1 | 3 | unoptimized | **Corrected from `unknown` — it runs, but by hand.** Members do refer; JR names it explicitly as an area for technical process improvement ◷ 2026-08-14 ⟐ Member Referral and Ambassador Programs — scaling next ‖ [Referral program](https://www.makehaven.org/member-referral-program) |
 | Ambassador program | 1 | 0 | 3 | planned | Confirmed by JR as an intention we have not started — a roadmap item, not a broken process. *(JR, round 2)* ◷ 2026-08-14 ⟐ Member Referral and Ambassador Programs — scaling next |
 | Community tabling & partner events | 2 | 0 | 2 | stable | Confirmed running. *(JR, round 2)* ◷ 2026-08-14 ⟐ Community Tabling and Partner Events — scaling next |
 | Community partnership development | 2 | 0 | 3 | stable | Confirmed running, though without a defined pipeline or count. *(JR, round 2)* ◷ 2026-08-14 ⟐ Partner Outreach and Sponsored Access Programs — planning next |
 | Media relations & press kit | 1 | 0 | 2 | planned | Confirmed by JR as an intention we have not started — a roadmap item, not a broken process. *(JR, round 2)* ◷ 2026-08-14 ⟐ Earned Media and Public Relations — planning next |
 | Neighborhood & postcard campaigns | 2 | 1 | 2 | stable | Run as experiments rather than on a schedule — planned ad hoc rather than triggered. *(JR, round 2)* ◷ 2026-08-14 ⟐ Priority · Neighborhood Apartment and Regional Outreach — planning next |
 | Paid digital advertising & retargeting | 1 | 2 | 3 | changing | 250 hrs budgeted. Ad Grant campaign launch-ready, blocked on account access ⟐ Paid Digital Advertising and Retargeting — planning next |
-| Lead / inquiry handling | 2 | 1 | 3 | degraded | **Corrected from `unknown` to a named weak point.** `info@` lands in a shared Google inbox answered mostly by Kate, and staff struggle to keep up with the volume ◷ 2026-08-14 |
+| Lead / inquiry handling | 2 | 1 | 3 | unoptimized | **Corrected from `unknown` to a named weak point.** `info@` lands in a shared Google inbox answered mostly by Kate, and staff struggle to keep up with the volume ◷ 2026-08-14 |
 | Member phonebank campaigns | 3 | 1 | 3 | stable | **Corrected from `unknown`.** Used once for a fundraising experiment, well received, and planned for the next phonathon. Occasional-use by design rather than neglected ◷ 2026-08-14 |
 
 ## Communications
@@ -505,7 +520,7 @@ whole conversion funnel._
 | Slack announcements | 4 | 1 | 2 | stable | Tasks, events, asset status |
 | Website content publishing | 2 | 0 | 2 | stable | Any staff member can publish; there is no editorial calendar. JR wants to step up blog and announcement output, which would also feed the developing automatic newsletter |
 | SEO & analytics instrumentation | 4 | 2 | 2 | watch | Live 08-09. Tag wiring is implicit and fragile |
-| Inbound phone & voicemail triage | 1 | 0 | 3 | degraded | **Corrected from `unknown` to a named weak point — JR: "this is a weak point."** Calls go to a Google voicemail box that often sits unanswered for a long time because of staff capacity. This is the problem the Voicemail-Tool was built to solve; it is written and pre-launch, awaiting a Twilio number ◷ 2026-08-14 |
+| Inbound phone & voicemail triage | 1 | 0 | 3 | unoptimized | **Corrected from `unknown` to a named weak point — JR: "this is a weak point."** Calls go to a Google voicemail box that often sits unanswered for a long time because of staff capacity. This is the problem the Voicemail-Tool was built to solve; it is written and pre-launch, awaiting a Twilio number ◷ 2026-08-14 |
 | Impact storytelling & member spotlights | 1 | 0 | 2 | planned | Confirmed by JR as an intention we have not started — a roadmap item, not a broken process. *(JR, round 2)* ◷ 2026-08-14 |
 | Annual report & impact reporting | 2 | 1 | 3 | stable | **Corrected from `undefined`.** The annual member meeting is presented and recorded, and a PDF of that deck serves as the annual report when one is requested. Standards S060 wants finances, participation, outcomes *and setbacks* — worth checking the deck against that ◷ 2026-08-14 |
 
@@ -541,7 +556,7 @@ had zero rows in v1._
 | Grant outcome recording | 3 | 1 | 3 | stable | Recorded in CiviCRM by Kate and the executive director; win ratio 12 of 34 decided. *(JR, round 2)* ◷ 2026-08-14 |
 | Donor data hygiene in CRM | 2 | 1 | 3 | stable | **Kate owns donor data quality** and does most of the checking, shared with the executive director for major donors and sponsors. *(JR, round 2)* ◷ 2026-08-14 ⟐ CRM and Pipeline Management — building next |
 | Case statement maintenance | 1 | 0 | 2 | planned | Confirmed by JR as an intention we have not started — a roadmap item, not a broken process. *(JR, round 2)* ◷ 2026-08-14 ⟐ Rotating Case Statements — planning next |
-| Planned giving / bequest program | 1 | 0 | 2 | degraded | A page exists but there is no cultivation activity behind it — present in form, dormant in practice. *(JR, round 2)* ◷ 2026-08-14 ⟐ Planned Giving Quiet Build — planning next |
+| Planned giving / bequest program | 1 | 0 | 2 | unoptimized | A page exists but there is no cultivation activity behind it — present in form, dormant in practice. *(JR, round 2)* ◷ 2026-08-14 ⟐ Planned Giving Quiet Build — planning next |
 
 ## Governance & People
 
@@ -562,14 +577,14 @@ where almost nothing is defined._
 | Executive succession & emergency authority | 1 | 0 | 5 | undefined | **The real gap, now isolated.** The bylaws handle *governance* continuity; nothing handles *operational* continuity. If the executive director were suddenly unavailable there is no documented answer to who signs, who approves payments, who holds the vendor and landlord relationships, or who assumes day-to-day authority — JR: "not really, we should work on this." The partial mitigations are real but incidental: system access is distributed and recoverable through the org email account, and a **MakeHaven System and Data Access Agreement** form has captured 21 submissions since May 2025. Standards S009 asks for succession and emergency authority to be documented **and tested** — we have neither. **This is now the highest-impact undefined process in the registry.** ⟐ Leadership and Succession Planning — planning next |
 | Staff onboarding / offboarding | 1 | 1 | 3 | stable | **Reframed.** The same four staff have been in post for years, so this rarely fires; when it does, the executive director spends substantial one-to-one time. **JR's own redirect is the useful finding: the real onboarding gap is instructors and volunteers, not staff** — and those are far higher-volume. *(JR, round 2)* ◷ 2026-08-14 ‖ [Personnel Policy](https://docs.google.com/document/d/1G70oyO5qSCDrjqVkLztEoLJyAbQzYs85QZJx_h3Snt0/edit) · [Staff Responsibilities Map](https://docs.google.com/drawings/d/1w8iB6siS0NJh0tNlZ0A3myBtsTayvzGYybzU_qRA8OQ/edit) |
 | Staff development, benefits & wellbeing | 2 | 2 | 3 | stable | Annual evaluations happen and job descriptions are reviewed at the same time; both live in Google Drive ⟐ Staff Retention Efficiency and Operational Continuity — refining next ‖ [Employee Evaluation](https://docs.google.com/document/d/1hm2Tl-jVQSOHfMhyDOjz4SCHxcOkS-BgGO7vZW4gR50/edit) · [Personnel Policy](https://docs.google.com/document/d/1G70oyO5qSCDrjqVkLztEoLJyAbQzYs85QZJx_h3Snt0/edit) |
-| Staffing plan & role clarity | 1 | 1 | 4 | degraded | JR: "not really formally… I feel like we have it but not in one place." Individual job descriptions exist and are reviewed at annual evaluations; the org-level plan does not exist as a single artefact. *(JR, round 2)* ◷ 2026-08-14 ‖ [Staff Responsibilities Map](https://docs.google.com/drawings/d/1w8iB6siS0NJh0tNlZ0A3myBtsTayvzGYybzU_qRA8OQ/edit) |
+| Staffing plan & role clarity | 1 | 1 | 4 | unoptimized | JR: "not really formally… I feel like we have it but not in one place." Individual job descriptions exist and are reviewed at annual evaluations; the org-level plan does not exist as a single artefact. *(JR, round 2)* ◷ 2026-08-14 ‖ [Staff Responsibilities Map](https://docs.google.com/drawings/d/1w8iB6siS0NJh0tNlZ0A3myBtsTayvzGYybzU_qRA8OQ/edit) |
 | Volunteer pathway, roles & recognition | 2 | 1 | 3 | stable | **Corrected from `undefined`.** Roughly **75+ titled volunteers** across facilitators, shop techs, the lending librarian, ambassadors, board and committee members. Structure is published; the gap is a single maintained roster ◷ 2026-08-14 ⟐ Volunteer Pathways and Member Committees — scaling next ‖ [Volunteer structure](https://www.makehaven.org/volunteer-leadership-structure) · [Intern Program](https://www.makehaven.org/intern-program) · [New Member Ambassador](https://docs.google.com/document/d/1XKOOxTMI4VJH66fhmKHbuVxwsz4eo_xgdWBQ4e_tBZc/edit) |
 | Annual member meeting | 2 | 1 | 3 | stable | Held with a recorded presentation; the PDF of that deck doubles as the annual report when one is requested ⟐ Transparent Communication and Shared Leadership — building next |
 | ED time reporting to board | 2 | 2 | 2 | changing | New Aug 2026, from a 5-day pilot. **Also the only real source for the `effort_hrs_month` field this registry is missing** — worth wiring the two together rather than estimating twice |
 | Harassment & conduct complaints | 3 | 2 | 5 | stable | **Corrected from `unknown`.** Intake is a Google Form — chosen deliberately for privacy control rather than the site's own webforms — which emails staff, who act immediately. Gap: no case record or tracking beyond the mailbox ◷ 2026-08-14 ‖ [Harassment policy](https://www.makehaven.org/harassment) |
-| Board–member engagement | 1 | 0 | 3 | degraded | A member comment states the board "fails every transparency test I can think of"; JR's reply agrees a stronger feedback loop is needed ⟐ Board Interaction with Members — scaling next ‖ [Expectations for Board Members](https://docs.google.com/document/d/1DS9-Av-3Y8HBOX79xtD0s5rw7OVLNOyaAjUY1DGMN90/edit) · [Board roster](https://www.makehaven.org/team) |
+| Board–member engagement | 1 | 0 | 3 | unoptimized | A member comment states the board "fails every transparency test I can think of"; JR's reply agrees a stronger feedback loop is needed ⟐ Board Interaction with Members — scaling next ‖ [Expectations for Board Members](https://docs.google.com/document/d/1DS9-Av-3Y8HBOX79xtD0s5rw7OVLNOyaAjUY1DGMN90/edit) · [Board roster](https://www.makehaven.org/team) |
 | DEI review (inclusion, accessibility, affordability) | 2 | 1 | 3 | stable | The DEI committee is active again and the accessibility walk-through runs annually alongside the safety one ⟐ Inclusive Representation and Accessibility Review — refining next ‖ [Committee structure](https://www.makehaven.org/volunteer-leadership-structure) |
-| Records retention & filings calendar | 1 | 1 | 5 | degraded | Filings are now documented in the renewal calendar, but **JR confirms there is no retention rule of any kind yet — "need to establish."** That blocks the Standards three-years-of-evidence test and leaves no defined answer to what we keep, for how long, or where. *(JR, round 2)* ◷ 2026-08-14 ‖ [Filing requirements & procedures](https://docs.google.com/document/d/1utOZLoGWzUXXe0hS3D7jt1YPEMKZ93yD1ztQedEaF0k/edit) |
+| Records retention & filings calendar | 1 | 1 | 5 | unoptimized | Filings are now documented in the renewal calendar, but **JR confirms there is no retention rule of any kind yet — "need to establish."** That blocks the Standards three-years-of-evidence test and leaves no defined answer to what we keep, for how long, or where. *(JR, round 2)* ◷ 2026-08-14 ‖ [Filing requirements & procedures](https://docs.google.com/document/d/1utOZLoGWzUXXe0hS3D7jt1YPEMKZ93yD1ztQedEaF0k/edit) |
 | Nondiscrimination & accommodation requests | 3 | 1 | 4 | stable | **Corrected from `undefined`.** Requests go to the shop manager and director, and there is a dedicated accessibility-issue intake alongside the general concern pipeline. *(JR, round 2)* ◷ 2026-08-14 ⟐ Adaptive Tools Training and Representation — building next ‖ [Accessibility issue form](https://www.makehaven.org/accessibility-issue) |
 | Member IP rights | 2 | 2 | 3 | stable | **Corrected — a policy does exist.** The membership agreement states members keep their own IP, which satisfies Standards S008. *(JR, round 2)* ◷ 2026-08-14 ‖ [Membership agreement](https://www.makehaven.org/membership-agreement) |
 | Demographic data collection & reporting | 4 | 2 | 3 | stable | Lives in CiviCRM since Dec 2025; dashboards converted 07-10 |
