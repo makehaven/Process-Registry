@@ -116,6 +116,44 @@ Already done, nothing to do:
 - Firebase web app registered; its config is in `public/registry-config.js`
 - The client — `public/participate.js`
 
+### 6·0. Enable Firebase Authentication — ⛔ console click required
+
+**This step was missing from earlier revisions of this file and is the one thing
+here that cannot be done from a terminal.** Registering a web app and creating
+Firestore does *not* provision Authentication; it is a separate service, and
+until it exists every custom-token sign-in fails with
+`auth/configuration-not-found` even though the Drupal bridge minted a perfectly
+valid token.
+
+Firebase Console → **Build → Authentication → Get started**:
+
+<https://console.firebase.google.com/project/makehaven-process-registry/authentication>
+
+No sign-in provider needs to be enabled. This app signs in only with custom
+tokens minted by Drupal, so the provider list can stay empty — "Get started" is
+what creates the config, and that is all that is required.
+
+While in Authentication → **Settings → Authorized domains**, confirm
+`process.makehaven.org` is listed.
+
+Do **not** reach for the `identityPlatform:initializeAuth` API to avoid the
+click. That provisions Identity Platform, the paid tier, and fails on this
+project with `BILLING_NOT_ENABLED` — `makehaven-process-registry` is on Spark
+with billing disabled, unlike `gen-lang-client-0572628920` behind the grant
+researcher. Plain Firebase Auth is free on Spark, and the console is the only
+free path to it.
+
+Verify from a terminal rather than the browser:
+
+```bash
+gcloud auth print-access-token >/dev/null && curl -s \
+  -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+  -H "x-goog-user-project: makehaven-process-registry" \
+  "https://identitytoolkit.googleapis.com/admin/v2/projects/makehaven-process-registry/config"
+```
+
+`404 CONFIGURATION_NOT_FOUND` means it still has not been enabled.
+
 ### 6a. Register the app with the Drupal bridge — ✅ config committed
 
 The `makerspace_firebase_auth` module is already generic and **already live** —
