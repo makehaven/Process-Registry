@@ -187,12 +187,41 @@ async function signInToFirebase() {
   return cred.user;
 }
 
+/**
+ * Ask Drupal who this is.
+ *
+ * Nothing in the Firebase session carries a name: the bridge mints role claims
+ * and a uid and nothing else, and signInWithCustomToken leaves displayName null
+ * because there is no provider profile behind a custom token. Without this every
+ * comment files as "Unknown" — for everyone, not just accounts that lack a name —
+ * and digest.py has no way to recover the author afterwards.
+ *
+ * The `profile` scope is already requested at /oauth/authorize and this origin is
+ * already in Drupal's CORS allow-list, so this needs no server change. Failure is
+ * deliberately silent: an unnamed comment is worth more than a blocked sign-in.
+ */
+async function drupalDisplayName() {
+  const token = localStorage.getItem(LS.access);
+  if (!token) return null;
+  try {
+    const res = await fetch(`${DRUPAL_BASE_URL}/oauth/userinfo`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return null;
+    const info = await res.json();
+    return info.name || info.preferred_username || null;
+  } catch {
+    return null;
+  }
+}
+
 async function buildProfile(user) {
   const res = await user.getIdTokenResult();
   const c = res.claims || {};
   return {
     uid: user.uid,
-    name: c.name || c.display_name || user.displayName || "Unknown",
+    name: c.name || c.display_name || user.displayName
+      || (await drupalDisplayName()) || "Unknown",
     // The bridge maps Drupal roles to claims. Which ones exist is deployment
     // config, so read whatever is there rather than hard-coding a list.
     roles: Object.keys(c).filter((k) => c[k] === true && !RESERVED.has(k)).sort(),

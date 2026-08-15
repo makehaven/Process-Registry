@@ -153,6 +153,9 @@
   .flux-row .what b { display:block; font-size:14px; font-weight:650; }
   .flux-row .what .grp { display:block; margin-top:3px; font-family:var(--mono); font-size:10px;
                          letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); }
+  /* The table variant sits inline after the process name; here it starts its own
+     line under the group label, so the inline left margin would misalign it. */
+  .flux-row .what .rowsay { display:inline-block; margin:8px 0 0; }
   .flux-row .n { font-size:13px; color:var(--ink-2); }
   @media (max-width:760px) {
     .flux-row { grid-template-columns:1fr; gap:6px; }

@@ -435,9 +435,16 @@ else:
 # ---- in flux right now ------------------------------------------------------
 flux = [r for r in rows if r["state"] in ("changing", "watch")]
 flux.sort(key=lambda r: (r["state"] != "changing", r["group"], r["name"]))
+# data-pid on the row, button inside it: paintCommentCounts() walks [data-pid]
+# and paints any .rowsay beneath, so this picks up counts with no client change.
+# This is the tab built for the board and staff conversation, which is exactly
+# where someone reading a row wants to say something about it — asked for in the
+# registry's own comments, 2026-08-15.
 influx = "".join(
-    f"""      <div class="flux-row"><div><span class="pill {r['state']}">{r['state']}</span></div>
-        <div class="what"><b>{md(r['name'])}</b><span class="grp">{html.escape(r['group'])}</span></div>
+    f"""      <div class="flux-row" data-pid="{r['pid']}"><div><span class="pill {r['state']}">{r['state']}</span></div>
+        <div class="what"><b>{md(r['name'])}</b><span class="grp">{html.escape(r['group'])}</span>
+        <button type="button" class="rowsay" data-pid="{r['pid']}" """
+    f"""aria-label="Comment on {html.escape(r['name'], quote=True)}">Comment</button></div>
         <div class="n">{md(plain_note(r['note']))}</div></div>""" for r in flux)
 
 # ---- fragments -------------------------------------------------------------
