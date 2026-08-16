@@ -445,7 +445,6 @@ function applyVotes() {
 
     const box = s.el.querySelector(".vote");
     if (box) {
-      box.hidden = !state.ready;
       box.querySelector(".up .c").textContent = s.t.up;
       box.querySelector(".down .c").textContent = s.t.down;
       box.querySelector(".up").classList.toggle("on", s.t.mine === 1);
@@ -659,15 +658,19 @@ function closePanel() {
 }
 
 function wireUI() {
-  // Comment affordances only mean something once someone can be identified, so
-  // they stay hidden until sign-in resolves.
+  // Comment and vote affordances show for everyone, signed in or not. They used
+  // to hide until a session resolved, which meant the person most likely to
+  // have a correction — someone glancing at Next between other things — saw no
+  // way to give it. Clicking while signed out starts sign-in, and the OAuth
+  // return lands back on the same tab.
   document.querySelectorAll(".rowsay").forEach((b) => {
-    b.hidden = !state.ready;
+    b.hidden = false;
     b.addEventListener("click", (e) => {
       e.stopPropagation();
       openPanel(b.dataset.pid);
     });
   });
+  document.querySelectorAll(".vote").forEach((v) => { v.hidden = false; });
 
   document.querySelectorAll(".vote .vt").forEach((b) => {
     b.addEventListener("click", async () => {
@@ -772,7 +775,6 @@ async function boot() {
     document.body.classList.add("signed-in");
     await Promise.all([loadVotes(), loadComments(), loadAnswers()]);
     applyVotes();
-    document.querySelectorAll(".rowsay").forEach((b) => { b.hidden = false; });
   } catch (e) {
     // An expired session is not an exception — signInToFirebase returns null for
     // that and the bar offers sign-in. Reaching here means something is wrong

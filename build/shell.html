@@ -320,6 +320,22 @@
   a:focus-visible { outline:2px solid var(--crimson); outline-offset:2px; border-radius:1px; }
   .res { display:block; margin-top:7px; padding-top:6px; border-top:1px dotted var(--rule-2);
          font-size:12px; line-height:1.7; }
+  /* Method prose folded behind a headline. The summary carries enough to act on;
+     the box is there the day a number needs defending. */
+  .explain { margin:0 0 18px; border:1px solid var(--rule); border-radius:2px;
+             background:var(--surface); }
+  .explain > summary { cursor:pointer; list-style:none; padding:11px 15px;
+                       font-family:var(--mono); font-size:11px; letter-spacing:.07em;
+                       text-transform:uppercase; font-weight:650; color:var(--ink-2); }
+  .explain > summary::-webkit-details-marker { display:none; }
+  .explain > summary::before { content:"▸ "; color:var(--crimson); }
+  .explain[open] > summary::before { content:"▾ "; }
+  .explain > summary:hover { color:var(--ink); }
+  .explain[open] > summary { border-bottom:1px solid var(--rule); }
+  .explain > :not(summary) { margin-left:15px; margin-right:15px; }
+  .explain > :nth-child(2) { margin-top:14px; }
+  .explain > :last-child { margin-bottom:14px; }
+
   /* Provenance folded behind one line. The summary names what is inside (Code ·
      Strategy · Docs · Reviewed) so the row still answers "is anything written
      down?" at a glance — only the links themselves cost a click. */
@@ -790,6 +806,11 @@
 
   <section>
     <h2>Where to automate next</h2>
+    <!-- The method prose matters — it is what makes the ranking auditable — but
+         it is reference, not preamble. Folded so the list itself is the first
+         thing on the tab; the summary line says enough to vote responsibly. -->
+    <details class="explain">
+    <summary>How this ranking works — the score, the plan's priorities, and your votes</summary>
     <p class="sec-note">
       <strong>{{NRANK}} of {{N}} processes are here; {{NSETTLED}} are not.</strong> A row earns a
       place by having something actually wrong with it — it is
@@ -825,6 +846,7 @@
       when it is finalised the update is that one file and a rebuild — no row-by-row re-tagging,
       and every score on this tab moves with it.
     </p>
+    </details>
     <div class="rank" id="rank-list">
 {{RANK}}
     </div>
@@ -841,9 +863,12 @@
 
 <div class="panel" id="p-inventory" role="tabpanel" aria-labelledby="t-inventory" hidden>
 
-  <p class="lead">The full reference. If the <strong>Auto</strong>, <strong>Doc</strong> and
-  <strong>Impact</strong> columns are unfamiliar, the scoring key comes first.</p>
+  <p class="lead">The full reference. The <strong>Auto</strong>, <strong>Doc</strong> and
+  <strong>Impact</strong> scales, and how much of this is verified, are in the two boxes below —
+  open them when a number needs defining; the list itself starts right after.</p>
 
+  <details class="explain">
+  <summary>How much of this is verified — and what was inferred</summary>
   <div class="coverage">
     <div><span class="cn">{{NREVIEWED}}<small>/{{N}}</small></span>
       <span class="cl">Verified by a person</span>
@@ -858,9 +883,11 @@
       <span class="cs">Inferred from the codebase, the plan or the dashboards, and never
       confirmed by a person. The registry's own staleness, kept in plain sight.</span></div>
   </div>
+  </details>
 
   <section>
-    <h2>How the scoring works</h2>
+    <details class="explain">
+    <summary>How the scoring works — the A, D and I scales, and the code-counts rule</summary>
     <p class="sec-note">
       Three axes, defined tightly enough that two people should land on the same number.
       If they don't, the fix is the wording of the scale — not the score.
@@ -929,6 +956,7 @@
       automated process here is currently the first without being the second — so the way we find
       out that something broke is that a person notices.
     </p>
+    </details>
     <p class="sec-note">
       An earlier draft of this paragraph argued the point with two incidents instead, one of them a
       door-sync outage. That was wrong, and wrong in a way worth recording: <strong>UniFi is an
