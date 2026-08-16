@@ -259,7 +259,81 @@ def score_cell(axis, v):
 # description ◷reviewed ⚙code ⟐strategy ‖docs, but parsing does not
 # depend on that order.
 SIGILS = {"◷": "reviewed", "⚙": "code", "⚠": "raised",
-          "⟐": "strategy", "‖": "docs", "◊": "drafted"}
+          "⟐": "strategy", "‖": "docs", "◊": "drafted", "▦": "measure"}
+
+# ---- the KPI dashboard as a measurement pointer ------------------------------
+# ▦ carries the id(s) of the strategic-plan KPI a process moves, resolved here to
+# the dashboard section that charts it. A link, deliberately not an embedded
+# number: the registry shows maturity, not current health — dashboards own the
+# live value, and the dashboard needs a login anyway. What the link buys in both
+# directions: "this broken process — here is the number it damages", and (via the
+# printed coverage stat) "which KPIs have no process pointed at them".
+# Ids and labels mirror makerspace_dashboard's kpis.yml; sections are its tab ids.
+DASHBOARD = "https://www.makehaven.org/makerspace-dashboard"
+KPI = {
+    # governance
+    "kpi_board_ethnic_diversity":        ("governance", "Board Ethnic Diversity (% BIPOC)"),
+    "kpi_board_gender_diversity":        ("governance", "Board Gender Diversity (% Female/Non-binary)"),
+    # finance
+    "kpi_reserve_funds_months":          ("finance", "Reserve Funds (Months of Operating Expense)"),
+    "kpi_earned_income_sustaining_core": ("finance", "Earned Income Sustaining Core %"),
+    "kpi_member_revenue_quarterly":      ("finance", "Member Revenue (Quarterly)"),
+    "kpi_net_income_program_lines":      ("finance", "Net Income (Program Lines)"),
+    "kpi_member_lifetime_value_projected": ("finance", "Member Lifetime Value (Projected)"),
+    "kpi_revenue_per_member_index":      ("finance", "Revenue vs Expense Index (per member)"),
+    "kpi_monthly_revenue_at_risk":       ("finance", "Monthly Revenue at Risk ($)"),
+    "kpi_payment_resolution_rate":       ("finance", "Payment Resolution Rate %"),
+    # infrastructure
+    "kpi_member_satisfaction_equipment": ("infrastructure", "Member Satisfaction (Equipment)"),
+    "kpi_equipment_uptime_rate":         ("infrastructure", "Equipment Uptime Rate %"),
+    "kpi_active_maintenance_load":       ("infrastructure", "Active Maintenance Load"),
+    "kpi_storage_occupancy":             ("infrastructure", "Storage Occupancy %"),
+    "kpi_equipment_investment":          ("infrastructure", "Value of Equipment Added ($)"),
+    "kpi_adherence_to_shop_budget":      ("infrastructure", "Adherence to Shop Budget"),
+    # outreach
+    "kpi_total_new_member_signups":      ("outreach", "Total New Member Signups"),
+    "kpi_total_first_time_workshop_participants": ("outreach", "First Time Workshop Participants"),
+    "kpi_total_new_recurring_revenue":   ("outreach", "New Recurring Membership Revenue (Monthly)"),
+    "kpi_tours":                         ("outreach", "Total Tours (12 month)"),
+    "kpi_tours_to_member_conversion":    ("outreach", "Tours to Member Conversion %"),
+    "kpi_guest_waiver_to_member_conversion": ("outreach", "Guest Waiver to Member Conversion %"),
+    "kpi_event_participant_to_member_conversion": ("outreach", "Event Participant to Member Conversion %"),
+    # retention
+    "kpi_total_active_members":          ("retention", "Total Active Members"),
+    "kpi_first_year_member_retention":   ("retention", "First Year Member Retention %"),
+    "kpi_member_post_12_month_retention": ("retention", "Member (Post-12mo) Retention %"),
+    "kpi_member_nps":                    ("retention", "Member Net Promoter Score"),
+    "kpi_active_participation":          ("retention", "Active Participation %"),
+    "kpi_new_member_first_badge_28_days": ("retention", "New Member First Badge (28 days) %"),
+    "kpi_members_at_risk_share":         ("retention", "Members At-Risk %"),
+    "kpi_membership_diversity_bipoc":    ("retention", "Membership Diversity (% BIPOC)"),
+    # education
+    "kpi_workshop_attendees":            ("education", "Workshop Attendees"),
+    "kpi_workshop_capacity_utilization": ("education", "Workshop Capacity Utilization %"),
+    "kpi_program_capacity_utilization":  ("education", "Program Capacity Utilization %"),
+    "kpi_workshop_program_capacity_utilization": ("education", "Workshop + Program Capacity Utilization %"),
+    "kpi_education_nps":                 ("education", "Education Net Promoter Score"),
+    "kpi_workshop_participants_bipoc":   ("education", "% Workshop Participants (BIPOC)"),
+    "kpi_active_instructors_bipoc":      ("education", "% Active Instructors (BIPOC)"),
+    "kpi_net_income_education":          ("education", "Net Income (Education Program)"),
+    # entrepreneurship
+    "kpi_incubator_workspace_occupancy": ("entrepreneurship", "Incubator Workspace Occupancy %"),
+    "kpi_active_incubator_ventures":     ("entrepreneurship", "Active Incubator Ventures"),
+    "kpi_entrepreneurship_event_participation": ("entrepreneurship", "Entrepreneurship Events Participants"),
+    # development
+    "kpi_recurring_donors_count":        ("development", "Recurring Donors"),
+    "kpi_annual_corporate_sponsorships": ("development", "$ Annual Corporate Sponsorships"),
+    "kpi_grant_pipeline_count":          ("development", "Grants Submitted (YTD)"),
+    "kpi_grant_win_ratio":               ("development", "Grant Win Ratio %"),
+    "kpi_donor_retention_rate":          ("development", "Donor Retention Rate %"),
+    "kpi_donor_upgrades_count":          ("development", "Donor Upgrades"),
+    # dei
+    "kpi_retention_poc":                 ("dei", "Retention POC %"),
+    "kpi_active_participation_bipoc":    ("dei", "Active Participation % (BIPOC)"),
+    "kpi_active_participation_female_nb": ("dei", "Active Participation % (Female/Non-binary)"),
+}
+unknown_kpis = []      # typos surface in the build output, like unmatched strategies
+used_kpis = set()
 
 def parse_note(raw):
     """Split a note cell into its prose and whichever optional fields it carries."""
@@ -311,6 +385,20 @@ def note_cell(raw):
     if p.get("docs"):
         folded.append(f'<span class="res"><b>Docs</b>{md(p["docs"])}</span>')
         labels.append("Docs")
+    if p.get("measure"):
+        links = []
+        for k in [x.strip() for x in p["measure"].split(",") if x.strip()]:
+            if k in KPI:
+                sec, label = KPI[k]
+                used_kpis.add(k)
+                links.append(f'<a href="{DASHBOARD}/{sec}" target="_blank" '
+                             f'rel="noopener">{html.escape(label)}</a>')
+            else:
+                unknown_kpis.append(k)
+                links.append(f'<code>{html.escape(k)}</code>')
+        folded.append(f'<span class="res kpi"><b>Measured by</b>{" · ".join(links)}'
+                      f' <i class="staffnote">— dashboard (staff)</i></span>')
+        labels.append("Measured")
     # Only rows a person actually confirmed carry a line. How much is unverified
     # is reported once, in the inventory header, rather than stamped on ninety-odd
     # rows as a reproach.
@@ -757,4 +845,9 @@ print(f"resource-linked rows: {nres}; D3 floor applied to {n_floored} rows "
 print(f"coverage — reviewed {n_reviewed}/{N}, code {n_code}/{N}, "
       f"descriptions inferred {n_drafted}/{N}")
 print(f"plan — {n_strat_matched} rows matched a strategy ({n_p1} P1), {n_unmatched} named a strategy not in strategies.csv")
+n_measured = sum(1 for f in fields if f.get("measure"))
+orphan_kpis = sorted(set(KPI) - used_kpis)
+print(f"kpi — {n_measured} rows name the KPI they move; "
+      f"{len(orphan_kpis)} of {len(KPI)} KPIs have no process pointed at them"
+      + (f"; UNKNOWN ids: {sorted(set(unknown_kpis))}" if unknown_kpis else ""))
 print(f"wrote {OUT} — {N} processes, {len(tables)} groups, change load {change_load}, can't-say {cant_say}")
