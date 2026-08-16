@@ -284,9 +284,14 @@
   .statedef dd { margin:0; font-size:13.5px; color:var(--ink-2); line-height:1.5; }
   .statedef dd strong { color:var(--ink); }
   td.n { color:var(--ink-2); font-size:13px; }
-  td.n a, .unranked a, .sec-note a { color:var(--crimson); text-decoration:underline;
-                                     text-underline-offset:2px; text-decoration-thickness:1px; }
-  td.n a:hover, .sec-note a:hover { text-decoration-thickness:2px; }
+  /* One rule for every prose link. This was scoped to the inventory cells and
+     section notes, which left links added later — the ranking's Docs line, flux
+     notes — in browser-default blue, unreadable in dark mode. */
+  td.n a, .unranked a, .sec-note a,
+  .rank-row a, .flux-row a { color:var(--crimson); text-decoration:underline;
+                             text-underline-offset:2px; text-decoration-thickness:1px; }
+  td.n a:hover, .sec-note a:hover,
+  .rank-row a:hover, .flux-row a:hover { text-decoration-thickness:2px; }
   a:focus-visible { outline:2px solid var(--crimson); outline-offset:2px; border-radius:1px; }
   .res { display:block; margin-top:7px; padding-top:6px; border-top:1px dotted var(--rule-2);
          font-size:12px; line-height:1.7; }
