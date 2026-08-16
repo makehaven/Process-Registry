@@ -915,6 +915,23 @@ manifest = json.dumps(
      for r in sorted(rows, key=lambda r: (r["group"], r["name"]))],
     ensure_ascii=False, separators=(",", ":"))
 
+# ---- question manifest ------------------------------------------------------
+# The question rounds are what took this registry from guesses to a map, and
+# they were run as documents passed to one person. Embedding the current round
+# in the page lets anyone signed in answer one question when they have a minute
+# — the same interview, spread across the people who actually run the processes.
+# qid is stable across rebuilds (process + category) so an answered question
+# stays answered; the wording can improve without resetting the round.
+import hashlib, sys as _sys
+_sys.path.insert(0, str(pathlib.Path(__file__).parent))
+import questions as _qgen
+_name2pid = {re.sub(r"[*`]", "", r["name"]).strip(): r["pid"] for r in rows}
+qmanifest = json.dumps(
+    [{"qid": hashlib.md5(f"{proc}|{cat}".encode()).hexdigest()[:10],
+      "pid": _name2pid.get(proc), "process": proc, "cat": cat, "q": q, "why": why}
+     for pri, cat, proc, q, why in _qgen.questions(_qgen.load())[:20]],
+    ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+
 # The key used to be hand-written and said "1 — worst on that axis", which is
 # true for Auto and Doc and wrong for Impact, where 5 is the bad end. Generated
 # from SCALES it shows the actual digits each column tints — and now that only
@@ -939,7 +956,8 @@ for key, val in [("TILES", tiles), ("LEGEND", legend), ("BOARD", "\n".join(board
                  ("NREVIEWED", str(n_reviewed)), ("NCODE", str(n_code)),
                  ("NNEVER", str(n_never)), ("NRANK", str(len(top))), ("NSHOWN", str(SHOWN)),
                  ("NMORE", str(max(0, len(top) - SHOWN))), ("RAISED", raised_html),
-                 ("MANIFEST", manifest), ("SCOREKEY", scorekey),
+                 ("MANIFEST", manifest), ("QUESTIONS", qmanifest),
+                 ("SCOREKEY", scorekey),
                  ("NSETTLED", str(n_settled)), ("NP1ROWS", str(n_p1)),
                  ("NSTRAT", str(n_strat_matched)),
                  ("NRAISED", str(len(raised))),

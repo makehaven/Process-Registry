@@ -22,7 +22,7 @@ import argparse, pathlib, re, sys
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SRC = ROOT / "data" / "inventory.md"
 QDIR = ROOT / "questions"
-SIGILS = "◷⚙⚠⟐‖"
+SIGILS = "◷⚙⚠⟐‖◊▦⧉"
 
 
 def load():
@@ -39,7 +39,8 @@ def load():
             continue
         note = c[5]
         f = {}
-        for sig, key in zip(SIGILS, ["reviewed", "code", "raised", "strategy", "docs"]):
+        for sig, key in zip(SIGILS, ["reviewed", "code", "raised", "strategy", "docs",
+                                     "drafted", "measure", "standards"]):
             if sig in note:
                 f[key] = re.split(f"[{SIGILS}]", note.split(sig, 1)[1])[0].strip()
         rows.append(dict(group=group, name=re.sub(r"\*", "", c[0]).strip(),
@@ -63,20 +64,20 @@ def questions(rows):
             out.append((base + 40, "Uncharacterised", nm,
                         f"What actually happens when this runs — who does it, and in what order?",
                         f"State is `{r['state']}` at impact I{i}. Nobody can currently describe it."))
-        elif r["state"] == "degraded":
-            out.append((base + 30, "Degraded", nm,
+        elif r["state"] == "broken":
+            out.append((base + 30, "Broken", nm,
                         "Is this still broken, and is anyone on it now?",
-                        f"Marked degraded at I{i}. Degraded with nobody assigned is the "
+                        f"Marked broken at I{i}. Broken with nobody assigned is the "
                         "registry's main finding — confirm it is still true."))
-        elif r["state"] == "unoptimized":
+        elif r["state"] == "optimizable":
             # A different question from the degraded one on purpose. Asking "is
             # it still broken" about something that was never built invites the
             # answer "it was never broken", which is true and useless. What is
             # worth knowing is where the ceiling is and whether it is worth the
             # climb — several of these may be fine left exactly as they are.
-            out.append((base + 22, "Unoptimized", nm,
+            out.append((base + 22, "Optimizable", nm,
                         "What would good enough look like here, and is it worth building?",
-                        f"Marked unoptimized at I{i} — it runs, it was just never built "
+                        f"Marked optimizable at I{i} — it runs, it was just never built "
                         "further. Some of these are fine as they are; the registry cannot "
                         "tell which without asking."))
 

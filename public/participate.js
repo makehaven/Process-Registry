@@ -140,6 +140,11 @@ const state = {
   votes: new Map(),      // pid -> { up, down, mine }
   comments: new Map(),   // pid ("__general__" for site-wide) -> [comment, …]
   processes: [],
+  questions: [],       // the current round, embedded by the build
+  answers: new Map(),  // qid -> [answer docs]
+  panelPid: "",
+  curQ: null,          // question currently shown in the panel
+  qSkipped: new Set(), // rotated past this session
   ready: false,
 };
 
@@ -322,6 +327,20 @@ async function loadComments() {
     (b.createdAt || "").localeCompare(a.createdAt || "")));
   state.comments = byPid;
   paintCommentCounts();
+}
+
+/** Answers to the question round, so an answered question stops being asked. */
+async function loadAnswers() {
+  const { db, api } = await loadFirebase();
+  const snap = await api.getDocs(api.collection(db, "answers"));
+  const byQid = new Map();
+  snap.forEach((d) => {
+    const a = d.data();
+    if (!a || !a.qid) return;
+    if (!byQid.has(a.qid)) byQid.set(a.qid, []);
+    byQid.get(a.qid).push(a);
+  });
+  state.answers = byQid;
 }
 
 /** A count on the button is what tells someone there is anything to read. */
@@ -513,7 +532,68 @@ function openPanel(pid) {
   $("fbpanel").hidden = false;
   $("fbpill").setAttribute("aria-expanded", "true");
   renderThread(state.panelPid);
+  renderQuestion(state.panelPid);
   setTimeout(() => $("fbtext").focus(), 40);
+}
+
+/**
+ * One question from the current round, above the comment form.
+ *
+ * The question rounds are what took the registry from guesses to a map, and
+ * they were run as documents handed to one person. This spreads the same
+ * interview across everyone signed in: opened from a row, its own unanswered
+ * question if the round has one; opened from the pill, whichever question has
+ * gone longest unanswered. Zero-answer questions come first — a second opinion
+ * is worth less than a first one. Optional by design; Skip costs nothing.
+ */
+function pickQuestion(pid) {
+  const mine = (q) =>
+    (state.answers.get(q.qid) || []).some((a) => a.uid === state.profile?.uid);
+  const pool = state.questions.filter((q) =>
+    (pid ? q.pid === pid : true) && !mine(q) && !state.qSkipped.has(q.qid));
+  if (!pool.length) return null;
+  const unanswered = pool.filter((q) => !(state.answers.get(q.qid) || []).length);
+  return (unanswered.length ? unanswered : pool)[0];
+}
+
+function renderQuestion(pid) {
+  const box = $("fbq");
+  const q = pickQuestion(pid);
+  state.curQ = q;
+  box.hidden = !q;
+  if (!q) return;
+  $("fbq-proc").textContent = q.process;
+  $("fbq-q").textContent = q.q;
+  $("fbq-why").textContent = `Why we ask: ${q.why}`;
+  $("fbq-text").value = "";
+}
+
+async function sendAnswer() {
+  const q = state.curQ;
+  const text = $("fbq-text").value.trim();
+  if (!q || !text) { $("fbq-text").focus(); return; }
+  const btn = $("fbq-send");
+  btn.disabled = true;
+  try {
+    const { db, api } = await loadFirebase();
+    const p = state.profile;
+    const id = `a-${Date.now()}-${randomString(6)}`;
+    const doc = {
+      id, qid: q.qid, processId: q.pid || null, processName: q.process,
+      question: q.q, text: text.slice(0, 4000),
+      uid: p.uid, name: p.name, roles: p.roles,
+      status: "new", createdAt: new Date().toISOString(),
+    };
+    await api.setDoc(api.doc(db, "answers", id), doc);
+    if (!state.answers.has(q.qid)) state.answers.set(q.qid, []);
+    state.answers.get(q.qid).push(doc);
+    renderQuestion(state.panelPid);   // next one, or the card disappears
+  } catch (e) {
+    console.error(e);
+    alert("Could not save that answer — please try again.");
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 const KIND_LABEL = {
@@ -622,6 +702,11 @@ function wireUI() {
   });
 
   $("fbsend").addEventListener("click", submitComment);
+  $("fbq-send").addEventListener("click", sendAnswer);
+  $("fbq-skip").addEventListener("click", () => {
+    if (state.curQ) state.qSkipped.add(state.curQ.qid);
+    renderQuestion(state.panelPid);
+  });
   $("fbtext").addEventListener("keydown", (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") submitComment();
   });
@@ -664,6 +749,7 @@ async function submitComment() {
 async function boot() {
   const dock = $("fbdock");
   state.processes = JSON.parse($("process-manifest").textContent);
+  state.questions = JSON.parse($("question-manifest").textContent || "[]");
   wireUI();
 
   // No consumer configured yet: leave the page exactly as built rather than
@@ -684,7 +770,7 @@ async function boot() {
     setAuthBar("in");
     dock.hidden = false;
     document.body.classList.add("signed-in");
-    await Promise.all([loadVotes(), loadComments()]);
+    await Promise.all([loadVotes(), loadComments(), loadAnswers()]);
     applyVotes();
     document.querySelectorAll(".rowsay").forEach((b) => { b.hidden = false; });
   } catch (e) {

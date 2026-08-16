@@ -93,6 +93,31 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ---- answers to the question round ------------------------------------
+    // Same shape as feedback: create-only as yourself, immutable once filed,
+    // staff triage moves status alongside. The question text is stored on the
+    // answer because the round regenerates — an answer must stay legible even
+    // after the question that prompted it has been reworded or retired.
+    match /answers/{docId} {
+      allow read: if signedIn();
+
+      allow create: if isSelf(request.resource.data.uid)
+        && isTrimmedString(request.resource.data.text, 4000)
+        && isTrimmedString(request.resource.data.qid, 40)
+        && isTrimmedString(request.resource.data.question, 500)
+        && request.resource.data.status == 'new'
+        && request.resource.data.keys().hasOnly([
+             'id', 'qid', 'processId', 'processName', 'question', 'text',
+             'uid', 'name', 'roles', 'status', 'createdAt'
+           ]);
+
+      allow update: if isStaff()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['status', 'adminNote', 'reviewedBy', 'reviewedAt']);
+
+      allow delete: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
