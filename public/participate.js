@@ -486,17 +486,33 @@ function setAuthBar(status, detail) {
   }
 }
 
+/**
+ * The panel no longer carries a process picker. It used to open on a 196-option
+ * grouped dropdown, which asked the commenter to re-answer a question they had
+ * already answered by clicking — every Comment button on the page knows its
+ * row. Opened from a button, the target is that process; opened from the pill,
+ * it is the registry as a whole (which also covers "something is missing").
+ */
 function openPanel(pid) {
   if (!state.ready) { login(); return; }
-  const panel = $("fbpanel");
-  const sel = $("fbproc");
-  sel.value = pid || "";
+  state.panelPid = pid || "";
+  const target = $("fbtarget");
+  const row = pid ? state.processes.find((x) => x.pid === pid) : null;
+  target.textContent = "";
+  const b = document.createElement("b");
+  b.textContent = row ? row.name : "The registry as a whole";
+  target.appendChild(b);
+  const s = document.createElement("span");
+  s.textContent = row ? row.group
+    : "— or tell us about a process that is missing";
+  target.appendChild(s);
+
   $("fbdone").hidden = true;
   $("fbform").hidden = false;
   $("fberr").hidden = true;
-  panel.hidden = false;
+  $("fbpanel").hidden = false;
   $("fbpill").setAttribute("aria-expanded", "true");
-  renderThread(sel.value);
+  renderThread(state.panelPid);
   setTimeout(() => $("fbtext").focus(), 40);
 }
 
@@ -508,25 +524,39 @@ const KIND_LABEL = {
   context: "Adds context",
 };
 
-/** What everyone else already said about this process, above the form — so
- *  people answer each other rather than each filing the same note. */
+/** What everyone else already said, above the form — so people answer each
+ *  other rather than each filing the same note. Per-process when opened from a
+ *  row; opened from the pill, the whole registry's recent comments, each
+ *  labelled with its process, so the panel doubles as a browse of what has
+ *  been said so far. */
 function renderThread(pid) {
   const box = $("fbthread");
-  const list = state.comments.get(pid || "__general__") || [];
+  let list, header;
+  if (pid) {
+    list = state.comments.get(pid) || [];
+    header = list.length === 1 ? "1 comment so far" : `${list.length} comments so far`;
+  } else {
+    list = [...state.comments.values()].flat()
+      .sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+    header = list.length === 1 ? "1 comment across the registry"
+                               : `${list.length} comments across the registry`;
+  }
   box.textContent = "";
   box.hidden = !list.length;
   if (!list.length) return;
 
   const h = document.createElement("span");
   h.className = "fbl";
-  h.textContent = list.length === 1 ? "1 comment so far" : `${list.length} comments so far`;
+  h.textContent = header;
   box.appendChild(h);
 
-  list.slice(0, 12).forEach((c) => {
+  const SHOWN = pid ? 12 : 20;
+  list.slice(0, SHOWN).forEach((c) => {
     const item = document.createElement("div");
     item.className = "fbc";
     const meta = document.createElement("b");
     meta.textContent = `${c.name || "Unknown"} — ${KIND_LABEL[c.kind] || c.kind}`;
+    if (!pid && c.processName) meta.textContent += ` · ${c.processName}`;
     const when = document.createElement("i");
     when.textContent = (c.createdAt || "").slice(0, 10);
     const body = document.createElement("p");
@@ -535,10 +565,10 @@ function renderThread(pid) {
     box.appendChild(item);
   });
 
-  if (list.length > 12) {
+  if (list.length > SHOWN) {
     const more = document.createElement("span");
     more.className = "fbmore";
-    more.textContent = `+${list.length - 12} older, in the digest`;
+    more.textContent = `+${list.length - SHOWN} older, in the digest`;
     box.appendChild(more);
   }
 }
@@ -592,7 +622,6 @@ function wireUI() {
   });
 
   $("fbsend").addEventListener("click", submitComment);
-  $("fbproc").addEventListener("change", (e) => renderThread(e.target.value));
   $("fbtext").addEventListener("keydown", (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") submitComment();
   });
@@ -611,14 +640,14 @@ async function submitComment() {
   btn.textContent = "Sending…";
   try {
     await sendComment({
-      pid: $("fbproc").value,
+      pid: state.panelPid,
       kind: document.querySelector('input[name="fbkind"]:checked').value,
       text,
     });
     $("fbtext").value = "";
     $("fbform").hidden = true;
     $("fbdone").hidden = false;
-    renderThread($("fbproc").value);
+    renderThread(state.panelPid);
     setTimeout(() => { if (!$("fbpanel").hidden) closePanel(); }, 2200);
   } catch (e) {
     console.error(e);
@@ -630,32 +659,11 @@ async function submitComment() {
   }
 }
 
-function fillProcessPicker() {
-  const sel = $("fbproc");
-  const byGroup = new Map();
-  state.processes.forEach((p) => {
-    if (!byGroup.has(p.group)) byGroup.set(p.group, []);
-    byGroup.get(p.group).push(p);
-  });
-  byGroup.forEach((list, group) => {
-    const g = document.createElement("optgroup");
-    g.label = group;
-    list.forEach((p) => {
-      const o = document.createElement("option");
-      o.value = p.pid;
-      o.textContent = p.name;
-      g.appendChild(o);
-    });
-    sel.appendChild(g);
-  });
-}
-
 /* ---------------------------------------------------------------------- boot */
 
 async function boot() {
   const dock = $("fbdock");
   state.processes = JSON.parse($("process-manifest").textContent);
-  fillProcessPicker();
   wireUI();
 
   // No consumer configured yet: leave the page exactly as built rather than

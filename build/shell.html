@@ -500,10 +500,14 @@
   .fbbody { padding:14px 16px 16px; }
   .fbl { display:block; font-family:var(--mono); font-size:10px; letter-spacing:.1em;
          text-transform:uppercase; color:var(--ink-3); font-weight:600; margin:0 0 5px; }
-  .fbbody select, .fbbody textarea { width:100%; font:inherit; font-size:13.5px;
+  .fbbody textarea { width:100%; font:inherit; font-size:13.5px;
          color:var(--ink); background:var(--paper); border:1px solid var(--rule);
          border-radius:4px; padding:8px 10px; }
-  .fbbody select:focus, .fbbody textarea:focus { outline:none; border-color:var(--accent,var(--crimson)); }
+  .fbbody textarea:focus { outline:none; border-color:var(--accent,var(--crimson)); }
+  /* What the comment is about — set by which button opened the panel. */
+  .fbtarget b { display:block; font-size:14px; font-weight:650; }
+  .fbtarget span { display:block; margin-top:2px; font-family:var(--mono); font-size:10px;
+                   letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); }
   .fbbody textarea { min-height:96px; resize:vertical; }
   .fbgap { margin-top:13px; }
   .fbkind { display:flex; flex-wrap:wrap; gap:5px; }
@@ -1267,10 +1271,11 @@
     <div class="fbbody">
       <div class="fbthread" id="fbthread" hidden></div>
       <div id="fbform">
-        <label class="fbl" for="fbproc">Which process</label>
-        <select id="fbproc">
-          <option value="">&mdash; the registry as a whole, or one that is missing &mdash;</option>
-        </select>
+        <!-- No process picker. Every Comment button already knows its row, so the
+             196-option dropdown asked a question the click had answered; opened
+             from the pill, the target is the registry as a whole. -->
+        <span class="fbl">About</span>
+        <div class="fbtarget" id="fbtarget"></div>
 
         <div class="fbgap">
           <span class="fbl">What kind of note</span>

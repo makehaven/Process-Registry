@@ -75,8 +75,15 @@ for ln in SRC.read_text().split("\n"):
         group = None if any(k in t for k in SKIP_H2) else t
         cur_blurb = []
         continue
-    if group and ln.startswith("_") and ln.endswith("_"):
-        blurbs[group] = ln.strip("_")
+    # Group blurbs wrap across source lines like all prose here, so accumulate
+    # from the opening underscore to the closing one. The old single-line test
+    # meant every wrapped blurb silently never rendered.
+    if group and (cur_blurb or ln.startswith("_")):
+        cur_blurb.append(ln)
+        if ln.endswith("_"):
+            blurbs[group] = " ".join(cur_blurb).strip("_")
+            cur_blurb = []
+        continue
     if group and ln.startswith("| "):
         c = [x.strip() for x in ln.strip().strip("|").split("|")]
         if len(c) == 6 and c[1] != "A" and not set(c[1]) <= set("-: "):

@@ -523,8 +523,12 @@ storage, and workspaces) for cost recovery and mission alignment."_
 
 ## Outreach & Recruitment
 
-_Almost entirely new in v2. v1 folded this into Communications and lost the
-whole conversion funnel._
+_The conversion funnel: getting people who are not yet members in the door and
+across the line — tours, waivers, follow-ups, campaigns. The line against
+Communications is the audience: if it exists to convert outsiders, it is here;
+if it is a standing channel talking to people we already have, it is
+Communications. v1 folded the two together and lost the whole funnel, which is
+why they are deliberately separate._
 
 | Process | A | D | I | State | Notes |
 |---|---|---|---|---|---|
@@ -544,6 +548,12 @@ whole conversion funnel._
 | Member phonebank campaigns | 3 | 2 | 3 | stable | **Corrected from `unknown`.** Used once for a fundraising experiment, well received, and planned for the next phonathon. Occasional-use by design rather than neglected ◷ 2026-08-14 |
 
 ## Communications
+
+_The standing channels — newsletter, digest, Slack, the site, the phone — and
+the hygiene that keeps them working. These speak to everyone we already have;
+anything built to convert outsiders lives in Outreach & Recruitment. The two
+overlap at the newsletter and social media, which serve both audiences: those
+sit here because the channel outlives any one campaign._
 
 | Process | A | D | I | State | Notes |
 |---|---|---|---|---|---|
