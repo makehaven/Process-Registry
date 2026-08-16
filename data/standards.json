@@ -1,0 +1,774 @@
+{
+ "source": "Makerspace-Standards app/index.html (draft framework)",
+ "domains": {
+  "1": "Governance",
+  "2": "Safety & Risk",
+  "3": "User Access",
+  "4": "Facility & Assets",
+  "5": "Finance & People",
+  "6": "Community & Impact",
+  "A": "Tool Lending",
+  "B": "Youth",
+  "C": "Incubation",
+  "D": "Circular Repair",
+  "E": "Workspaces"
+ },
+ "standards": [
+  {
+   "id": "S001",
+   "domain": "1",
+   "module": "core",
+   "tier": 1,
+   "critical": true,
+   "statement": "Legal entity, tax-exempt status, registrations, and required filings are current.",
+   "evidence": "Formation documents; determination letter; filing calendar; latest filings"
+  },
+  {
+   "id": "S002",
+   "domain": "1",
+   "module": "core",
+   "tier": 1,
+   "critical": true,
+   "statement": "Governing documents define authority, elections, meetings, and dissolution.",
+   "evidence": "Current bylaws; amendments"
+  },
+  {
+   "id": "S003",
+   "domain": "1",
+   "module": "core",
+   "tier": 1,
+   "critical": true,
+   "statement": "Board has at least five independent, unrelated voting directors or documents why another structure is appropriate.",
+   "evidence": "Board roster; independence declarations"
+  },
+  {
+   "id": "S004",
+   "domain": "1",
+   "module": "core",
+   "tier": 1,
+   "critical": true,
+   "statement": "Board meets regularly and retains approved minutes documenting decisions.",
+   "evidence": "Meeting calendar; approved minutes"
+  },
+  {
+   "id": "S005",
+   "domain": "1",
+   "module": "core",
+   "tier": 2,
+   "critical": true,
+   "statement": "Conflict-of-interest policy includes annual disclosure and documented handling of conflicts.",
+   "evidence": "Policy; signed disclosures; relevant minutes"
+  },
+  {
+   "id": "S006",
+   "domain": "1",
+   "module": "core",
+   "tier": 2,
+   "critical": false,
+   "statement": "Whistleblower, records-retention, and ethics policies cover directors, staff, and key volunteers.",
+   "evidence": "Board-approved policies; training records"
+  },
+  {
+   "id": "S007",
+   "domain": "1",
+   "module": "core",
+   "tier": 2,
+   "critical": false,
+   "statement": "Board-approved strategy connects mission, programs, facilities, and major capital purchases.",
+   "evidence": "Strategic plan; annual goals; board review"
+  },
+  {
+   "id": "S008",
+   "domain": "1",
+   "module": "core",
+   "tier": 2,
+   "critical": false,
+   "statement": "Users retain intellectual property they create except where a written agreement clearly states otherwise.",
+   "evidence": "IP policy; sponsored-project agreement template"
+  },
+  {
+   "id": "S009",
+   "domain": "1",
+   "module": "core",
+   "tier": 3,
+   "critical": true,
+   "statement": "Leadership succession and emergency authority are documented and tested.",
+   "evidence": "Succession plan; delegation matrix; test record"
+  },
+  {
+   "id": "S010",
+   "domain": "1",
+   "module": "core",
+   "tier": 3,
+   "critical": false,
+   "statement": "Board completes a documented annual self-evaluation and reviews organizational risk.",
+   "evidence": "Three annual evaluations; risk register reviews"
+  },
+  {
+   "id": "S011",
+   "domain": "2",
+   "module": "core",
+   "tier": 1,
+   "critical": true,
+   "statement": "Written general safety rules, emergency procedures, and emergency contacts are visible and current.",
+   "evidence": "Safety manual; posted procedures; review date"
+  },
+  {
+   "id": "S012",
+   "domain": "2",
+   "module": "core",
+   "tier": 1,
+   "critical": true,
+   "statement": "Required fire protection, first-aid supplies, eyewash, exits, and emergency shutoffs are accessible and inspected.",
+   "evidence": "Inspection checklist; service tags; photos"
+  },
+  {
+   "id": "S013",
+   "domain": "2",
+   "module": "core",
+   "tier": 1,
+   "critical": true,
+   "statement": "Hazardous chemicals are labeled, stored compatibly, and supported by accessible SDS information.",
+   "evidence": "Chemical inventory; SDS access; storage inspection"
+  },
+  {
+   "id": "S014",
+   "domain": "2",
+   "module": "core",
+   "tier": 1,
+   "critical": true,
+   "statement": "Tools have point-of-use rules and required guarding, dust collection, ventilation, and PPE.",
+   "evidence": "Tool SOPs; inspection records; photos"
+  },
+  {
+   "id": "S015",
+   "domain": "2",
+   "module": "core",
+   "tier": 2,
+   "critical": true,
+   "statement": "Tools are assigned risk levels that determine training, supervision, and access-control requirements.",
+   "evidence": "Hazard matrix; approved access rules"
+  },
+  {
+   "id": "S016",
+   "domain": "2",
+   "module": "core",
+   "tier": 2,
+   "critical": true,
+   "statement": "Injuries, near misses, unsafe conditions, and equipment damage are promptly reported and reviewed.",
+   "evidence": "Incident form; log; corrective-action records"
+  },
+  {
+   "id": "S017",
+   "domain": "2",
+   "module": "core",
+   "tier": 2,
+   "critical": false,
+   "statement": "Opening, closing, lone-work, impairment, and after-hours emergency protocols are documented.",
+   "evidence": "Operating policies; orientation materials"
+  },
+  {
+   "id": "S018",
+   "domain": "2",
+   "module": "core",
+   "tier": 2,
+   "critical": true,
+   "statement": "Insurance coverages and limits are reviewed annually against actual operations.",
+   "evidence": "Policies; broker review; board minutes"
+  },
+  {
+   "id": "S019",
+   "domain": "2",
+   "module": "core",
+   "tier": 3,
+   "critical": true,
+   "statement": "A qualified annual safety audit tracks findings through closure and analyzes incident trends.",
+   "evidence": "Three annual audits; closure log; trend review"
+  },
+  {
+   "id": "S020",
+   "domain": "2",
+   "module": "core",
+   "tier": 3,
+   "critical": false,
+   "statement": "Waste, emissions, used materials, and hazardous disposal are managed under documented environmental procedures.",
+   "evidence": "Waste plan; vendor records; training logs"
+  },
+  {
+   "id": "S021",
+   "domain": "3",
+   "module": "member",
+   "tier": 1,
+   "critical": true,
+   "statement": "Every member completes orientation, accepts conduct rules, and signs required agreements before access.",
+   "evidence": "Orientation checklist; agreements; access record"
+  },
+  {
+   "id": "S022",
+   "domain": "3",
+   "module": "member",
+   "tier": 1,
+   "critical": true,
+   "statement": "Restricted tools require verified practical training before independent use.",
+   "evidence": "Badge requirements; training records"
+  },
+  {
+   "id": "S023",
+   "domain": "3",
+   "module": "member",
+   "tier": 2,
+   "critical": true,
+   "statement": "Digital or auditable credentials control tool and facility access and can be suspended promptly.",
+   "evidence": "Badge database; access-control test; suspension procedure"
+  },
+  {
+   "id": "S024",
+   "domain": "3",
+   "module": "member",
+   "tier": 2,
+   "critical": false,
+   "statement": "Dues, holds, guests, refunds, accessibility accommodations, and termination rules are transparent.",
+   "evidence": "Published membership policies"
+  },
+  {
+   "id": "S025",
+   "domain": "3",
+   "module": "member",
+   "tier": 2,
+   "critical": true,
+   "statement": "Conduct and disciplinary procedures provide reporting, fair review, documentation, and proportionate action.",
+   "evidence": "Conduct policy; complaint procedure; de-identified case log"
+  },
+  {
+   "id": "S026",
+   "domain": "3",
+   "module": "member",
+   "tier": 3,
+   "critical": false,
+   "statement": "Credential quality is periodically reviewed and portable credentials are accepted only through defined equivalency rules.",
+   "evidence": "Curriculum review; equivalency agreements; audit sample"
+  },
+  {
+   "id": "S027",
+   "domain": "3",
+   "module": "public",
+   "tier": 1,
+   "critical": true,
+   "statement": "Visitors register, accept safety/conduct rules, and remain within defined access boundaries.",
+   "evidence": "Visitor form; signage; sign-in log"
+  },
+  {
+   "id": "S028",
+   "domain": "3",
+   "module": "public",
+   "tier": 1,
+   "critical": true,
+   "statement": "Staffing and supervision levels match the hazards available during public access.",
+   "evidence": "Coverage schedule; hazard/supervision matrix"
+  },
+  {
+   "id": "S029",
+   "domain": "3",
+   "module": "public",
+   "tier": 2,
+   "critical": true,
+   "statement": "Point-of-use authorization or verified workshop credentials govern restricted equipment use.",
+   "evidence": "Facilitation procedure; credential records"
+  },
+  {
+   "id": "S030",
+   "domain": "3",
+   "module": "public",
+   "tier": 2,
+   "critical": false,
+   "statement": "Accessible pathways help repeat visitors advance from introduction to independent capability.",
+   "evidence": "Program pathway; participant guidance"
+  },
+  {
+   "id": "S031",
+   "domain": "3",
+   "module": "public",
+   "tier": 3,
+   "critical": false,
+   "statement": "Public-access data and feedback are reviewed to improve hours, staffing, access, and instruction.",
+   "evidence": "Three annual reviews; change log"
+  },
+  {
+   "id": "S032",
+   "domain": "4",
+   "module": "core",
+   "tier": 1,
+   "critical": true,
+   "statement": "A current inventory identifies major equipment, location, status, and responsible lead.",
+   "evidence": "Asset register"
+  },
+  {
+   "id": "S033",
+   "domain": "4",
+   "module": "core",
+   "tier": 1,
+   "critical": true,
+   "statement": "Unsafe equipment is clearly locked out and cannot return to service without authorization.",
+   "evidence": "Lockout procedure; repair/release records"
+  },
+  {
+   "id": "S034",
+   "domain": "4",
+   "module": "core",
+   "tier": 2,
+   "critical": true,
+   "statement": "Preventive maintenance schedules reflect manufacturer guidance, use, and risk.",
+   "evidence": "Maintenance schedule and completed logs"
+  },
+  {
+   "id": "S035",
+   "domain": "4",
+   "module": "core",
+   "tier": 2,
+   "critical": false,
+   "statement": "Original manuals, warranties, leases, insurance, access-control configuration, and critical records are securely backed up.",
+   "evidence": "Document index; backup test"
+  },
+  {
+   "id": "S036",
+   "domain": "4",
+   "module": "core",
+   "tier": 2,
+   "critical": true,
+   "statement": "Shop inspections verify egress, storage, guards, utilities, ventilation, and housekeeping.",
+   "evidence": "Routine inspection checklists; corrective actions"
+  },
+  {
+   "id": "S037",
+   "domain": "4",
+   "module": "core",
+   "tier": 2,
+   "critical": false,
+   "statement": "Critical digital services have named owners, backups, recovery instructions, and controlled administrator access.",
+   "evidence": "Systems register; recovery test; admin roster"
+  },
+  {
+   "id": "S038",
+   "domain": "4",
+   "module": "core",
+   "tier": 3,
+   "critical": true,
+   "statement": "Annual asset audits reconcile inventory, condition, maintenance, training controls, and replacement needs.",
+   "evidence": "Three annual asset audits"
+  },
+  {
+   "id": "S039",
+   "domain": "4",
+   "module": "core",
+   "tier": 3,
+   "critical": false,
+   "statement": "A board-designated capital replacement plan and reserve reflect documented lifecycle needs.",
+   "evidence": "Replacement forecast; reserve policy; statements"
+  },
+  {
+   "id": "S040",
+   "domain": "5",
+   "module": "core",
+   "tier": 1,
+   "critical": true,
+   "statement": "Board approves an annual budget and reviews timely budget-to-actual, balance sheet, and cash information.",
+   "evidence": "Approved budget; financial packets; minutes"
+  },
+  {
+   "id": "S041",
+   "domain": "5",
+   "module": "core",
+   "tier": 1,
+   "critical": true,
+   "statement": "Financial duties are separated or compensating controls are documented for receipts, payments, payroll, and reconciliation.",
+   "evidence": "Control matrix; approvals; reconciliation samples"
+  },
+  {
+   "id": "S042",
+   "domain": "5",
+   "module": "core",
+   "tier": 1,
+   "critical": true,
+   "statement": "Restricted funds, donations, acknowledgments, and fundraising claims are handled accurately.",
+   "evidence": "Gift records; acknowledgments; restrictions schedule"
+  },
+  {
+   "id": "S043",
+   "domain": "5",
+   "module": "core",
+   "tier": 2,
+   "critical": true,
+   "statement": "Board reviews liquidity, revenue concentration, liabilities, and insurance at least annually.",
+   "evidence": "Dashboard; risk discussion minutes"
+  },
+  {
+   "id": "S044",
+   "domain": "5",
+   "module": "core",
+   "tier": 2,
+   "critical": false,
+   "statement": "Independent financial review, compilation, or audit matches legal requirements and organizational risk.",
+   "evidence": "Accountant report; management letter response"
+  },
+  {
+   "id": "S045",
+   "domain": "5",
+   "module": "core",
+   "tier": 3,
+   "critical": true,
+   "statement": "Multi-year forecasts and reserves demonstrate a credible continuity plan under adverse scenarios.",
+   "evidence": "Forecast; scenario analysis; reserve policy"
+  },
+  {
+   "id": "S046",
+   "domain": "5",
+   "module": "staff",
+   "tier": 1,
+   "critical": true,
+   "statement": "Every employee has a current job description, lawful classification, payroll processing, and required postings.",
+   "evidence": "Job descriptions; payroll records; postings checklist"
+  },
+  {
+   "id": "S047",
+   "domain": "5",
+   "module": "staff",
+   "tier": 2,
+   "critical": true,
+   "statement": "Employee handbook covers conduct, harassment, leave, hours, safety, complaints, and discipline.",
+   "evidence": "Current handbook; acknowledgments"
+  },
+  {
+   "id": "S048",
+   "domain": "5",
+   "module": "staff",
+   "tier": 2,
+   "critical": false,
+   "statement": "Performance goals, supervision, compensation review, and annual evaluations are documented.",
+   "evidence": "Review schedule; completed evaluations"
+  },
+  {
+   "id": "S049",
+   "domain": "5",
+   "module": "staff",
+   "tier": 3,
+   "critical": false,
+   "statement": "Leadership reviews retention, workload, pay equity, development, and single-person dependencies.",
+   "evidence": "Three annual workforce reviews; mitigation plan"
+  },
+  {
+   "id": "S050",
+   "domain": "5",
+   "module": "volunteer",
+   "tier": 1,
+   "critical": true,
+   "statement": "Volunteer leads have defined roles, authority, contacts, and required safety qualifications.",
+   "evidence": "Lead roster; role descriptions; training records"
+  },
+  {
+   "id": "S051",
+   "domain": "5",
+   "module": "volunteer",
+   "tier": 2,
+   "critical": true,
+   "statement": "Scheduling, onboarding, supervision, complaints, removal, and escalation are documented.",
+   "evidence": "Volunteer handbook; schedules; escalation procedure"
+  },
+  {
+   "id": "S052",
+   "domain": "5",
+   "module": "volunteer",
+   "tier": 2,
+   "critical": false,
+   "statement": "Critical responsibilities have backup coverage and transitions do not depend on one volunteer.",
+   "evidence": "Coverage matrix; handoff documentation"
+  },
+  {
+   "id": "S053",
+   "domain": "5",
+   "module": "volunteer",
+   "tier": 3,
+   "critical": false,
+   "statement": "Leadership annually reviews workload, retention, recognition, burnout risk, and succession.",
+   "evidence": "Three annual reviews; improvement actions"
+  },
+  {
+   "id": "S054",
+   "domain": "6",
+   "module": "core",
+   "tier": 1,
+   "critical": false,
+   "statement": "Organization tracks who participates, what they use, and basic program attendance.",
+   "evidence": "Membership/visitor and attendance reports"
+  },
+  {
+   "id": "S055",
+   "domain": "6",
+   "module": "core",
+   "tier": 1,
+   "critical": true,
+   "statement": "Nondiscrimination, accessibility, and inclusion expectations apply to users, staff, volunteers, and programs.",
+   "evidence": "Policies; accommodation procedure; training"
+  },
+  {
+   "id": "S056",
+   "domain": "6",
+   "module": "core",
+   "tier": 2,
+   "critical": false,
+   "statement": "Measurable annual goals connect activities to participant learning, agency, belonging, or opportunity.",
+   "evidence": "Outcomes framework; annual targets"
+  },
+  {
+   "id": "S057",
+   "domain": "6",
+   "module": "core",
+   "tier": 2,
+   "critical": false,
+   "statement": "Participant feedback is collected safely and reviewed with usage and demographic information.",
+   "evidence": "Survey tools; results; leadership review"
+  },
+  {
+   "id": "S058",
+   "domain": "6",
+   "module": "core",
+   "tier": 2,
+   "critical": false,
+   "statement": "Instruction supports choice, iteration, peer learning, and multiple ways to participate and demonstrate learning.",
+   "evidence": "Facilitation guide; observation rubric; instructor training"
+  },
+  {
+   "id": "S059",
+   "domain": "6",
+   "module": "core",
+   "tier": 2,
+   "critical": false,
+   "statement": "Community partnerships have clear purposes, responsibilities, and mutual benefit.",
+   "evidence": "MOUs; partner list; review notes"
+  },
+  {
+   "id": "S060",
+   "domain": "6",
+   "module": "core",
+   "tier": 3,
+   "critical": false,
+   "statement": "A public annual report summarizes finances, participation, outcomes, setbacks, and improvement commitments.",
+   "evidence": "Three annual reports"
+  },
+  {
+   "id": "S061",
+   "domain": "6",
+   "module": "core",
+   "tier": 3,
+   "critical": false,
+   "statement": "Evaluation findings demonstrably influence program design, outreach, staffing, and capital decisions.",
+   "evidence": "Three-year decision/change log"
+  },
+  {
+   "id": "S062",
+   "domain": "A",
+   "module": "lending",
+   "tier": 1,
+   "critical": true,
+   "statement": "Each circulating tool is uniquely identified and checked out to a verified borrower.",
+   "evidence": "Catalog; checkout records"
+  },
+  {
+   "id": "S063",
+   "domain": "A",
+   "module": "lending",
+   "tier": 2,
+   "critical": true,
+   "statement": "Loan agreement, due dates, condition, accessories, loss, and safe-use limits are documented.",
+   "evidence": "Agreement; checkout checklist"
+  },
+  {
+   "id": "S064",
+   "domain": "A",
+   "module": "lending",
+   "tier": 2,
+   "critical": true,
+   "statement": "Returned powered tools receive documented functional and electrical inspection before recirculation.",
+   "evidence": "Return inspection logs"
+  },
+  {
+   "id": "S065",
+   "domain": "A",
+   "module": "lending",
+   "tier": 3,
+   "critical": false,
+   "statement": "Loss, damage, late return, utilization, and maintenance trends inform inventory decisions.",
+   "evidence": "Three annual lending analyses"
+  },
+  {
+   "id": "S066",
+   "domain": "B",
+   "module": "youth",
+   "tier": 1,
+   "critical": true,
+   "statement": "Parent/guardian consent, emergency contacts, supervision, and authorized pickup rules are enforced.",
+   "evidence": "Forms; procedures; roster samples"
+  },
+  {
+   "id": "S067",
+   "domain": "B",
+   "module": "youth",
+   "tier": 1,
+   "critical": true,
+   "statement": "Age and capability rules prohibit or control youth access to hazardous equipment.",
+   "evidence": "Age/hazard matrix; curriculum rules"
+  },
+  {
+   "id": "S068",
+   "domain": "B",
+   "module": "youth",
+   "tier": 2,
+   "critical": true,
+   "statement": "Background screening and youth-protection training apply to all covered adults before service.",
+   "evidence": "Screening roster; training records"
+  },
+  {
+   "id": "S069",
+   "domain": "B",
+   "module": "youth",
+   "tier": 2,
+   "critical": true,
+   "statement": "Two-adult/open-observable practices, reporting duties, communication, and overnight/transport rules are documented as applicable.",
+   "evidence": "Youth protection policy; incident/reporting procedure"
+  },
+  {
+   "id": "S070",
+   "domain": "B",
+   "module": "youth",
+   "tier": 3,
+   "critical": false,
+   "statement": "Youth curricula and outcomes are periodically reviewed with educators, families, and participants.",
+   "evidence": "Three annual curriculum/outcome reviews"
+  },
+  {
+   "id": "S071",
+   "domain": "C",
+   "module": "incubation",
+   "tier": 1,
+   "critical": true,
+   "statement": "Commercial use, production limits, shared-tool priority, staging, and prohibited activities are clear.",
+   "evidence": "Commercial use policy"
+  },
+  {
+   "id": "S072",
+   "domain": "C",
+   "module": "incubation",
+   "tier": 2,
+   "critical": true,
+   "statement": "Written agreements define space, term, fees, insurance, IP, milestones, and termination.",
+   "evidence": "Executed agreements; insurance certificates"
+  },
+  {
+   "id": "S073",
+   "domain": "C",
+   "module": "incubation",
+   "tier": 2,
+   "critical": true,
+   "statement": "Production activities receive documented safety, zoning, environmental, and capacity review.",
+   "evidence": "Intake/risk reviews; approvals"
+  },
+  {
+   "id": "S074",
+   "domain": "C",
+   "module": "incubation",
+   "tier": 3,
+   "critical": false,
+   "statement": "Program outcomes and community subsidy are measured and reviewed for mission alignment.",
+   "evidence": "Three annual cohort and subsidy analyses"
+  },
+  {
+   "id": "S075",
+   "domain": "D",
+   "module": "repair",
+   "tier": 1,
+   "critical": true,
+   "statement": "Repair events use intake, ownership, safety, and liability procedures.",
+   "evidence": "Intake form; event procedure"
+  },
+  {
+   "id": "S076",
+   "domain": "D",
+   "module": "repair",
+   "tier": 2,
+   "critical": true,
+   "statement": "Repairs are assigned to qualified mentors and powered items receive an appropriate post-repair safety check.",
+   "evidence": "Mentor roster; test logs"
+  },
+  {
+   "id": "S077",
+   "domain": "D",
+   "module": "repair",
+   "tier": 2,
+   "critical": true,
+   "statement": "Salvaged materials are screened for hazardous coatings, contamination, structural defects, and prohibited items.",
+   "evidence": "Acceptance policy; inspection records"
+  },
+  {
+   "id": "S078",
+   "domain": "D",
+   "module": "repair",
+   "tier": 3,
+   "critical": false,
+   "statement": "Diversion, repair outcomes, incidents, and repeat failures are reviewed annually.",
+   "evidence": "Three annual outcome reports"
+  },
+  {
+   "id": "S079",
+   "domain": "E",
+   "module": "rentals",
+   "tier": 1,
+   "critical": true,
+   "statement": "Every occupant has a written license or rental agreement defining use, fees, term, termination, and non-subletting.",
+   "evidence": "Executed agreements; occupant roster"
+  },
+  {
+   "id": "S080",
+   "domain": "E",
+   "module": "rentals",
+   "tier": 1,
+   "critical": true,
+   "statement": "Egress, fire access, storage, chemicals, and housekeeping are inspected in private areas.",
+   "evidence": "Bay inspection logs; corrective actions"
+  },
+  {
+   "id": "S081",
+   "domain": "E",
+   "module": "rentals",
+   "tier": 2,
+   "critical": true,
+   "statement": "Electrical loads, personal machinery, alterations, hot work, and prohibited uses require defined approval.",
+   "evidence": "Workspace rules; approval records"
+  },
+  {
+   "id": "S082",
+   "domain": "E",
+   "module": "rentals",
+   "tier": 2,
+   "critical": true,
+   "statement": "Access, property risk, required insurance, disputes, and abandoned property are addressed in writing.",
+   "evidence": "Agreements; insurance records; procedures"
+  },
+  {
+   "id": "S083",
+   "domain": "E",
+   "module": "rentals",
+   "tier": 3,
+   "critical": false,
+   "statement": "Annual portfolio review covers compliance, incidents, insurance, occupancy, subsidy, and mission alignment.",
+   "evidence": "Three annual workspace reviews"
+  },
+  {
+   "id": "S084",
+   "domain": "6",
+   "module": "core",
+   "tier": 2,
+   "critical": false,
+   "statement": "Organization participates in peer makerspace networks and shares documentation, curricula, or lessons learned beyond its own walls.",
+   "evidence": "Network memberships; shared templates or curricula; exchange or conference participation"
+  }
+ ]
+}

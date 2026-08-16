@@ -266,7 +266,20 @@ def score_cell(axis, v):
 # description ◷reviewed ⚙code ⟐strategy ‖docs, but parsing does not
 # depend on that order.
 SIGILS = {"◷": "reviewed", "⚙": "code", "⚠": "raised",
-          "⟐": "strategy", "‖": "docs", "◊": "drafted", "▦": "measure"}
+          "⟐": "strategy", "‖": "docs", "◊": "drafted", "▦": "measure",
+          "⧉": "standards"}
+
+# ---- the Standards of Excellence as a lens ----------------------------------
+# ⧉ carries the standards a process implements, from the crosswalk
+# (docs/STANDARDS_CROSSWALK.md). Framework metadata is snapshotted into
+# data/standards.json by build/standards_sync.py — the build never reads the
+# sibling repo, so CI works from a bare clone. `S055*` means the standard as
+# written does not reach what the process does; `P3` is a proposed standard from
+# the gaps doc that does not exist yet.
+STD = json.loads((pathlib.Path(__file__).resolve().parents[1]
+                  / "data" / "standards.json").read_text())
+STD_BY_ID = {s["id"]: s for s in STD["standards"]}
+STD_DOMAINS = STD["domains"]
 
 # ---- the KPI dashboard as a measurement pointer ------------------------------
 # ▦ carries the id(s) of the strategic-plan KPI a process moves, resolved here to
@@ -421,6 +434,10 @@ def note_cell(raw):
     if p.get("drafted"):
         out += (f'<span class="res draft"><b>Description inferred</b> '
                 f'{md(p["drafted"])} — not confirmed by anyone who runs it</span>')
+    if p.get("standards"):
+        folded.append(f'<span class="res std"><b>Standards</b>'
+                      f'{html.escape(p["standards"])}</span>')
+        labels.append("Standards")
     if folded:
         out += (f'<details class="rowmeta"><summary>{" · ".join(labels)}</summary>'
                 f'{"".join(folded)}</details>')
@@ -559,6 +576,103 @@ if raised:
   </section>"""
 else:
     raised_html = ""
+
+# ---- standards tab ----------------------------------------------------------
+# The registry cannot score a standard — the assessment tool owns that. What it
+# can do is the drill-down the tool cannot: for each standard, which processes
+# implement it and what state they are in, which is the concrete answer to
+# "what would we actually have to change to reach the next level?" A standard
+# whose implementing rows are broken or unwritten (D0–D1) cannot honestly score
+# 2 ("written, assigned, consistently implemented, evidenced") no matter what an
+# assessor hopes — those rows are the work list, and this tab names them.
+std_rows = collections.defaultdict(list)   # S-id -> [(row, stretch?)]
+prop_rows = collections.defaultdict(list)  # proposed P-id -> [row]
+for r in rows:
+    spec = parse_note(r["note"]).get("standards")
+    if not spec:
+        continue
+    for tok in spec.split():
+        sid = tok.rstrip("*")
+        if sid in STD_BY_ID:
+            std_rows[sid].append((r, tok.endswith("*")))
+        elif re.fullmatch(r"P\d+", sid):
+            prop_rows[sid].append(r)
+
+def std_blockers(pairs):
+    """The rows that hold a standard below level 2, and why."""
+    out = []
+    for r, _ in pairs:
+        why = []
+        if r["state"] == "broken":
+            why.append("broken")
+        elif r["state"] in ("undefined", "unknown"):
+            why.append(r["state"])
+        if r["d"].isdigit() and int(r["d"]) < 2:
+            why.append(f"nothing written (D{r['d']})")
+        if why:
+            out.append((r, " and ".join(why)))
+    return out
+
+std_sections, n_std_covered = [], len(std_rows)
+for dcode in "123456ABCDE":
+    dom_ids = [s["id"] for s in STD["standards"] if s["domain"] == dcode]
+    covered = [i for i in dom_ids if i in std_rows]
+    if not covered:
+        continue
+    orphans = [i for i in dom_ids if i not in std_rows]
+    blocks = []
+    for sid in covered:
+        s = STD_BY_ID[sid]
+        pairs = sorted(std_rows[sid], key=lambda p: (p[0]["state"] != "broken", p[0]["name"]))
+        chips = " ".join(
+            f'<span class="std-proc{" stretch" if stretch else ""}">'
+            f'<span class="pill {r["state"]}">{r["state"]}</span>{md(r["name"])}'
+            f'<i>D{html.escape(r["d"])}</i></span>' for r, stretch in pairs)
+        badges = f'tier {s["tier"]}' + (" · critical" if s["critical"] else "")
+        up = std_blockers(pairs)
+        up_html = ""
+        if up:
+            items = " · ".join(f'{md(r["name"])} <i>({why})</i>' for r, why in up)
+            up_html = f'<div class="std-up"><b>To move up</b>{items}</div>'
+        blocks.append(f"""      <div class="std-row" id="std-{sid}">
+        <div class="std-head"><code>{sid}</code><span class="std-badges">{badges}</span>
+          <p>{html.escape(s["statement"])}</p></div>
+        <div class="std-procs">{chips}</div>
+        {up_html}</div>""")
+    orphan_html = ""
+    if orphans:
+        orphan_html = (f'<p class="std-orphans">Not yet mapped to any process: '
+                       f'{" ".join(f"<code>{i}</code>" for i in orphans)} — either a real '
+                       f'underinvestment or a standard that does not apply here. '
+                       f'Each is worth one honest sentence.</p>')
+    std_sections.append(f"""  <section>
+    <h2>{html.escape(STD_DOMAINS[dcode])}</h2>
+    <div class="std-list">
+{chr(10).join(blocks)}
+    </div>
+{orphan_html}
+  </section>""")
+
+if prop_rows:
+    pb = []
+    for pid_, prs in sorted(prop_rows.items(), key=lambda kv: int(kv[0][1:])):
+        chips = " ".join(
+            f'<span class="std-proc"><span class="pill {r["state"]}">{r["state"]}</span>'
+            f'{md(r["name"])}</span>' for r in sorted(prs, key=lambda r: r["name"]))
+        pb.append(f"""      <div class="std-row"><div class="std-head"><code>{pid_}</code>
+        <span class="std-badges">proposed</span></div><div class="std-procs">{chips}</div></div>""")
+    std_sections.append(f"""  <section>
+    <h2>Proposed standards</h2>
+    <p class="sec-note">Processes the crosswalk found that no standard reaches — the registry's
+      contribution back to the framework. Definitions live in <code>STANDARDS_GAPS.md</code>
+      in the Makerspace-Standards repo.</p>
+    <div class="std-list">
+{chr(10).join(pb)}
+    </div>
+  </section>""")
+
+standards_html = "\n".join(std_sections)
+n_std_stretch = sum(1 for pairs in std_rows.values() for _, st in pairs if st)
 
 # ---- recently finished ------------------------------------------------------
 # The other half of a change board. The page is fluent about what is wrong and
@@ -832,6 +946,9 @@ for key, val in [("TILES", tiles), ("LEGEND", legend), ("BOARD", "\n".join(board
                  ("RANK", "\n".join(rank_html)), ("TABLES", "\n".join(tables)),
                  ("UNRANK", unrank_html), ("INFLUX", influx), ("N", str(N)),
                  ("WINS", wins_html),
+                 ("STANDARDS", standards_html), ("NSTD", str(n_std_covered)),
+                 ("NSTDSTRETCH", str(n_std_stretch)),
+                 ("NSTDTOTAL", str(len(STD_BY_ID))),
                  ("GROUPOPTS", "\n".join(
                      f'        <option value="{html.escape(g, quote=True)}">{html.escape(g)}</option>'
                      for g in by_group)),
@@ -852,6 +969,10 @@ print(f"resource-linked rows: {nres}; D3 floor applied to {n_floored} rows "
 print(f"coverage — reviewed {n_reviewed}/{N}, code {n_code}/{N}, "
       f"descriptions inferred {n_drafted}/{N}")
 print(f"plan — {n_strat_matched} rows matched a strategy ({n_p1} P1), {n_unmatched} named a strategy not in strategies.csv")
+n_std_blocked = sum(1 for pairs in std_rows.values() if std_blockers(pairs))
+print(f"standards — {n_std_covered}/{len(STD_BY_ID)} mapped to a process; "
+      f"{n_std_blocked} held below level 2 by a broken or unwritten row; "
+      f"{len(prop_rows)} proposed standards carry rows")
 n_measured = sum(1 for f in fields if f.get("measure"))
 orphan_kpis = sorted(set(KPI) - used_kpis)
 print(f"kpi — {n_measured} rows name the KPI they move; "

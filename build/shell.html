@@ -181,6 +181,31 @@
   @media (max-width:760px) { .raise-row { grid-template-columns:1fr; } .raise-row .st { text-align:left; } }
   .res.raised b { color:var(--s-watch); }
 
+  /* Standards tab. One block per standard: id + tier, the statement, the
+     processes implementing it as compact chips, and the rows holding it back. */
+  .std-list { display:flex; flex-direction:column; gap:1px; background:var(--rule);
+              border:1px solid var(--rule); border-radius:2px; overflow:hidden; }
+  .std-row { background:var(--surface); padding:13px 16px; }
+  .std-head code { font-family:var(--mono); font-weight:700; font-size:12px; color:var(--crimson); }
+  .std-badges { margin-left:9px; font-family:var(--mono); font-size:9.5px; letter-spacing:.09em;
+                text-transform:uppercase; color:var(--ink-3); }
+  .std-head p { margin:4px 0 0; font-size:13.5px; color:var(--ink); }
+  .std-procs { margin-top:8px; display:flex; flex-wrap:wrap; gap:6px; }
+  .std-proc { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--ink-2);
+              border:1px solid var(--rule); border-radius:2px; padding:2px 8px 2px 3px; }
+  .std-proc .pill { font-size:8.5px; padding:1px 5px; }
+  .std-proc i { font-style:normal; font-family:var(--mono); font-size:10px; color:var(--ink-3); }
+  /* Starred in the crosswalk: the process exceeds the standard as written. */
+  .std-proc.stretch { border-style:dashed; }
+  .std-up { margin-top:8px; padding:6px 10px; font-size:12.5px; color:var(--ink-2);
+            border-left:2px solid var(--s-watch); background:var(--s-watch-bg); border-radius:0 2px 2px 0; }
+  .std-up b { font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; text-transform:uppercase;
+              color:var(--s-watch); margin-right:8px; }
+  .std-up i { font-style:normal; color:var(--ink-3); }
+  .std-orphans { margin-top:10px; font-size:12px; color:var(--ink-3); }
+  .std-orphans code { font-family:var(--mono); font-size:11px; }
+  .res.std b { color:var(--s-idea); }
+
   .flux { display:flex; flex-direction:column; gap:1px; background:var(--rule);
           border:1px solid var(--rule); border-radius:2px; overflow:hidden; }
   .flux-row { display:grid; grid-template-columns:96px 240px 1fr; gap:16px; align-items:start;
@@ -643,6 +668,7 @@
     <button role="tab" id="t-flux" aria-controls="p-flux" aria-selected="false" tabindex="-1">What&rsquo;s moving<span class="c">{{CHANGELOAD}}</span></button>
     <button role="tab" id="t-next" aria-controls="p-next" aria-selected="false" tabindex="-1">Next<span class="c">{{NRANK}}</span></button>
     <button role="tab" id="t-inventory" aria-controls="p-inventory" aria-selected="false" tabindex="-1">Inventory<span class="c">{{N}}</span></button>
+    <button role="tab" id="t-standards" aria-controls="p-standards" aria-selected="false" tabindex="-1">Standards<span class="c">{{NSTD}}</span></button>
     <button role="tab" id="t-method" aria-controls="p-method" aria-selected="false" tabindex="-1">Method &amp; caveats</button>
   </div>
 </nav>
@@ -931,6 +957,30 @@
 {{TABLES}}
     </div>
   </section>
+</div>
+
+<div class="panel" id="p-standards" role="tabpanel" aria-labelledby="t-standards" hidden>
+
+  <p class="lead">
+    The <strong>CT Makerspace Network Standards of Excellence</strong>, as a lens on the
+    registry: {{NSTD}} of {{NSTDTOTAL}} standards map to at least one process here. The
+    registry cannot score a standard &mdash; the assessment tool owns that &mdash; but it can do
+    the drill-down the tool cannot: <strong>for each standard, which processes implement it,
+    what state they are in, and which specific rows hold it below the next level.</strong>
+    A standard whose processes are broken or unwritten cannot honestly reach level 2
+    (&ldquo;written, assigned, consistently implemented, evidenced&rdquo;) &mdash; so the
+    <b>To move up</b> lines below are the work list for getting to standard, which is a
+    concrete way of finding what we have underinvested in.
+  </p>
+  <p class="sec-note">
+    Mapping from <code>docs/STANDARDS_CROSSWALK.md</code> (draft, not yet reviewed).
+    {{NSTDSTRETCH}} mappings are starred in the source: the process does more than the standard
+    as written asks &mdash; feedback owed to the framework, not to us. The framework itself is a
+    draft under active development.
+  </p>
+
+{{STANDARDS}}
+
 </div>
 
 <div class="panel" id="p-method" role="tabpanel" aria-labelledby="t-method" hidden>
