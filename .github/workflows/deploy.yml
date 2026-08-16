@@ -8,7 +8,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      # Full history: the build derives its "Recently finished" list from state
+      # transitions in git log; the default depth-1 clone would silently empty it.
       - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
 

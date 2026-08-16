@@ -23,8 +23,14 @@ trusting an un-annotated number.
   distance from finished. D5 mirrors A5 — A5 tells us when it stops, D5 tells us
   when it has gone stale. Both are empty today.
 - **I** = impact when it fails, I1 annoyance → I5 safety/legal/existential
-- **State** = `stable` · `changing` · `watch` · `planned` · `optimizable` ·
-  `broken` · `undefined` · `unknown`
+- **State** = `stable` · `changing` · `watch` · `planned` · `idea` ·
+  `optimizable` · `broken` · `undefined` · `unknown`
+- `idea` sits below `planned`, and the line between them is commitment.
+  `planned` means someone has said *we will do this*; `idea` means *we are
+  considering this* — a brainstorm, a research question, a maybe. Ideas are
+  deliberately inert: they never enter the Next ranking or the change load,
+  because a thing nobody has committed to cannot be urgent. Promoting one to
+  `planned` is a decision, and should be recorded as one.
 - `broken` and `optimizable` are both deficits and are not the same problem.
   **`broken` means it fails** — something that is supposed to happen does not,
   whether it broke or never once fired. **`optimizable` means it does what it was
@@ -114,6 +120,7 @@ should adopt that vocabulary rather than invent a parallel one:
 | MAINTAIN | `stable` |
 | — *(no equivalent)* | **`optimizable`** |
 | — *(no equivalent)* | **`broken`** |
+| — *(before the sheet begins)* | **`idea`** |
 
 **Those last two rows are the point.** The strategy sheet is entirely
 forward-looking: every state describes work someone intends to do. It has no way

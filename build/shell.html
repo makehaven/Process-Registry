@@ -9,6 +9,7 @@
     --rule:#dcd8d1; --rule-2:#c6c1b8; --crimson:#8b1919;
     --s-stable:#3d6b52; --s-watch:#9c6a0c; --s-changing:#2d5b87;
     --s-optimizable:#7d5a91; --s-broken:#a01f1f; --s-undefined:#6b6560; --s-unknown:#a9a29a; --s-planned:#4a5a7a;
+    --s-idea:#2f7276; --s-idea-bg:#e2eeee;
     --s-stable-bg:#e5efe8; --s-watch-bg:#f6ecd8; --s-changing-bg:#e2ebf4;
     --s-optimizable-bg:#efe8f3; --s-broken-bg:#f6e3e3; --s-undefined-bg:#e9e6e2; --s-unknown-bg:#eeebe7; --s-planned-bg:#e7ebf2;
     --sans: ui-sans-serif, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -22,6 +23,7 @@
       --rule:#322e34; --rule-2:#423d45; --crimson:#d96a6a;
       --s-stable:#7cc39a; --s-watch:#dfae52; --s-changing:#7bacd8;
       --s-optimizable:#c0a0d4; --s-broken:#e58080; --s-undefined:#9a938b; --s-unknown:#6e6862; --s-planned:#93a6c4;
+      --s-idea:#72bfc4; --s-idea-bg:#1a2b2d;
       --s-stable-bg:#1e3129; --s-watch-bg:#33280f; --s-changing-bg:#1c2b3a;
       --s-optimizable-bg:#2c2333; --s-broken-bg:#38201f; --s-undefined-bg:#2a2725; --s-unknown-bg:#232120; --s-planned-bg:#20262f;
     }
@@ -32,6 +34,7 @@
     --rule:#322e34; --rule-2:#423d45; --crimson:#d96a6a;
     --s-stable:#7cc39a; --s-watch:#dfae52; --s-changing:#7bacd8;
     --s-optimizable:#c0a0d4; --s-broken:#e58080; --s-undefined:#9a938b; --s-unknown:#6e6862; --s-planned:#93a6c4;
+    --s-idea:#72bfc4; --s-idea-bg:#1a2b2d;
     --s-stable-bg:#1e3129; --s-watch-bg:#33280f; --s-changing-bg:#1c2b3a;
     --s-optimizable-bg:#2c2333; --s-broken-bg:#38201f; --s-undefined-bg:#2a2725; --s-unknown-bg:#232120; --s-planned-bg:#20262f;
   }
@@ -66,6 +69,22 @@
        font-weight:700; color:var(--ink); padding-bottom:9px; border-bottom:1px solid var(--ink); }
   .sec-note { margin:12px 0 22px; color:var(--ink-2); font-size:14.5px; max-width:74ch; }
   .sec-note strong { color:var(--ink); }
+
+  /* Start here: three questions, one number each. Bigger and quieter than the
+     tiles below — a visitor should be able to leave this page having read
+     nothing else. */
+  .qstrip { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:20px 0 8px; }
+  .qstrip a { display:block; padding:15px 17px; background:var(--surface); border:1px solid var(--rule);
+              border-radius:2px; text-decoration:none; color:var(--ink); }
+  .qstrip a:hover { border-color:var(--rule-2); }
+  .qstrip b { font-size:27px; font-weight:750; margin-right:9px; font-variant-numeric:tabular-nums; }
+  .qstrip .q-broken b { color:var(--s-broken); }
+  .qstrip .q-next b { color:var(--crimson); }
+  .qstrip .q-flux b { color:var(--s-changing); }
+  .qstrip span { font-size:13px; color:var(--ink-2); line-height:1.45; }
+  .qstrip em { display:block; margin-top:8px; font-style:normal; font-family:var(--mono); font-size:10px;
+               letter-spacing:.09em; text-transform:uppercase; color:var(--crimson); }
+  @media (max-width:760px) { .qstrip { grid-template-columns:1fr; } }
 
   .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(172px,1fr)); gap:1px;
            background:var(--rule); border:1px solid var(--rule); border-radius:2px; overflow:hidden; }
@@ -127,19 +146,14 @@
                        text-transform:uppercase; color:var(--ink-3); font-weight:600;
                        margin-right:7px; }
 
-  /* Unanswered comments, inline on a row. Amber because it is the same signal as
-     `watch`: not broken, but owed a response. Clickable through to the thread. */
-  .pending { display:block; margin-top:8px; padding:7px 10px; cursor:pointer;
-             border-left:2px solid var(--s-watch); background:var(--s-watch-bg);
+  /* Unanswered comments: one quiet line per row. Amber because it is the same
+     signal as `watch` — not broken, but owed a response. The thread is a click. */
+  .pending { display:inline-block; margin-top:7px; padding:3px 9px; cursor:pointer;
+             appearance:none; font:inherit; font-family:var(--mono); font-size:10px;
+             letter-spacing:.04em; color:var(--s-watch); text-align:left;
+             border:0; border-left:2px solid var(--s-watch); background:var(--s-watch-bg);
              border-radius:0 2px 2px 0; }
-  .pending:hover { filter:brightness(0.98); }
-  .pending .pl { display:block; font-family:var(--mono); font-size:9px; letter-spacing:.11em;
-                 text-transform:uppercase; font-weight:700; color:var(--s-watch); }
-  .pending .pc { margin-top:5px; font-size:12.5px; line-height:1.55; color:var(--ink-2); }
-  .pending .pc b { display:block; font-family:var(--mono); font-size:9.5px; letter-spacing:.06em;
-                   text-transform:uppercase; font-weight:600; color:var(--ink-3); }
-  .pending em { display:block; margin-top:5px; font-style:normal; font-family:var(--mono);
-                font-size:10px; color:var(--ink-3); }
+  .pending:hover { filter:brightness(0.97); }
   @media print { .pending { display:none !important; } }
   .rank-row .score { font-family:var(--mono); font-size:13px; font-weight:700; font-variant-numeric:tabular-nums;
                      color:var(--crimson); white-space:nowrap; }
@@ -276,6 +290,17 @@
   a:focus-visible { outline:2px solid var(--crimson); outline-offset:2px; border-radius:1px; }
   .res { display:block; margin-top:7px; padding-top:6px; border-top:1px dotted var(--rule-2);
          font-size:12px; line-height:1.7; }
+  /* Provenance folded behind one line. The summary names what is inside (Code ·
+     Strategy · Docs · Reviewed) so the row still answers "is anything written
+     down?" at a glance — only the links themselves cost a click. */
+  .rowmeta { margin-top:6px; }
+  .rowmeta summary { cursor:pointer; list-style:none; font-family:var(--mono); font-size:9.5px;
+                     letter-spacing:.11em; text-transform:uppercase; font-weight:600;
+                     color:var(--ink-3); border-top:1px dotted var(--rule-2); padding-top:6px; }
+  .rowmeta summary::-webkit-details-marker { display:none; }
+  .rowmeta summary::after { content:" +"; }
+  .rowmeta[open] summary::after { content:" \2212"; }
+  .rowmeta summary:hover { color:var(--ink); }
   .res.strat b { color:var(--crimson); }
   .res.strat { border-top-style:solid; }
   .res.code b { color:var(--s-changing); }
@@ -302,6 +327,8 @@
   .pill.undefined{color:var(--s-undefined);background:var(--s-undefined-bg);border-color:var(--s-undefined)}
   .pill.planned{color:var(--s-planned);background:var(--s-planned-bg);border-color:var(--s-planned)}
   .pill.unknown{color:var(--s-unknown);background:var(--s-unknown-bg);border-color:var(--s-unknown)}
+  /* Dashed: not yet a commitment. The one pill whose border says what its word means. */
+  .pill.idea{color:var(--s-idea);background:var(--s-idea-bg);border-color:var(--s-idea);border-style:dashed}
 
   .group-stack { display:flex; flex-direction:column; gap:26px; }
 
@@ -356,6 +383,9 @@
 
   /* ---- inventory filter ------------------------------------------------ */
   .filter { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:0 0 26px; }
+  .filter select { font:inherit; font-size:.9rem; padding:9px 11px; color:var(--ink);
+                   background:var(--surface); border:1px solid var(--rule-2); border-radius:2px; }
+  .filter select:focus { outline:none; border-color:var(--accent); }
   .filter input { font:inherit; font-size:.9rem; padding:9px 13px; min-width:260px; flex:1 1 260px;
       background:var(--surface); color:var(--ink);
       border:1px solid var(--rule); border-radius:7px; }
@@ -609,20 +639,34 @@
 <div class="panel" id="p-overview" role="tabpanel" aria-labelledby="t-overview">
 
   <p class="lead">
-    <strong>The automated half of MakeHaven documents itself &mdash; where we can say which code
-    does it.</strong> {{NAUTO}} processes run themselves, but only {{NAUTOCODE}} name the module that
-    runs them, and only those can claim the implementation <em>is</em> the description. The other
-    {{NAUTONOCODE}} run as code nobody has pointed at. Meanwhile {{NMANUAL}} take a human at every
-    step, and {{NMANUALUNDOC}} of those have nothing written beyond scattered notes. Only
-    {{ND3}} process in {{N}} has documentation a second person has actually worked from &mdash;
-    which is the real gap, and it applies to the code too.
+    <strong>Every operational process at MakeHaven, in one place</strong> &mdash; what runs, what is
+    broken, what is changing, and what should come next. Start with whichever question brought
+    you here; everything else on this page is reference.
   </p>
+
+  <!-- Three questions, not a system. The page's whole apparatus — scores, states,
+       sigils — exists to answer these, and a first-time visitor should meet the
+       questions before the apparatus. -->
+  <nav class="qstrip" aria-label="Start here">
+    <a class="q-broken" href="#inventory" data-filter="state:broken"><b>{{DEGRADED}}</b><span>processes are broken with nobody on them</span><em>See the list</em></a>
+    <a class="q-next" href="#next" data-goto="t-next"><b>{{NSHOWN}}</b><span>candidates for what to fix next &mdash; vote on the order</span><em>See the ranking</em></a>
+    <a class="q-flux" href="#flux" data-goto="t-flux"><b>{{CHANGELOAD}}</b><span>are changing or settling right now</span><em>See what moved</em></a>
+  </nav>
 
   <section>
     <h2>Where we stand</h2>
     <p class="sec-note">Six numbers, all of which should move over the next year.</p>
     <div class="tiles">{{TILES}}
     </div>
+    <p class="sec-note" style="margin-top:18px">
+      <strong>The automated half of MakeHaven documents itself &mdash; where we can say which code
+      does it.</strong> {{NAUTO}} processes run themselves, but only {{NAUTOCODE}} name the module that
+      runs them, and only those can claim the implementation <em>is</em> the description. The other
+      {{NAUTONOCODE}} run as code nobody has pointed at. Meanwhile {{NMANUAL}} take a human at every
+      step, and {{NMANUALUNDOC}} of those have nothing written beyond scattered notes. Only
+      {{ND3}} process in {{N}} has documentation a second person has actually worked from &mdash;
+      which is the real gap, and it applies to the code too.
+    </p>
   </section>
 
   <section>
@@ -667,6 +711,8 @@
       <em>watch</em> when its window closes with nothing having gone wrong — it does not leave
       by being forgotten.</dd></div>
   </dl>
+
+{{WINS}}
 
   <section>
     <h2>In flux right now</h2>
@@ -856,6 +902,12 @@
       for that reason, not as a warning.</span>
     </p>
     <div class="filter">
+      <!-- "Just my area" — the single biggest overwhelm-reducer for staff. The
+           education manager's registry is 25 rows, not 188. -->
+      <select id="inv-group" aria-label="Show one group only">
+        <option value="">All groups</option>
+{{GROUPOPTS}}
+      </select>
       <input id="inv-filter" type="search" autocomplete="off"
              placeholder="Filter processes — name, note, or state:broken"
              aria-label="Filter the inventory">
@@ -1106,10 +1158,24 @@
   var want = document.getElementById('t' + location.hash.replace('#', '-'));
   if (want) select(want);
 
+  // Anything that names a tab opens it. The question strip and any future link
+  // share this rather than each growing its own handler.
+  Array.prototype.forEach.call(document.querySelectorAll('[data-goto]'),
+    function (el) {
+      el.addEventListener('click', function (e) {
+        var t = document.getElementById(el.dataset.goto);
+        if (!t) return;
+        e.preventDefault();
+        select(t);
+        window.scrollTo(0, 0);
+      });
+    });
+
   // A tile that counts one state opens the inventory already filtered to it.
   // Wired here rather than left to the href alone: the hash is only read on
   // load, and the filter box needs its input event to actually apply.
-  Array.prototype.forEach.call(document.querySelectorAll('.tile[data-filter]'),
+  // "[data-filter]" not ".tile[data-filter]": the question strip filters too.
+  Array.prototype.forEach.call(document.querySelectorAll('[data-filter]'),
     function (t) {
       t.addEventListener('click', function (e) {
         var inv = document.getElementById('t-inventory'),
@@ -1141,7 +1207,10 @@
   }
 
   // Inventory filter — hides non-matching rows, then any table left empty.
-  var box = document.getElementById('inv-filter'), hits = document.getElementById('inv-hits');
+  // Two independent axes: the group select answers "just my area", the text box
+  // narrows within whatever is left. They compose rather than compete.
+  var box = document.getElementById('inv-filter'), hits = document.getElementById('inv-hits'),
+      grp = document.getElementById('inv-group');
   if (!box) return;
   var tables = Array.prototype.slice.call(
     document.querySelectorAll('#p-inventory .group-stack .tblwrap'));
@@ -1149,12 +1218,14 @@
 
   function apply() {
     var q = box.value.trim().toLowerCase(), shown = 0;
+    var g = grp ? grp.value : '';
     // "state:broken" matches the state column exactly. Plain text still searches
     // the whole row, but a bare state word cannot do this job: "broken" appears
     // in three notes about broken items and clauses, so the front-page tile
     // counting 11 would have landed the reader on 14 rows.
     var st = /^state:\s*([a-z]+)$/.exec(q), want = st && st[1];
     tables.forEach(function (w) {
+      if (g && w.dataset.group !== g) { w.hidden = true; return; }
       var any = false;
       Array.prototype.forEach.call(w.querySelectorAll('tbody tr'), function (tr) {
         var hit = !q || (want ? tr.dataset.state === want
@@ -1164,9 +1235,10 @@
       });
       w.hidden = !any;
     });
-    hits.textContent = q ? shown + ' of ' + total + ' processes' : total + ' processes';
+    hits.textContent = (q || g) ? shown + ' of ' + total + ' processes' : total + ' processes';
   }
   box.addEventListener('input', apply);
+  if (grp) grp.addEventListener('change', apply);
   apply();
 })();
 </script>

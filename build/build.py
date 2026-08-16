@@ -47,8 +47,15 @@ inventory filter matches the row text and the row said something else.
 end goal. It does not mean "could be improved" — read that way it would cover
 nearly all 188 rows and the count would stop carrying information. A row where
 nothing exists yet is `planned`, not `optimizable`.
+
+`idea` is weaker than `planned` and the distinction is commitment. `planned` is
+a confirmed intention — someone has said we will do this. `idea` is under
+consideration: a brainstorm, a research question, a maybe. It exists so that
+maybes have somewhere to live without being overstated as commitments, and it is
+deliberately inert — excluded from the Next ranking and the change load, because
+a thing nobody has committed to cannot be urgent.
 """
-STATES = ["stable", "watch", "changing", "planned",
+STATES = ["stable", "watch", "changing", "planned", "idea",
           "optimizable", "broken", "undefined", "unknown"]
 
 # Front-page tiles and inventory badges must name a state identically or the
@@ -280,30 +287,48 @@ def code_links(spec):
     return " · ".join(out)
 
 def note_cell(raw):
-    """Prose first, then each optional field as its own labelled line."""
+    """Prose and warnings visible; provenance folded behind one line.
+
+    A row's sentence and anything a person raised about it stay in plain sight.
+    The rest — which module, which strategy, which documents, when reviewed —
+    is provenance: essential when you are working on the row, noise when you are
+    scanning 188 of them. It collapses into a <details> whose summary names what
+    is inside, so "is anything written down?" is still answerable without a
+    click even though the links themselves take one.
+    """
     p = parse_note(raw)
     out = md(p["note"])
     if p.get("raised"):
         out += f'<span class="res raised"><b>Raised</b>{md(p["raised"])}</span>'
+
+    folded, labels = [], []
     if p.get("code"):
-        out += f'<span class="res code"><b>Code</b>{code_links(p["code"])}</span>'
+        folded.append(f'<span class="res code"><b>Code</b>{code_links(p["code"])}</span>')
+        labels.append("Code")
     if p.get("strategy"):
-        out += f'<span class="res strat"><b>Strategy</b>{md(p["strategy"])}</span>'
+        folded.append(f'<span class="res strat"><b>Strategy</b>{md(p["strategy"])}</span>')
+        labels.append("Strategy")
     if p.get("docs"):
-        out += f'<span class="res"><b>Docs</b>{md(p["docs"])}</span>'
+        folded.append(f'<span class="res"><b>Docs</b>{md(p["docs"])}</span>')
+        labels.append("Docs")
     # Only rows a person actually confirmed carry a line. How much is unverified
     # is reported once, in the inventory header, rather than stamped on ninety-odd
     # rows as a reproach.
     if p.get("reviewed"):
-        out += f'<span class="res meta"><b>Reviewed</b> {md(p["reviewed"])}</span>'
+        folded.append(f'<span class="res meta"><b>Reviewed</b> {md(p["reviewed"])}</span>')
+        labels.append("Reviewed")
     # A description written from the row's name, module and strategy rather than
     # by someone who runs the process. This is a separate claim from `reviewed`,
     # which on several of these rows is true of the state and scores but was never
     # true of the prose — those rows had no prose at all. Marked per row because
-    # the sentence reads exactly like a confirmed one otherwise.
+    # the sentence reads exactly like a confirmed one otherwise. It stays outside
+    # the fold: a caveat on the sentence belongs next to the sentence.
     if p.get("drafted"):
         out += (f'<span class="res draft"><b>Description inferred</b> '
                 f'{md(p["drafted"])} — not confirmed by anyone who runs it</span>')
+    if folded:
+        out += (f'<details class="rowmeta"><summary>{" · ".join(labels)}</summary>'
+                f'{"".join(folded)}</details>')
     return out
 
 # ---- the strategic plan as a ranking input ----------------------------------
@@ -374,6 +399,10 @@ FINISHED_A, FINISHED_D, WORTH_IT_I = 4, 3, 3
 
 
 def needs_work(r):
+    # An idea is not work owed — nobody committed to it, so it cannot be ranked
+    # against things that are failing or promised. It waits in the inventory.
+    if r["state"] == "idea":
+        return False
     if r["state"] in ("broken", "optimizable"):
         return True
     # A P1 commitment belongs on the list whatever its scores say — that is what
@@ -397,9 +426,13 @@ for r in rows:
 
 n_settled = N - len(ranked)
 ranked.sort(key=lambda t: (-t[0], -t[1], t[2]["name"]))
-# A dedicated tab has room for more than a dozen. Show 30 and keep the rest
-# one click away rather than truncating silently.
-SHOWN = 30
+# Ten, not thirty. A ranked list is a request for attention, and the request has
+# to be answerable in one meeting — "here are the ten, argue about the order" is
+# a conversation; thirty is homework. The rest stay one click away rather than
+# truncated silently. (Cut from 30 after a strategic-planning consultant's
+# review: the team needs consensus on what comes first, and a shorter list is
+# how a page asks for that.)
+SHOWN = 10
 top = ranked
 
 unrankable = [r for r in rows if r["i"] == "5" and not r["a"].isdigit()]
@@ -431,6 +464,79 @@ if raised:
   </section>"""
 else:
     raised_html = ""
+
+# ---- recently finished ------------------------------------------------------
+# The other half of a change board. The page is fluent about what is wrong and
+# what is moving, and silent about what got done — which reads as "look how much
+# is unresolved" to the exact people being asked to resolve it. Finishing is the
+# thing the team is being asked to value ("stabilize", in their own word), so the
+# page should say it out loud. Derived from this file's own git history rather
+# than a new field: the inventory already records every state change as an edit.
+def state_transitions(days=30):
+    """(name, old_state, new_state, date) for rows whose state changed in git."""
+    import subprocess
+    root = pathlib.Path(__file__).resolve().parents[1]
+    try:
+        log = subprocess.run(
+            ["git", "log", f"--since={days} days ago", "--format=@@%as",
+             "-p", "--unified=0", "--", "data/inventory.md"],
+            capture_output=True, text=True, cwd=root, timeout=30).stdout
+    except Exception:
+        return []          # no git (tarball build): the section simply absents itself
+
+    valid = set(STATES)
+    def row_state(line):
+        cells = [c.strip() for c in line.split("|")]
+        # ['', name, a, d, i, state, note, ''] — only a real row has a state word
+        if len(cells) >= 7 and cells[5] in valid and cells[1] not in ("Process", ""):
+            return cells[1].strip("*"), cells[5]
+        return None
+
+    out, seen, date = [], set(), ""
+    removed, added = {}, {}
+    def flush():
+        for name, new in added.items():
+            old = removed.get(name)
+            if old and old != new and name not in seen:
+                seen.add(name)               # newest-first log → first hit wins
+                out.append((name, old, new, date))
+        removed.clear(); added.clear()
+
+    for line in log.splitlines():
+        # Commit marker is "@@<date>"; hunk headers are "@@ -n,m" with a space.
+        if line.startswith("@@") and not line.startswith("@@ "):
+            flush(); date = line[2:]
+        elif line.startswith("-|"):
+            rs = row_state(line[1:])
+            if rs: removed[rs[0]] = rs[1]
+        elif line.startswith("+|"):
+            rs = row_state(line[1:])
+            if rs: added[rs[0]] = rs[1]
+    flush()
+    return out
+
+# A win is reaching stable, or ceasing to be broken — the two transitions worth
+# announcing. changing→watch is progress too, but it is already visible in flux.
+wins = [(n, o, s, d) for (n, o, s, d) in state_transitions(30)
+        if s == "stable" or (o == "broken" and s != "broken")]
+if wins:
+    win_rows = "".join(
+        f"""      <div class="flux-row"><div><span class="pill {s}">{s}</span></div>
+        <div class="what"><b>{html.escape(n)}</b></div>
+        <div class="n">was <span class="pill {o}" style="padding:1px 5px">{o}</span> until {d}</div></div>"""
+        for n, o, s, d in wins[:8])
+    wins_html = f"""  <section>
+    <h2>Recently finished</h2>
+    <p class="sec-note"><strong>{len(wins)} process{"es" if len(wins) != 1 else ""} reached
+      <span class="pill stable" style="padding:1px 5px">stable</span> or stopped being
+      <span class="pill broken" style="padding:1px 5px">broken</span> in the last 30 days.</strong>
+      Read this list first: it is the point of all the others.</p>
+    <div class="flux">
+{win_rows}
+    </div>
+  </section>"""
+else:
+    wins_html = ""
 
 # ---- in flux right now ------------------------------------------------------
 flux = [r for r in rows if r["state"] in ("changing", "watch")]
@@ -531,7 +637,8 @@ for g, rs in by_group.items():
         f"""<td><span class="pill {r['state']}">{r['state']}</span></td>"""
         f"""<td class="n">{note_cell(r['note'])}</td></tr>""" for r in rs)
     counts = " · ".join(f"{c[s]} {s}" for s in STATES if c[s])
-    tables.append(f"""      <div class="tblwrap">
+    # data-group is what the "just my area" select matches against.
+    tables.append(f"""      <div class="tblwrap" data-group="{html.escape(g, quote=True)}">
         {blurb}<table>
           <caption>{html.escape(g)} <span>{len(rs)} processes · {GOAL[g]}</span><b>{counts}</b></caption>
           <thead><tr><th>Process</th><th>Auto</th><th>Doc</th><th>Impact</th><th>State</th><th>Notes</th></tr></thead>
@@ -629,6 +736,10 @@ for key, val in [("TILES", tiles), ("LEGEND", legend), ("BOARD", "\n".join(board
                  ("NRAISED", str(len(raised))),
                  ("RANK", "\n".join(rank_html)), ("TABLES", "\n".join(tables)),
                  ("UNRANK", unrank_html), ("INFLUX", influx), ("N", str(N)),
+                 ("WINS", wins_html),
+                 ("GROUPOPTS", "\n".join(
+                     f'        <option value="{html.escape(g, quote=True)}">{html.escape(g)}</option>'
+                     for g in by_group)),
                  ("NCHANGING", str(st_tot["changing"])), ("NWATCH", str(st_tot["watch"])),
                  ("CHANGELOAD", str(change_load)), ("CANTSAY", str(cant_say)),
                  ("DEGRADED", str(st_tot["broken"])), ("UNOPT", str(st_tot["optimizable"])),

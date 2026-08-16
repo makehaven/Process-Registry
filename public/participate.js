@@ -341,16 +341,18 @@ function paintCommentCounts() {
 const isPending = (c) => c.status !== "reviewed";
 
 /**
- * Unanswered comments, on the row itself.
+ * Unanswered comments: one quiet line on the row, the thread one click away.
  *
- * A count behind a button says something was said; it does not say what, and on
- * the Next tab that is the difference that matters — this is where the room
- * decides what to work on, and an unresolved objection to a row's rank is
- * exactly what should be readable while deciding rather than one click away.
+ * This started as the three most recent comments rendered in full, and that was
+ * wrong — a strategic-planning consultant's review of the page made the point
+ * that overwhelm comes from how much a screen asks you to hold, and injected
+ * comment threads are exactly that. The signal that matters while deciding is
+ * that an objection exists and from whom; the argument itself belongs in the
+ * panel. So: count, latest author, click to read.
  *
  * Only pending ones. Once a comment has been folded into the inventory and
  * marked reviewed it is history, and leaving it here would make every row look
- * permanently contested. The full thread, reviewed included, stays in the panel.
+ * permanently contested.
  */
 function paintPending() {
   document.querySelectorAll(".rank-row[data-pid], .flux-row[data-pid]").forEach((row) => {
@@ -360,33 +362,13 @@ function paintPending() {
     const list = (state.comments.get(row.dataset.pid) || []).filter(isPending);
     if (!list.length) return;
 
-    const box = document.createElement("div");
+    const box = document.createElement("button");
+    box.type = "button";
     box.className = "pending";
-
-    const head = document.createElement("span");
-    head.className = "pl";
-    head.textContent = list.length === 1 ? "1 unanswered" : `${list.length} unanswered`;
-    box.appendChild(head);
-
-    // Three is enough to show a row is contested; the rest are a click away.
-    list.slice(0, 3).forEach((c) => {
-      const item = document.createElement("div");
-      item.className = "pc";
-      const who = document.createElement("b");
-      who.textContent = `${c.name || "Unknown"} — ${KIND_LABEL[c.kind] || c.kind}`;
-      const txt = document.createElement("span");
-      txt.textContent = c.text;
-      item.append(who, txt);
-      box.appendChild(item);
-    });
-
-    if (list.length > 3) {
-      const more = document.createElement("em");
-      more.textContent = `+${list.length - 3} more`;
-      box.appendChild(more);
-    }
-
-    // Clicking anywhere in the block opens the thread it is summarising.
+    const who = list[0].name || "Unknown";
+    box.textContent = list.length === 1
+      ? `1 unanswered comment — ${who}`
+      : `${list.length} unanswered comments — latest from ${who}`;
     box.addEventListener("click", (e) => {
       e.stopPropagation();
       openPanel(row.dataset.pid);
