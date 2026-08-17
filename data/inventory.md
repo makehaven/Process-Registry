@@ -503,7 +503,7 @@ storage, and workspaces) for cost recovery and mission alignment."_
 
 | Process | A | D | I | State | Notes |
 |---|---|---|---|---|---|
-| Onboarding nudge / stalled-join recovery | 4 | 3 | 3 | watch | Live 08-11. Efficacy unproven — before widening, 0 of 5 nudged progressed ⟐ Priority · Structured Onboarding and Early Engagement — refining next |
+| Onboarding nudge / stalled-join recovery | 4 | 3 | 3 | watch | Live 08-11, profile-step only. Efficacy unproven — before widening, 0 of 5 nudged progressed. **08-17: widening to the full funnel (video/quiz/schedule) staged, deploy pending** — triggered by Glenn Bair stalling at the video step with no automated email; watch post-deploy whether video-stuck members progress ⟐ Priority · Structured Onboarding and Early Engagement — refining next |
 | Orientation scheduling | 3 | 2 | 3 | stable | Calendly. A webhook outage lost Apr–Jun records; orientations never backfilled ‖ [Orientation video / process](https://www.makehaven.org/orientation-video) ⧉ S021 |
 | First-badge-in-28-days promotion | 3 | 2 | 4 | optimizable | **Measured but not managed** — JR: "now just measured and we work against it." 67% against an 80% goal. Current experiment: sending a free GEMS course to members who appear stuck. *(JR, round 2)* ◷ 2026-08-14 ⚠ Staff, 2026-08-14 — part of the badge-earning flow, which staff see as a major driver of retention and a strong candidate for review soon ▦ kpi_new_member_first_badge_28_days |
 | Interest capture + Slack invite | 4 | 2 | 2 | watch | Captures someone who registers interest in joining and invites them into Slack automatically. Live since August 2026 and still being watched. ◊ 2026-08-15 |
