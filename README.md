@@ -78,6 +78,14 @@ python3 build/build.py     # writes public/index.html
 No dependencies beyond the Python standard library. The output is a single
 self-contained HTML file.
 
+The build **fails** on a state word outside the vocabulary rather than rendering
+it. An unknown state parses fine and then quietly vanishes — missing from the
+legend and the group bars, no `.pill` rule so the badge renders unstyled, and
+invisible to the recent-changes scanner. Two rows spent several days as
+`degraded`, a word this vocabulary retired, before anyone noticed the legend no
+longer summed to the row count. To add a state, add it to `STATES` in
+`build/build.py` and give it a `.pill` and `--s-` rule in `build/shell.html`.
+
 ## Deploy
 
 Firebase Hosting at `process.makehaven.org`, matching the pattern already used by
@@ -211,6 +219,18 @@ shorter priority list — replacing that one file re-ranks everything.
   the ranking can be argued with rather than just distrusted.
 - **Comment on any process** — this is wrong, we changed it, something is
   missing, wrong priority, or added context.
+- **Answer the open questions on the Questions tab.** `build/questions.py` reads
+  the registry's own weak spots — rows nobody has verified, rows scored broken,
+  rows where a human does every step and nothing is written down — and the whole
+  round is embedded in the page. The tab is a list you work down in one sitting:
+  filter it, answer the handful you actually know, skip the rest. Answered ones
+  collapse but stay readable, because a second opinion on a question one person
+  answered is worth having.
+
+  This started as a single rotating question card above the comment form. It was
+  the wrong place: two asks in one small panel is one too many, and a question
+  worth thinking about wants more room than a bubble. The comment panel now
+  carries one line pointing at the tab, and only when something is unanswered.
 - **Read what everyone else said.** Comments are visible to any signed-in
   account, shown above the form on the process they are about. A suggestion box
   nobody can see into produces the silence it was built to fix, and it makes
@@ -223,8 +243,8 @@ Identity comes from Drupal through the `makerspace_firebase_auth` bridge
 than a typed-in name, and one person gets one vote per process structurally
 rather than by promise.
 
-**Nothing written by participants edits the registry.** Votes and comments live
-in Firestore; `build/digest.py` exports them to `data/feedback-digest.md`, and a
+**Nothing written by participants edits the registry.** Votes, comments and
+answers live in Firestore; `build/digest.py` exports them to `data/feedback-digest.md`, and a
 person decides what is actually true before editing `data/inventory.md` by hand.
 Letting anyone with an account rewrite the record directly would make the
 registry a thing whoever clicked last owns.

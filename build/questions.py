@@ -120,12 +120,17 @@ def render(qs, rows):
          "**Answer inline under each question.** Anything left blank stays unknown, "
          "which is a valid outcome — a guess recorded as fact is worse. When applying "
          "answers, stamp `◷ <date>` on the rows a person confirmed.", ""]
-    cur = None
-    for pri, cat, proc, q, why in qs:
-        if cat != cur:
-            L += [f"## {cat}", ""]
-            cur = cat
-        L += [f"### {proc}", "", f"**{q}**", "", f"_Why asked: {why}_", "", "> ", ""]
+    # Grouped, not walked in rank order: the ranking is global, so categories
+    # interleave and a straight walk prints "## Never verified" nine times.
+    # Category order follows the strongest question in each, so the heading
+    # worth reading first still comes first.
+    cats: dict = {}
+    for item in qs:
+        cats.setdefault(item[1], []).append(item)
+    for cat, items in cats.items():
+        L += [f"## {cat}", ""]
+        for pri, _cat, proc, q, why in items:
+            L += [f"### {proc}", "", f"**{q}**", "", f"_Why asked: {why}_", "", "> ", ""]
     L += ["---", "",
           f"_{len(qs)} questions across {len({q[2] for q in qs})} processes, "
           f"from {len(rows)} rows._"]

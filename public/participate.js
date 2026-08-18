@@ -143,8 +143,6 @@ const state = {
   questions: [],       // the current round, embedded by the build
   answers: new Map(),  // qid -> [answer docs]
   panelPid: "",
-  curQ: null,          // question currently shown in the panel
-  qSkipped: new Set(), // rotated past this session
   ready: false,
 };
 
@@ -531,68 +529,272 @@ function openPanel(pid) {
   $("fbpanel").hidden = false;
   $("fbpill").setAttribute("aria-expanded", "true");
   renderThread(state.panelPid);
-  renderQuestion(state.panelPid);
+  paintQuestionCount();
   setTimeout(() => $("fbtext").focus(), 40);
 }
 
 /**
- * One question from the current round, above the comment form.
+ * The question round, as a tab you can work down in one sitting.
  *
- * The question rounds are what took the registry from guesses to a map, and
- * they were run as documents handed to one person. This spreads the same
- * interview across everyone signed in: opened from a row, its own unanswered
- * question if the round has one; opened from the pill, whichever question has
- * gone longest unanswered. Zero-answer questions come first — a second opinion
- * is worth less than a first one. Optional by design; Skip costs nothing.
+ * The rounds are what took this registry from guesses to a map, and they were
+ * run as documents handed to one person. Spreading them across everyone signed
+ * in was the right idea; putting one card above the comment form was the wrong
+ * place for it. Two asks in one small panel is one too many, and a question
+ * worth thinking about wants more room than a bubble — so the round lives on
+ * its own tab, the whole list at once, and the bubble keeps a single line
+ * pointing at it.
+ *
+ * The list is grouped the way the generator ranks it, most consequential first,
+ * and every question is optional. Answered ones collapse out of the way but
+ * stay reachable, because a second opinion on a question one person answered is
+ * worth having and the toggle is how you find them.
  */
-function pickQuestion(pid) {
-  const mine = (q) =>
-    (state.answers.get(q.qid) || []).some((a) => a.uid === state.profile?.uid);
-  const pool = state.questions.filter((q) =>
-    (pid ? q.pid === pid : true) && !mine(q) && !state.qSkipped.has(q.qid));
-  if (!pool.length) return null;
-  const unanswered = pool.filter((q) => !(state.answers.get(q.qid) || []).length);
-  return (unanswered.length ? unanswered : pool)[0];
+/** The generator writes state words as `code`, because its other output is a
+ *  markdown file. Rendered as text those backticks are just litter, and using
+ *  innerHTML on strings that quote a row's own prose is not worth the risk —
+ *  so split on the ticks and build the <code> nodes. */
+function setTicked(el, s) {
+  el.textContent = "";
+  s.split(/`([^`]+)`/).forEach((part, i) => {
+    if (i % 2) {
+      const c = document.createElement("code");
+      c.textContent = part;
+      el.appendChild(c);
+    } else if (part) {
+      el.appendChild(document.createTextNode(part));
+    }
+  });
 }
 
-function renderQuestion(pid) {
-  const box = $("fbq");
-  const q = pickQuestion(pid);
-  state.curQ = q;
-  box.hidden = !q;
-  if (!q) return;
-  $("fbq-proc").textContent = q.process;
-  $("fbq-q").textContent = q.q;
-  $("fbq-why").textContent = `Why we ask: ${q.why}`;
-  $("fbq-text").value = "";
+const myAnswer = (qid) =>
+  (state.answers.get(qid) || []).find((a) => a.uid === state.profile?.uid);
+
+function questionStats() {
+  const total = state.questions.length;
+  const mine = state.questions.filter((q) => myAnswer(q.qid)).length;
+  const anyone = state.questions.filter((q) => (state.answers.get(q.qid) || []).length).length;
+  return { total, mine, anyone, open: total - anyone };
 }
 
-async function sendAnswer() {
-  const q = state.curQ;
-  const text = $("fbq-text").value.trim();
-  if (!q || !text) { $("fbq-text").focus(); return; }
-  const btn = $("fbq-send");
-  btn.disabled = true;
-  try {
-    const { db, api } = await loadFirebase();
-    const p = state.profile;
-    const id = `a-${Date.now()}-${randomString(6)}`;
-    const doc = {
-      id, qid: q.qid, processId: q.pid || null, processName: q.process,
-      question: q.q, text: text.slice(0, 4000),
-      uid: p.uid, name: p.name, roles: p.roles,
-      status: "new", createdAt: new Date().toISOString(),
-    };
-    await api.setDoc(api.doc(db, "answers", id), doc);
-    if (!state.answers.has(q.qid)) state.answers.set(q.qid, []);
-    state.answers.get(q.qid).push(doc);
-    renderQuestion(state.panelPid);   // next one, or the card disappears
-  } catch (e) {
-    console.error(e);
-    alert("Could not save that answer — please try again.");
-  } finally {
-    btn.disabled = false;
+/** The tab chip counts what is still unanswered, not the size of the round —
+ *  a number that never moves is not worth putting on a tab. */
+function paintQuestionCount() {
+  const chip = $("qtab-count");
+  const s = questionStats();
+  if (chip) chip.textContent = String(state.ready ? s.total - s.mine : s.total);
+
+  // The bubble's one line, and only when there is something left to point at.
+  const link = $("fbqlink");
+  if (!link) return;
+  const left = s.total - s.mine;
+  link.hidden = !state.ready || left === 0;
+  link.textContent = left === 1
+    ? "1 open question about the registry — answer it on the Questions tab →"
+    : `${left} open questions about the registry — answer a batch on the Questions tab →`;
+}
+
+function qCard(q) {
+  const el = document.createElement("div");
+  el.className = "qitem";
+  el.dataset.qid = q.qid;
+  el.dataset.hay = `${q.process} ${q.cat} ${q.q}`.toLowerCase();
+
+  const proc = document.createElement("div");
+  proc.className = "qproc";
+  if (q.pid) {
+    const a = document.createElement("a");
+    a.href = "#inventory";
+    a.textContent = q.process;
+    a.addEventListener("click", (e) => { e.preventDefault(); gotoProcess(q.pid); });
+    proc.appendChild(a);
+  } else {
+    proc.textContent = q.process;
   }
+  el.appendChild(proc);
+
+  const qq = document.createElement("p");
+  qq.className = "qq";
+  setTicked(qq, q.q);
+  el.appendChild(qq);
+
+  const why = document.createElement("p");
+  why.className = "qwhy";
+  setTicked(why, `Why we ask: ${q.why}`);
+  el.appendChild(why);
+
+  const ta = document.createElement("textarea");
+  ta.placeholder = "Whatever you actually know — a partial answer beats a blank. Leave it empty if you would be guessing.";
+  el.appendChild(ta);
+
+  const foot = document.createElement("div");
+  foot.className = "qfoot";
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = "Answer";
+  const saved = document.createElement("span");
+  saved.className = "qsaved";
+  foot.append(btn, saved);
+  el.appendChild(foot);
+
+  const others = document.createElement("div");
+  others.className = "qanswers";
+  el.appendChild(others);
+
+  const paint = () => {
+    const mine = myAnswer(q.qid);
+    const all = state.answers.get(q.qid) || [];
+    el.classList.toggle("done", !!mine);
+    saved.textContent = mine ? "Answered — send another to add to it" : "";
+    others.hidden = !all.length;
+    others.textContent = "";
+    all.forEach((a) => {
+      const line = document.createElement("p");
+      const who = document.createElement("b");
+      who.textContent = `${a.name || "Someone"} — `;
+      line.appendChild(who);
+      line.appendChild(document.createTextNode(a.text));
+      others.appendChild(line);
+    });
+  };
+  paint();
+
+  btn.addEventListener("click", async () => {
+    if (!state.ready) { login(); return; }
+    const text = ta.value.trim();
+    if (!text) { ta.focus(); return; }
+    btn.disabled = true;
+    btn.textContent = "Saving…";
+    try {
+      await saveAnswer(q, text);
+      ta.value = "";
+      paint();
+      paintQuestionCount();
+      paintQuestionProgress();
+    } catch (e) {
+      console.error(e);
+      saved.textContent = "Could not save — try again";
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Answer";
+    }
+  });
+  ta.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") btn.click();
+  });
+  return el;
+}
+
+function paintQuestionProgress() {
+  const box = $("qprogress");
+  if (!box) return;
+  const s = questionStats();
+  box.hidden = false;
+  // Signed out there is no "you" to be a fraction of, so the bar goes and the
+  // count stays — the size of the round is the useful half of this line anyway.
+  const bar = box.querySelector(".qbar");
+  if (bar) bar.hidden = !state.ready;
+  const pct = s.total ? Math.round((s.mine / s.total) * 100) : 0;
+  const fill = $("qbar-fill");
+  if (fill) fill.style.width = `${pct}%`;
+  const txt = $("qprogress-txt");
+  if (txt) {
+    txt.textContent = s.mine
+      ? `${s.mine} of ${s.total} answered by you · ${s.open} nobody has answered yet`
+      : `${s.total} questions · ${s.open} nobody has answered yet`;
+  }
+  applyQuestionFilter();
+}
+
+/** Search and the answered-toggle are one pass, so they cannot disagree about
+ *  what is on screen. Category headings hide when nothing under them survives. */
+function applyQuestionFilter() {
+  const list = $("qlist");
+  if (!list) return;
+  const term = ($("qsearch")?.value || "").trim().toLowerCase();
+  const hideDone = !!$("qhide-answered")?.checked && state.ready;
+  let shown = 0, head = null, headShown = 0;
+
+  Array.from(list.children).forEach((el) => {
+    if (el.classList.contains("qcat")) {
+      if (head) head.hidden = headShown === 0;
+      head = el; headShown = 0;
+      return;
+    }
+    if (!el.classList.contains("qitem")) return;
+    const ok = (!term || el.dataset.hay.includes(term))
+            && !(hideDone && el.classList.contains("done"));
+    el.hidden = !ok;
+    if (ok) { shown++; headShown++; }
+  });
+  if (head) head.hidden = headShown === 0;
+
+  const empty = $("qempty");
+  if (empty) {
+    empty.hidden = shown > 0;
+    empty.textContent = term
+      ? "Nothing in the round matches that."
+      : "You have answered everything in this round. Untick the box above to read them back, or re-run build/questions.py for the next one.";
+  }
+}
+
+function renderQuestionsTab() {
+  const list = $("qlist");
+  if (!list) return;
+  list.textContent = "";
+  // The generator ranks globally by impact, so categories interleave — walking
+  // the list in order would print "Never verified" nine separate times. Group
+  // them, keep each category in its ranked order, and order the categories by
+  // their strongest question so the most consequential heading is still first.
+  const cats = new Map();
+  state.questions.forEach((q) => {
+    if (!cats.has(q.cat)) cats.set(q.cat, []);
+    cats.get(q.cat).push(q);
+  });
+  cats.forEach((qs, cat) => {
+    const h = document.createElement("div");
+    h.className = "qcat";
+    h.textContent = `${cat} · ${qs.length}`;
+    list.appendChild(h);
+    qs.forEach((q) => list.appendChild(qCard(q)));
+  });
+  const empty = document.createElement("p");
+  empty.className = "qempty";
+  empty.id = "qempty";
+  empty.hidden = true;
+  list.appendChild(empty);
+
+  $("qintro").hidden = state.ready;
+  $("qfilter").hidden = false;
+  // Nothing to hide until there is an account whose answers could be hidden.
+  const tog = document.querySelector(".qtoggle");
+  if (tog) tog.hidden = !state.ready;
+  paintQuestionProgress();
+  paintQuestionCount();
+}
+
+async function saveAnswer(q, text) {
+  const { db, api } = await loadFirebase();
+  const p = state.profile;
+  const id = `a-${Date.now()}-${randomString(6)}`;
+  const doc = {
+    id, qid: q.qid, processId: q.pid || null, processName: q.process,
+    question: q.q, text: text.slice(0, 4000),
+    uid: p.uid, name: p.name, roles: p.roles,
+    status: "new", createdAt: new Date().toISOString(),
+  };
+  await api.setDoc(api.doc(db, "answers", id), doc);
+  if (!state.answers.has(q.qid)) state.answers.set(q.qid, []);
+  state.answers.get(q.qid).push(doc);
+}
+
+/** Open the inventory on the row a question is about. The tab machinery lives
+ *  in the page's own script, so this reaches it the way every other cross-tab
+ *  link does — by clicking the tab and then scrolling. */
+function gotoProcess(pid) {
+  const tab = document.getElementById("t-inventory");
+  if (tab) tab.click();
+  const row = document.querySelector(`#p-inventory [data-pid="${CSS.escape(pid)}"]`);
+  if (row) row.scrollIntoView({ block: "center" });
 }
 
 const KIND_LABEL = {
@@ -705,11 +907,8 @@ function wireUI() {
   });
 
   $("fbsend").addEventListener("click", submitComment);
-  $("fbq-send").addEventListener("click", sendAnswer);
-  $("fbq-skip").addEventListener("click", () => {
-    if (state.curQ) state.qSkipped.add(state.curQ.qid);
-    renderQuestion(state.panelPid);
-  });
+  $("qsearch")?.addEventListener("input", applyQuestionFilter);
+  $("qhide-answered")?.addEventListener("change", applyQuestionFilter);
   $("fbtext").addEventListener("keydown", (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") submitComment();
   });
@@ -754,6 +953,10 @@ async function boot() {
   state.processes = JSON.parse($("process-manifest").textContent);
   state.questions = JSON.parse($("question-manifest").textContent || "[]");
   wireUI();
+  // Rendered before sign-in too. The questions are the most readable statement
+  // of what the registry does not know, and hiding them behind a login would
+  // make the tab look empty to exactly the person who has not signed in yet.
+  renderQuestionsTab();
 
   // No consumer configured yet: leave the page exactly as built rather than
   // offering a sign-in button that cannot work.
@@ -775,6 +978,7 @@ async function boot() {
     document.body.classList.add("signed-in");
     await Promise.all([loadVotes(), loadComments(), loadAnswers()]);
     applyVotes();
+    renderQuestionsTab();   // now with who answered what, and the progress bar
   } catch (e) {
     // An expired session is not an exception — signInToFirebase returns null for
     // that and the bar offers sign-in. Reaching here means something is wrong

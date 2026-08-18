@@ -549,22 +549,64 @@
   .fbtarget b { display:block; font-size:14px; font-weight:650; }
   .fbtarget span { display:block; margin-top:2px; font-family:var(--mono); font-size:10px;
                    letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); }
-  /* One question from the current round. Bordered in the idea teal — an
-     invitation, distinct from the amber owed-a-response and crimson actions. */
-  .fbq { margin:0 0 14px; padding:10px 12px; border:1px dashed var(--s-idea);
-         border-radius:4px; background:var(--s-idea-bg); }
-  .fbq .fbl { color:var(--s-idea); }
-  .fbq-proc { font-size:13px; font-weight:650; }
-  .fbq-q { margin:4px 0 0; font-size:13.5px; }
-  .fbq-why { margin:4px 0 8px; font-size:11.5px; color:var(--ink-3); }
-  .fbq textarea { min-height:64px; }
-  .fbq-foot { margin-top:8px; display:flex; justify-content:space-between; align-items:center; }
-  .fbq-foot button { font:inherit; font-family:var(--mono); font-size:10.5px; letter-spacing:.06em;
-                     text-transform:uppercase; cursor:pointer; border-radius:3px; padding:5px 12px; }
-  #fbq-skip { background:none; border:1px solid var(--rule-2); color:var(--ink-3); }
-  #fbq-skip:hover { color:var(--ink); }
-  #fbq-send { background:var(--s-idea); border:1px solid var(--s-idea); color:var(--paper); font-weight:700; }
-  #fbq-send:disabled { opacity:.6; }
+  /* The pointer that replaced the in-bubble question card. */
+  .fbqlink { display:block; margin:0 0 13px; padding:8px 11px; border:1px dashed var(--s-idea);
+             border-radius:4px; background:var(--s-idea-bg); color:var(--s-idea);
+             font-family:var(--mono); font-size:10.5px; letter-spacing:.05em;
+             text-transform:uppercase; font-weight:600; text-decoration:none; }
+  .fbqlink:hover { filter:brightness(1.06); }
+
+  /* ---- Questions tab ---------------------------------------------------- */
+  .qintro { border-left:2px solid var(--s-idea); padding:2px 0 2px 15px; margin:22px 0 26px;
+            max-width:66ch; }
+  .qintro p { margin:0 0 9px; font-size:14px; color:var(--ink-2); }
+  .qintro p:last-child { margin-bottom:0; }
+  .qprogress { display:flex; align-items:center; gap:11px; margin:0 0 20px; }
+  /* display:flex outranks the UA's [hidden] rule, so these two need saying. */
+  .qprogress[hidden], .qfilter[hidden], .qtoggle[hidden] { display:none; }
+  .qbar { flex:1; max-width:320px; height:5px; border-radius:3px; background:var(--rule);
+          overflow:hidden; }
+  .qbar i { display:block; height:100%; width:0; background:var(--s-idea); transition:width .25s; }
+  #qprogress-txt { font-family:var(--mono); font-size:10.5px; letter-spacing:.07em;
+                   text-transform:uppercase; color:var(--ink-3); }
+  .qfilter { display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px; margin:0 0 22px; }
+  .qfilter .fbl { margin:0; }
+  #qsearch { flex:1; min-width:210px; font:inherit; font-size:13.5px; color:var(--ink);
+             background:var(--paper); border:1px solid var(--rule); border-radius:4px;
+             padding:7px 10px; }
+  #qsearch:focus { outline:none; border-color:var(--accent,var(--crimson)); }
+  .qtoggle { display:flex; align-items:center; gap:6px; font-family:var(--mono); font-size:10.5px;
+             letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3); cursor:pointer; }
+  .qcat { font-family:var(--mono); font-size:10px; letter-spacing:.11em; text-transform:uppercase;
+          color:var(--ink-3); font-weight:700; margin:30px 0 11px;
+          padding-bottom:6px; border-bottom:1px solid var(--rule); }
+  .qcat:first-child { margin-top:0; }
+  .qitem { border:1px solid var(--rule); border-radius:5px; padding:14px 16px; margin:0 0 10px;
+           background:var(--surface); }
+  .qitem[hidden] { display:none; }
+  .qitem.done { border-style:dashed; opacity:.62; }
+  .qitem .qproc { font-size:13px; font-weight:650; }
+  .qitem .qproc a { color:inherit; text-decoration:none; border-bottom:1px solid var(--rule-2); }
+  .qitem .qq { margin:5px 0 0; font-size:14.5px; line-height:1.45; }
+  .qitem .qwhy { margin:5px 0 0; font-size:11.5px; color:var(--ink-3); max-width:70ch; }
+  .qitem textarea { width:100%; margin-top:10px; min-height:72px; resize:vertical; font:inherit;
+                    font-size:13.5px; color:var(--ink); background:var(--paper);
+                    border:1px solid var(--rule); border-radius:4px; padding:8px 10px; }
+  .qitem textarea:focus { outline:none; border-color:var(--accent,var(--crimson)); }
+  .qfoot { margin-top:9px; display:flex; align-items:center; gap:11px; }
+  .qfoot button { font:inherit; font-family:var(--mono); font-size:10.5px; letter-spacing:.06em;
+                  text-transform:uppercase; cursor:pointer; border-radius:3px; padding:5px 13px;
+                  background:var(--s-idea); border:1px solid var(--s-idea); color:var(--paper);
+                  font-weight:700; }
+  .qfoot button:disabled { opacity:.55; cursor:default; }
+  .qfoot .qsaved { font-family:var(--mono); font-size:10.5px; letter-spacing:.06em;
+                   text-transform:uppercase; color:var(--s-idea); font-weight:600; }
+  .qanswers { margin-top:11px; border-top:1px solid var(--rule); padding-top:9px; }
+  .qanswers p { margin:0 0 7px; font-size:13px; color:var(--ink-2); }
+  .qanswers p:last-child { margin-bottom:0; }
+  .qanswers b { font-family:var(--mono); font-size:10px; letter-spacing:.07em;
+                text-transform:uppercase; color:var(--ink-3); font-weight:700; }
+  .qempty { font-size:14px; color:var(--ink-3); padding:18px 0; }
   .fbbody textarea { min-height:96px; resize:vertical; }
   .fbgap { margin-top:13px; }
   .fbkind { display:flex; flex-wrap:wrap; gap:5px; }
@@ -701,6 +743,7 @@
     <button role="tab" id="t-next" aria-controls="p-next" aria-selected="false" tabindex="-1">Next<span class="c">{{NRANK}}</span></button>
     <button role="tab" id="t-inventory" aria-controls="p-inventory" aria-selected="false" tabindex="-1">Inventory<span class="c">{{N}}</span></button>
     <button role="tab" id="t-standards" aria-controls="p-standards" aria-selected="false" tabindex="-1">Standards<span class="c">{{NSTD}}</span></button>
+    <button role="tab" id="t-questions" aria-controls="p-questions" aria-selected="false" tabindex="-1">Questions<span class="c" id="qtab-count">{{NQUESTIONS}}</span></button>
     <button role="tab" id="t-method" aria-controls="p-method" aria-selected="false" tabindex="-1">Method &amp; caveats</button>
   </div>
 </nav>
@@ -1015,6 +1058,35 @@
   </p>
 
 {{STANDARDS}}
+
+</div>
+
+<div class="panel" id="p-questions" role="tabpanel" aria-labelledby="t-questions" hidden>
+
+  <h2>Questions</h2>
+  <p class="lead">The <strong>{{NQUESTIONS}} things the registry cannot currently answer about itself</strong>, generated from its own weak spots &mdash; rows nobody has verified, rows scored broken, rows where a human does every step and nothing is written down. Answer the ones you know. <strong>Skipping is the right move on anything you would have to guess at</strong>: a guess recorded as fact is worse than a blank.</p>
+
+  <div class="qintro" id="qintro">
+    <p>These used to be documents handed to one person. This is the same interview,
+    open to everyone who runs a process &mdash; the difference is that you answer the
+    handful you actually know instead of the whole list.</p>
+    <p><b>Sign in to answer.</b> Answers carry your account so a later reader knows
+    who said it; they land in the review queue and get folded into the inventory by
+    hand, never applied automatically.</p>
+  </div>
+
+  <div class="qprogress" id="qprogress" hidden>
+    <div class="qbar"><i id="qbar-fill"></i></div>
+    <span id="qprogress-txt"></span>
+  </div>
+
+  <div class="qfilter" id="qfilter" hidden>
+    <label class="fbl" for="qsearch">Narrow the list</label>
+    <input type="search" id="qsearch" placeholder="Filter by process, category or wording&hellip;" autocomplete="off">
+    <label class="qtoggle"><input type="checkbox" id="qhide-answered" checked> Hide the ones I have answered</label>
+  </div>
+
+  <div id="qlist" class="qlist"></div>
 
 </div>
 
@@ -1360,20 +1432,13 @@
     </div>
     <div class="fbbody">
       <div class="fbthread" id="fbthread" hidden></div>
-      <!-- One question from the current round, when there is an unanswered one
-           for this process (or any, from the pill). Optional by design: the
-           label says so, and Skip costs nothing. -->
-      <div class="fbq" id="fbq" hidden>
-        <span class="fbl">Help us understand &mdash; optional</span>
-        <div class="fbq-proc" id="fbq-proc"></div>
-        <p class="fbq-q" id="fbq-q"></p>
-        <p class="fbq-why" id="fbq-why"></p>
-        <textarea id="fbq-text" placeholder="Whatever you actually know &mdash; a partial answer beats a blank."></textarea>
-        <div class="fbq-foot">
-          <button type="button" id="fbq-skip">Show another</button>
-          <button type="button" id="fbq-send">Answer</button>
-        </div>
-      </div>
+      <!-- The round used to be answered here, one question at a time, above a
+           form that was already asking for something. Two asks in one small
+           panel is one too many, and a question worth thinking about deserves
+           more room than a bubble. The round moved to its own tab, where a
+           person can work down it in a sitting; what stays is a line pointing
+           at it, and only when there is actually something unanswered. -->
+      <a class="fbqlink" id="fbqlink" href="#questions" data-goto="t-questions" hidden></a>
 
       <div id="fbform">
         <!-- No process picker. Every Comment button already knows its row, so the

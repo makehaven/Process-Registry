@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Prototype of the Phase 2 renderer: seed-inventory.md -> one self-contained page."""
-import re, html, json, collections, pathlib
+import re, sys, html, json, collections, pathlib
 
 SRC = pathlib.Path(__file__).resolve().parents[1] / "data" / "inventory.md"
 TPL = pathlib.Path(__file__).with_name("shell.html")
@@ -89,6 +89,25 @@ for ln in SRC.read_text().split("\n"):
         if len(c) == 6 and c[1] != "A" and not set(c[1]) <= set("-: "):
             rows.append(dict(group=group, name=c[0], a=c[1], d=c[2], i=c[3],
                              state=c[4], note=c[5]))
+
+# ---- state vocabulary guard -------------------------------------------------
+# A state word outside STATES parses fine and then vanishes: it is missing from
+# the legend and the group bars (both of which loop over STATES), it has no
+# `.pill` rule so the badge renders unstyled, and the recent-changes scanner
+# filters on the same set so edits to the row are invisible there too. Two rows
+# spent several days as `degraded` — a word this vocabulary retired — before
+# anyone noticed the counts no longer summed to N. Failing the build is the only
+# way that stays noticed.
+_bad = sorted({r["state"] for r in rows} - set(STATES))
+if _bad:
+    for w in _bad:
+        for r in rows:
+            if r["state"] == w:
+                print(f"  {w!r}: {r['group']} / {r['name']}", file=sys.stderr)
+    sys.exit(f"inventory.md uses state(s) not in the vocabulary: {_bad}\n"
+             f"Valid states: {STATES}\n"
+             "Either re-score those rows or add the word to STATES, TILE_COPY "
+             "if it needs a gloss, and a .pill/--s- rule in build/shell.html.")
 
 # ---- documentation floor ----------------------------------------------------
 # A process that runs as code has a maintained implementation, and that
@@ -769,17 +788,36 @@ influx = "".join(
 # who saw "11 failing now" had nothing to type to find those eleven rows.
 # "In flux" spans two states and "Processes mapped" is the whole set, so those
 # two stay plain divs rather than pretending to a filter they cannot express.
+# The tile used to be labelled "Still unknown", which reads as "there is a row
+# scored `unknown`" — and there is not; it counts `undefined` + `unknown`, two
+# different claims. When only one of them is non-zero the tile says which, and
+# filters the inventory to it, so the number on the front page and the rows
+# behind it are the same thing.
+_gap = [(s, st_tot[s]) for s in ("undefined", "unknown") if st_tot[s]]
+_gap_sub = ("Nobody can currently say what the process is"
+            if len(_gap) != 1 else
+            {"undefined": "The process has no defined shape yet — this is a decision nobody has made",
+             "unknown": "It runs, but we cannot characterise it — ask the person who does it"}[_gap[0][0]])
+_gap_lbl = _gap[0][0].title() if len(_gap) == 1 else "No agreed shape"
+gap_tile = (
+    f'<a class="tile gap" href="#inventory" data-filter="state:{_gap[0][0]}">'
+    f'<span class="num">{cant_say}</span><span class="lbl">{_gap_lbl}</span>'
+    f'<span class="sub">{_gap_sub}</span></a>'
+    if len(_gap) == 1 else
+    f'<div class="tile gap"><span class="num">{cant_say}</span>'
+    f'<span class="lbl">{_gap_lbl}</span><span class="sub">{_gap_sub}</span></div>')
+
 tiles = f"""
       <div class="tile"><span class="num">{N}</span><span class="lbl">Processes mapped</span><span class="sub">Across 13 groups · {st_tot['stable']} running normally</span></div>
       <a class="tile bad" href="#inventory" data-filter="state:broken"><span class="num">{st_tot['broken']}</span><span class="lbl">Broken</span><span class="sub">{TILE_COPY['broken']}</span></a>
       <a class="tile unopt" href="#inventory" data-filter="state:optimizable"><span class="num">{st_tot['optimizable']}</span><span class="lbl">Optimizable</span><span class="sub">{TILE_COPY['optimizable']}</span></a>
       <div class="tile accent"><span class="num">{change_load}</span><span class="lbl">In flux</span><span class="sub">{st_tot['watch']} being watched, {st_tot['changing']} actively changing</span></div>
       <a class="tile plan" href="#inventory" data-filter="state:planned"><span class="num">{planned}</span><span class="lbl">Planned</span><span class="sub">Not started — intentions on the roadmap, not failures</span></a>
-      <div class="tile gap"><span class="num">{cant_say}</span><span class="lbl">Still unknown</span><span class="sub">No agreed shape yet — ask the person who runs it</span></div>"""
+      {gap_tile}"""
 
 legend = "".join(
     f'<span><i class="swatch" style="background:var(--s-{s})"></i>{s.title()} {st_tot[s]}</span>'
-    for s in STATES)
+    for s in STATES if st_tot[s])
 
 board = []
 for g, rs in by_group.items():
@@ -926,10 +964,16 @@ import hashlib, sys as _sys
 _sys.path.insert(0, str(pathlib.Path(__file__).parent))
 import questions as _qgen
 _name2pid = {re.sub(r"[*`]", "", r["name"]).strip(): r["pid"] for r in rows}
+# The whole round, not a top-20 slice. The slice existed when the only place a
+# question could be answered was one card in the comment bubble, where more than
+# a handful was pointless. The Questions tab shows the round as a list you work
+# down in a sitting, so truncating it would only hide questions nobody can then
+# reach — and the tail is where the never-verified high-impact rows sit.
+_qs = _qgen.questions(_qgen.load())
 qmanifest = json.dumps(
     [{"qid": hashlib.md5(f"{proc}|{cat}".encode()).hexdigest()[:10],
       "pid": _name2pid.get(proc), "process": proc, "cat": cat, "q": q, "why": why}
-     for pri, cat, proc, q, why in _qgen.questions(_qgen.load())[:20]],
+     for pri, cat, proc, q, why in _qs],
     ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
 
 # The key used to be hand-written and said "1 — worst on that axis", which is
@@ -957,6 +1001,7 @@ for key, val in [("TILES", tiles), ("LEGEND", legend), ("BOARD", "\n".join(board
                  ("NNEVER", str(n_never)), ("NRANK", str(len(top))), ("NSHOWN", str(SHOWN)),
                  ("NMORE", str(max(0, len(top) - SHOWN))), ("RAISED", raised_html),
                  ("MANIFEST", manifest), ("QUESTIONS", qmanifest),
+                 ("NQUESTIONS", str(len(_qs))),
                  ("SCOREKEY", scorekey),
                  ("NSETTLED", str(n_settled)), ("NP1ROWS", str(n_p1)),
                  ("NSTRAT", str(n_strat_matched)),
@@ -997,3 +1042,5 @@ print(f"kpi — {n_measured} rows name the KPI they move; "
       f"{len(orphan_kpis)} of {len(KPI)} KPIs have no process pointed at them"
       + (f"; UNKNOWN ids: {sorted(set(unknown_kpis))}" if unknown_kpis else ""))
 print(f"wrote {OUT} — {N} processes, {len(tables)} groups, change load {change_load}, can't-say {cant_say}")
+print(f"questions — {len(_qs)} in the round across "
+      f"{len({q[2] for q in _qs})} processes")
