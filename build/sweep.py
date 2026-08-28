@@ -93,7 +93,13 @@ def load_rows():
             continue
         code = ""
         if "⚙" in c[5]:
-            code = re.split(r"[⚠⟐‖]", c[5].split("⚙", 1)[1])[0]
+            # Any sigil terminates the code field, not just these three. The
+            # original [⚠⟐‖] dropped ⧉ ▦ ◷ ◊, so a row written as
+            # "⚙ xero_bills_sync ⧉ S041" parsed its module as the whole string
+            # and matched nothing — silently hiding 11 modules that changed in
+            # Q1 2026, including xero_bills_sync, the most-developed module of
+            # the quarter. SIGILS here matches build/questions.py.
+            code = re.split(r"[⚠⟐‖⧉▦◷◊]", c[5].split("⚙", 1)[1])[0]
         rows.append(dict(group=group, name=re.sub(r"\*", "", c[0]).strip(),
                          state=c[4],
                          modules=[m.strip() for m in code.split(",") if m.strip()]))
