@@ -740,7 +740,7 @@
   <div class="wrap" role="tablist" aria-label="Registry sections">
     <button role="tab" id="t-overview" aria-controls="p-overview" aria-selected="true">Overview</button>
     <button role="tab" id="t-flux" aria-controls="p-flux" aria-selected="false" tabindex="-1">What&rsquo;s moving<span class="c">{{CHANGELOAD}}</span></button>
-    <button role="tab" id="t-next" aria-controls="p-next" aria-selected="false" tabindex="-1">Next<span class="c">{{NRANK}}</span></button>
+    <button role="tab" id="t-next" aria-controls="p-next" aria-selected="false" tabindex="-1">Opportunities<span class="c">{{NRANK}}</span></button>
     <button role="tab" id="t-inventory" aria-controls="p-inventory" aria-selected="false" tabindex="-1">Inventory<span class="c">{{N}}</span></button>
     <button role="tab" id="t-standards" aria-controls="p-standards" aria-selected="false" tabindex="-1">Standards<span class="c">{{NSTD}}</span></button>
     <button role="tab" id="t-questions" aria-controls="p-questions" aria-selected="false" tabindex="-1">Questions<span class="c" id="qtab-count">{{NQUESTIONS}}</span></button>
@@ -763,14 +763,14 @@
        sigils — exists to answer these, and a first-time visitor should meet the
        questions before the apparatus. -->
   <nav class="qstrip" aria-label="Start here">
-    <a class="q-broken" href="#inventory" data-filter="state:broken"><b>{{DEGRADED}}</b><span>processes are broken with nobody on them</span><em>See the list</em></a>
-    <a class="q-next" href="#next" data-goto="t-next"><b>{{NSHOWN}}</b><span>candidates for what to fix next &mdash; vote on the order</span><em>See the ranking</em></a>
+    <a class="q-broken" href="#inventory" data-filter="state:broken"><b>{{DEGRADED}}</b><span>processes are recorded as broken</span><em>See the list</em></a>
+    <a class="q-next" href="#next" data-goto="t-next"><b>{{NSHOWN}}</b><span>improvement candidates &mdash; help assess priorities</span><em>See the ranking</em></a>
     <a class="q-flux" href="#flux" data-goto="t-flux"><b>{{CHANGELOAD}}</b><span>are changing or settling right now</span><em>See what moved</em></a>
   </nav>
 
   <section>
     <h2>Where we stand</h2>
-    <p class="sec-note">Six numbers, all of which should move over the next year.</p>
+    <p class="sec-note">Recorded process states. These counts do not measure completed improvements or staff adoption.</p>
     <div class="tiles">{{TILES}}
     </div>
     <p class="sec-note" style="margin-top:18px">
@@ -787,10 +787,9 @@
   <section>
     <h2>Change board</h2>
     <p class="sec-note">
-      The board's question — <em>is change under control?</em> — is this chart, tracked over time.
-      One caution: <strong>track the count in flux ({{CHANGELOAD}}), not the percentage.</strong>
-      The inventory itself is still growing, so the ratio moves for reasons that have nothing
-      to do with how much is actually changing.
+      This chart shows the recorded mix of process states. <strong>The count in flux
+      ({{CHANGELOAD}}) does not establish whether change is under control.</strong> Review the
+      next actions, acceptance evidence and outstanding decisions with the people doing the work.
     </p>
     <div class="legend">{{LEGEND}}</div>
     <div class="board">
@@ -823,8 +822,8 @@
       rebuilding or migrating. Expect it to behave differently next week than it does today.</dd></div>
     <div><dt><span class="pill watch">watch</span></dt>
       <dd><strong>The change already landed; we are still watching it.</strong> A process leaves
-      <em>watch</em> when its window closes with nothing having gone wrong — it does not leave
-      by being forgotten.</dd></div>
+      <em>watch</em> when its acceptance conditions are met through relevant observed use.
+      Time passing or a check passing today does not establish that the process works throughout a period.</dd></div>
   </dl>
 
 {{WINS}}
@@ -845,10 +844,10 @@
 
 <div class="panel" id="p-next" role="tabpanel" aria-labelledby="t-next" hidden>
 
-  <p class="lead">The <strong>{{NRANK}} processes with something actually wrong with them</strong>, ranked by <strong>impact × how manual it still is</strong> and then adjusted by the people who run them. A prioritisation aid, not a verdict.</p>
+  <p class="lead"><strong>{{NRANK}} improvement candidates</strong>, ordered by impact, automation, draft plan priorities and votes. This is an opportunity inventory, not a committed work queue. Human work can be appropriate and effective. Select work using actual problems, staff effort, expected benefit and available capacity.</p>
 
   <section>
-    <h2>Where to automate next</h2>
+    <h2>Opportunities to assess</h2>
     <!-- The method prose matters — it is what makes the ranking auditable — but
          it is reference, not preamble. Folded so the list itself is the first
          thing on the tab; the summary line says enough to vote responsibly. -->
@@ -856,12 +855,12 @@
     <summary>How this ranking works — the score, the plan's priorities, and your votes</summary>
     <p class="sec-note">
       <strong>{{NRANK}} of {{N}} processes are here; {{NSETTLED}} are not.</strong> A row earns a
-      place by having something actually wrong with it — it is
+      place through a recorded gap or its automation/documentation scores — it is
       <span class="pill broken" style="padding:1px 5px">broken</span> or
       <span class="pill optimizable" style="padding:1px 5px">optimizable</span>, or it is not yet
       both automated and documented and it matters enough to be worth someone's week. A process
       that is automated, documented and working is finished, not merely un-started, and putting it
-      on a list called <em>next</em> only makes the list longer.
+      on this candidate list only makes the list longer. Inclusion does not commit anyone to a project.
     </p>
     <p class="sec-note">
       The base score is <strong>impact × how manual it still is</strong>, out of 20. That is
@@ -1244,10 +1243,10 @@
       person reads against the inventory. Neither stream writes to the registry on its own.
     </p>
     <div class="caveats">
-      <div class="caveat"><h3>Tier 1 · applied automatically</h3>
-        <p>Last-changed dates from module git history, <code>watch</code> set on recent change,
-        <code>changing</code> set from active tracks, documentation staleness from file dates.
-        No judgement required; wrong answers are obvious.</p></div>
+      <div class="caveat"><h3>Tier 1 · computed observations</h3>
+        <p>Module commit dates and document edit dates can be computed. They do not prove
+        deployment, current documentation or successful use. Process state changes require
+        review of the relevant evidence; the sweep reports candidates and does not edit rows.</p></div>
       <div class="caveat"><h3>Tier 2 · proposed with evidence</h3>
         <p>"Seven storage assignments still have no subscription — query returns 7 rows."
         The pass opens a diff citing its evidence and does not merge itself.</p></div>
@@ -1271,7 +1270,7 @@
         what actually happens. A plan saying "conduct annual drills" is not evidence that drills
         happen.</p></div>
       <div class="caveat"><h3>The plan is still a draft</h3>
-        <p>Priorities on the <em>Next</em> tab come from the strategic plan's current working
+        <p>Priorities on the <em>Opportunities</em> tab come from the strategic plan's current working
         sheet, which is heading for a shorter list. Treat the <span class="plan p1"><b>P1</b></span>
         marks as a demonstration of the mechanism rather than a settled answer; when the plan lands,
         <code>data/strategies.csv</code> is replaced and every score moves with it.</p></div>

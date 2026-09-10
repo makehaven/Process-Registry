@@ -255,3 +255,25 @@ voted in both directions — disagreements worth a conversation, not an edit —
 
 Setup is in [SETUP.md](SETUP.md) §6. Until the OAuth client id is filled in, the
 page renders exactly as it did before with sign-in hidden.
+
+## Current summaries and follow-through
+
+For a process with a long history, put these optional fields in its existing
+inventory row. The renderer shows them first on Inventory and What's moving,
+with earlier prose folded under Background and earlier evidence. No extra file
+or independently maintained queue is introduced.
+
+- `◉` Current: dated situation, citing the existing release/work evidence.
+- `⏭` Next action: concrete step; name the next actor only when established.
+- `⏱` Next review: date or triggering event; do not invent a staff commitment.
+- `☑` Acceptance: outcome and relevant observed use required to close the watch.
+
+These summaries are not human confirmation: preserve `◷` dates and process
+scores. Link to existing work records for detailed tasks and communication.
+The Opportunities tab ranks candidates; it is not the selected work queue.
+Neither elapsed time nor a current passing probe establishes sustained health.
+
+The inventory and generated HTML are public, including folded details. Keep
+member-specific cases, account assignments and recovery instructions in
+restricted operational records. Sanitize the source rather than hiding text
+with CSS. Historical repository revisions are not erased by a content edit.

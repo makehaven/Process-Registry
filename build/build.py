@@ -62,7 +62,7 @@ STATES = ["stable", "watch", "changing", "planned", "idea",
 # filter cannot find what the tile is counting; TILE_COPY keeps the gloss beside
 # the word instead of replacing it.
 TILE_COPY = {
-    "broken":      "Something that should happen does not — nobody currently fixing",
+    "broken":      "Something expected is recorded as failing",
     "optimizable": "Runs, but was never built to its end goal — not merely improvable",
 }
 
@@ -286,7 +286,8 @@ def score_cell(axis, v):
 # depend on that order.
 SIGILS = {"◷": "reviewed", "⚙": "code", "⚠": "raised",
           "⟐": "strategy", "‖": "docs", "◊": "drafted", "▦": "measure",
-          "⧉": "standards"}
+          "⧉": "standards", "◉": "current", "⏭": "next",
+          "⏱": "review", "☑": "acceptance"}
 
 # ---- the Standards of Excellence as a lens ----------------------------------
 # ⧉ carries the standards a process implements, from the crosswalk
@@ -391,6 +392,21 @@ def plain_note(raw):
     """Just the prose: no optional fields, no drafting history."""
     return parse_note(raw)["note"]
 
+def current_summary(raw):
+    """Show explicitly dated current information; never infer it from old prose."""
+    p = parse_note(raw)
+    if not p.get("current"):
+        return md(p["note"])
+    out = f'<span class="res"><b>Current</b>{md(p["current"])}</span>'
+    for key, label in (("next", "Next action"), ("review", "Next review"),
+                       ("acceptance", "Acceptance")):
+        out += f'<span class="res"><b>{label}</b>{md(p.get(key) or "Not recorded")}</span>'
+    if p["note"]:
+        out += ('<details class="rowmeta"><summary>Background and earlier evidence</summary>'
+                f'{md(p["note"])}</details>')
+    return out
+
+
 def code_links(spec):
     """Module names -> links to the module directory on GitHub."""
     out = []
@@ -410,7 +426,7 @@ def note_cell(raw):
     click even though the links themselves take one.
     """
     p = parse_note(raw)
-    out = md(p["note"])
+    out = current_summary(raw)
     if p.get("raised"):
         out += f'<span class="res raised"><b>Raised</b>{md(p["raised"])}</span>'
 
@@ -779,7 +795,7 @@ influx = "".join(
         <div class="what"><b>{md(r['name'])}</b><span class="grp">{html.escape(r['group'])}</span>
         <button type="button" class="rowsay" data-pid="{r['pid']}" """
     f"""aria-label="Comment on {html.escape(r['name'], quote=True)}">Comment</button></div>
-        <div class="n">{md(plain_note(r['note']))}</div></div>""" for r in flux)
+        <div class="n">{current_summary(r['note'])}</div></div>""" for r in flux)
 
 # ---- fragments -------------------------------------------------------------
 # Every tile that counts a single state is an anchor carrying that state's exact

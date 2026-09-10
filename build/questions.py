@@ -22,7 +22,7 @@ import argparse, pathlib, re, sys
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SRC = ROOT / "data" / "inventory.md"
 QDIR = ROOT / "questions"
-SIGILS = "◷⚙⚠⟐‖◊▦⧉"
+SIGILS = "◷⚙⚠⟐‖◊▦⧉◉⏭⏱☑"
 
 
 def load():

@@ -99,7 +99,7 @@ def load_rows():
             # and matched nothing — silently hiding 11 modules that changed in
             # Q1 2026, including xero_bills_sync, the most-developed module of
             # the quarter. SIGILS here matches build/questions.py.
-            code = re.split(r"[⚠⟐‖⧉▦◷◊]", c[5].split("⚙", 1)[1])[0]
+            code = re.split(r"[⚠⟐‖⧉▦◷◊◉⏭⏱☑]", c[5].split("⚙", 1)[1])[0]
         rows.append(dict(group=group, name=re.sub(r"\*", "", c[0]).strip(),
                          state=c[4],
                          modules=[m.strip() for m in code.split(",") if m.strip()]))
