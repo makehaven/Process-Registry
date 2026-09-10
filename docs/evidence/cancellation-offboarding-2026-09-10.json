@@ -1,0 +1,134 @@
+{
+  "environment": "live",
+  "observed_at": "2026-09-10T20:56:38+00:00",
+  "source_sha256": {
+    "web/modules/custom/chargebee_fetch_data/src/Service/LapsedMemberAuditor.php": "167a2a03804b77f4f2412e2b89b8f8927d6b8ac01e799f8d19ce58572d88956b",
+    "web/modules/custom/chargebee_fetch_data/chargebee_fetch_data.module": "622e5a4b46af5771d30d50f3c4ed6deccbf30e2896b1ecc7421bedefd825eae4",
+    "web/modules/custom/chargebee_status_sync/chargebee_status_sync.module": "0e0b184fe2e12b9fb288d32b991dc212fd023762a48a007fd998fed95c7b5b1a",
+    "webhook_controller": "a651cc603a56b4bc2ee0f1fb92b404e49ed0c8035aa9c21c74ede6d339bf233e"
+  },
+  "current_audit": {
+    "observed_at": "2026-09-10T20:56:23+00:00",
+    "environment": "live",
+    "mode": "audit(false)",
+    "checked": 850,
+    "lapsed": 0,
+    "revoked": 0,
+    "blocked": false,
+    "active_membership_role_holders": 852,
+    "unlinked_role_holders": 2,
+    "completed_at": "2026-09-10T20:56:38+00:00"
+  },
+  "auto_revoke": true,
+  "membership_roles": [
+    "member",
+    "member_pending_approval"
+  ],
+  "historical_accounts": {
+    "found": 4,
+    "with_membership_roles": 0,
+    "in_cached_fallback": 0
+  },
+  "last_scheduled_audit_started": "2026-09-09T23:41:53+00:00",
+  "scheduled_summaries_since_activation": [
+    {
+      "at": "2026-09-09T23:43:25+00:00",
+      "severity": 6,
+      "message": "Lapsed member audit: @checked member(s) checked, all with a live Chargebee subscription.",
+      "@checked": 850
+    },
+    {
+      "at": "2026-09-08T22:46:33+00:00",
+      "severity": 4,
+      "message": "Lapsed member audit: @lapsed of @checked member(s) hold a membership role with no live Chargebee subscription (@revoked revoked): @names",
+      "@checked": 853,
+      "@lapsed": 1,
+      "@revoked": 1
+    },
+    {
+      "at": "2026-09-07T22:45:01+00:00",
+      "severity": 4,
+      "message": "Lapsed member audit: @lapsed of @checked member(s) hold a membership role with no live Chargebee subscription (@revoked revoked): @names",
+      "@checked": 850,
+      "@lapsed": 1,
+      "@revoked": 1
+    },
+    {
+      "at": "2026-09-06T22:44:19+00:00",
+      "severity": 6,
+      "message": "Lapsed member audit: @checked member(s) checked, all with a live Chargebee subscription.",
+      "@checked": 847
+    },
+    {
+      "at": "2026-09-05T21:45:02+00:00",
+      "severity": 6,
+      "message": "Lapsed member audit: @checked member(s) checked, all with a live Chargebee subscription.",
+      "@checked": 847
+    },
+    {
+      "at": "2026-09-04T21:43:15+00:00",
+      "severity": 6,
+      "message": "Lapsed member audit: @checked member(s) checked, all with a live Chargebee subscription.",
+      "@checked": 850
+    },
+    {
+      "at": "2026-09-03T21:41:49+00:00",
+      "severity": 6,
+      "message": "Lapsed member audit: @checked member(s) checked, all with a live Chargebee subscription.",
+      "@checked": 851
+    },
+    {
+      "at": "2026-09-02T21:40:31+00:00",
+      "severity": 6,
+      "message": "Lapsed member audit: @checked member(s) checked, all with a live Chargebee subscription.",
+      "@checked": 848
+    },
+    {
+      "at": "2026-09-01T21:41:20+00:00",
+      "severity": 6,
+      "message": "Lapsed member audit: @checked member(s) checked, all with a live Chargebee subscription.",
+      "@checked": 848
+    },
+    {
+      "at": "2026-08-31T21:38:12+00:00",
+      "severity": 6,
+      "message": "Lapsed member audit: @checked member(s) checked, all with a live Chargebee subscription.",
+      "@checked": 850
+    },
+    {
+      "at": "2026-08-30T21:38:34+00:00",
+      "severity": 6,
+      "message": "Lapsed member audit: @checked member(s) checked, all with a live Chargebee subscription.",
+      "@checked": 851
+    },
+    {
+      "at": "2026-08-29T21:35:31+00:00",
+      "severity": 4,
+      "message": "Lapsed member audit: @lapsed of @checked member(s) hold a membership role with no live Chargebee subscription (@revoked revoked): @names",
+      "@checked": 854,
+      "@lapsed": 1,
+      "@revoked": 1
+    },
+    {
+      "at": "2026-08-28T21:35:41+00:00",
+      "severity": 6,
+      "message": "Lapsed member audit: @checked member(s) checked, all with a live Chargebee subscription.",
+      "@checked": 855
+    }
+  ],
+  "scheduled_runs_since_activation": 13,
+  "automatic_revocations_since_activation": 3,
+  "unlinked_coverage": {
+    "total": 2,
+    "member_role": 1,
+    "pending_approval_role": 1,
+    "no_recorded_plan": 2
+  },
+  "limits": [
+    "No physical door test or device-local cache inspection.",
+    "Two unlinked accounts excluded by design; no conclusion about payment or entitlement.",
+    "Cancellation email, CRM reason capture, Slack and rental offboarding not audited.",
+    "Source review identifies zero-checked audit summaries can appear successful on upstream failure; no such event in the inspected window."
+  ],
+  "mutations": "No membership, billing, access, config or notification mutations performed."
+}
