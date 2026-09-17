@@ -713,6 +713,8 @@
   code, td.n a, .res a, footer p { overflow-wrap:anywhere; }
 
   @media print { .fbdock, .authbar, .vote, .rowsay { display:none !important; } }
+  .pinned-row > td { background: color-mix(in srgb, var(--accent, #8b1919) 9%, transparent); }
+  .pinned-row > td:first-child { box-shadow: inset 3px 0 0 var(--accent, #8b1919); }
 </style>
 
 <header class="masthead">
@@ -1382,6 +1384,13 @@
   var box = document.getElementById('inv-filter'), hits = document.getElementById('inv-hits'),
       grp = document.getElementById('inv-group');
   if (!box) return;
+
+  // ?p=<process-id> — a deep link from outside. The website's feedback board
+  // links a member's item to the process behind it, and a link that lands on a
+  // 190-row table has not answered anything. The pin survives until the reader
+  // touches a filter, which is the moment they have asked a different question.
+  var pin = (/[?&]p=([^&#]+)/.exec(location.search) || [])[1];
+  if (pin) pin = decodeURIComponent(pin);
   var tables = Array.prototype.slice.call(
     document.querySelectorAll('#p-inventory .group-stack .tblwrap'));
   var total = document.querySelectorAll('#p-inventory .group-stack tbody tr').length;
@@ -1389,6 +1398,7 @@
   function apply() {
     var q = box.value.trim().toLowerCase(), shown = 0;
     var g = grp ? grp.value : '';
+    if (pin) { q = ''; g = ''; }
     // "state:broken" matches the state column exactly. Plain text still searches
     // the whole row, but a bare state word cannot do this job: "broken" appears
     // in three notes about broken items and clauses, so the front-page tile
@@ -1398,18 +1408,40 @@
       if (g && w.dataset.group !== g) { w.hidden = true; return; }
       var any = false;
       Array.prototype.forEach.call(w.querySelectorAll('tbody tr'), function (tr) {
-        var hit = !q || (want ? tr.dataset.state === want
-                              : tr.textContent.toLowerCase().indexOf(q) !== -1);
+        var hit = pin
+          ? tr.dataset.pid === pin
+          : (!q || (want ? tr.dataset.state === want
+                         : tr.textContent.toLowerCase().indexOf(q) !== -1));
         tr.hidden = !hit;
         if (hit) { any = true; shown++; }
       });
       w.hidden = !any;
     });
+    if (pin) {
+      hits.innerHTML = shown
+        ? 'one process, linked from elsewhere \u00b7 <a href="#" id="unpin">show all ' + total + '</a>'
+        : 'no process here with the id <code>' + pin.replace(/[<>&]/g, '') + '</code> \u00b7 <a href="#" id="unpin">show all ' + total + '</a>';
+      var un = document.getElementById('unpin');
+      if (un) un.addEventListener('click', function (e) { e.preventDefault(); pin = null; apply(); });
+      return;
+    }
     hits.textContent = (q || g) ? shown + ' of ' + total + ' processes' : total + ' processes';
   }
-  box.addEventListener('input', apply);
-  if (grp) grp.addEventListener('change', apply);
+  box.addEventListener('input', function () { pin = null; apply(); });
+  if (grp) grp.addEventListener('change', function () { pin = null; apply(); });
   apply();
+
+  // A pinned row is useless behind a closed tab: open the inventory and scroll
+  // to it. Done after the first apply() so the row is already visible.
+  if (pin) {
+    var invTab = document.getElementById('t-inventory');
+    if (invTab) select(invTab);
+    var row = document.querySelector('#p-inventory tbody tr[data-pid="' + pin.replace(/"/g, '') + '"]');
+    if (row) {
+      row.classList.add('pinned-row');
+      row.scrollIntoView({block: 'center'});
+    }
+  }
 })();
 </script>
 
