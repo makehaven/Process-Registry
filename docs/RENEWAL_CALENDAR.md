@@ -10,6 +10,14 @@ which is how the 990 was filed late in 2025 and incurred a fine.
 
 **Process registry:** `insurance_compliance.renewals`, `governance.records_retention`
 
+> **Superseded in part by [`data/obligations.md`](../data/obligations.md)
+> (2026-09-21).** That register carries the same items plus the ones missing
+> here — the New Haven quadrennial M-3 exemption, the annual personal property
+> declaration, semimonthly contractor payments, the quarterly staff
+> reimbursement form and 1099 issuance — and adds evidence of last completion
+> and cost of failure for each. Two dates in this file were wrong and are
+> corrected below.
+
 ---
 
 ## At a glance
@@ -17,7 +25,7 @@ which is how the 990 was filed late in 2025 and incurred a fine.
 | Month | Item | Owner |
 |---|---|---|
 | February | General Liability & Commercial Umbrella renewal → issue updated COI to landlord | ED |
-| March | CT Secretary of the State Annual Report (target 26th) | ED |
+| **March 22** | CT Secretary of the State Annual Report | ED |
 | April | Directors & Officers (D&O) renewal | ED |
 | April–June | CPA financial review preparation | ED + Treasurer |
 | May 15 | IRS Form 990 statutory deadline — **file Form 8868 extension → November 15** | ED + CPA |
@@ -66,7 +74,10 @@ Broker for all three: **Wellstone Insurance** — Kathleen Daleb,
 ## 3. Compliance and tax filings
 
 ### CT Secretary of the State Annual Report
-- **Due:** March (target filing 26 March)
+- **Due:** **22 March.** ⚠️ This document previously said "target filing 26
+  March", which is wrong and caused two consecutive late filings: 2025 was
+  missed entirely (past-due notice 21 April, filed 5 May) and 2026 was filed on
+  26 March, four days late, on the date this calendar gave.
 - **Where:** Business.CT.gov, Business Services Division
 - **Details:** filed online using ALEI `US-CT.BER:1066239`. $50 fee.
 
@@ -87,7 +98,8 @@ Broker for all three: **Wellstone Insurance** — Kathleen Daleb,
   control that prevents this — it is not optional paperwork.
 
 ### CT Charitable Solicitation Registration
-- **Renews:** annually, per the state portal schedule
+- **Renews:** **30 November**, annually. (This document previously said "per the
+  state portal schedule"; the expiration date is fixed.)
 - **Agency:** CT Department of Consumer Protection, Public Charities Unit
 - An active "CHR" registration number is **required** for state and municipal
   grant applications and for public fundraising. Lapsing it blocks grant
