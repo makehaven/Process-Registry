@@ -16,11 +16,14 @@ jobs:
         with: { python-version: '3.12' }
 
       - name: Build site
-        run: python3 build/build.py
+        run: |
+          pip install --quiet pyyaml
+          python3 build/build.py
+          python3 build/obligations.py
 
       - name: Check for unrendered placeholders
         run: |
-          if grep -qE '\{\{[A-Z]+\}\}' public/index.html; then
+          if grep -qE '\{\{[A-Z]+\}\}' public/index.html public/obligations/index.html; then
             echo "::error::Unrendered placeholders in output"; exit 1
           fi
 

@@ -1,0 +1,252 @@
+# MakeHaven obligations register — machine-readable source.
+#
+# build/obligations.py renders this to public/obligations/index.html. The
+# narrative companion with history and runbook detail is data/obligations.md.
+# Keep credentials OUT of this file: it publishes to a public page.
+#
+# Fields
+#   id          stable slug
+#   name        what a successor would call it
+#   group       tax | insurance | money   (one timeline lane each)
+#   cadence     annual | semimonthly | quarterly | once | every-4-years | ongoing
+#   due         annual: "MM-DD"  once: "YYYY-MM-DD"  every-4-years: "YYYY-MM-DD" (last)
+#               semimonthly: "1,15"  quarterly: "quarter-end"  ongoing: null
+#               An annual value of "~MM" means "sometime that month, exact day
+#               set by the sender" and renders on the 15th.
+#   start_days  how many days before `due` the working window opens
+#   owner       who does it
+#   state       current | due-soon | at-risk | unresolved | unverified | changing
+#               (due-soon is computed from dates; the others are set here)
+#   evidence    what proves the last cycle closed, or null if nothing was found
+#   if_slips    consequence, one line
+#   note        one line for the table; runbook detail stays in obligations.md
+#   auto        true if software prepares the work and a person only signs off
+
+- id: contractor-approvals
+  name: Contractor payment approval & pay run
+  group: money
+  cadence: semimonthly
+  due: "1,15"
+  start_days: 0
+  owner: ED
+  state: current
+  auto: true
+  evidence: Payments scheduled 15 & 18 Sep 2026
+  if_slips: Contractors unpaid
+  note: Site consolidates timesheet drafts → one Xero bill per contractor → approve → pay in Melio
+
+- id: gusto-xero-check
+  name: Check Xero ↔ Gusto connection
+  group: money
+  cadence: once
+  due: "2026-09-28"
+  start_days: 0
+  owner: ED
+  state: current
+  evidence: null
+  if_slips: Payroll stops syncing to the ledger; 1099 reconciliation loses its payroll half
+  note: Gusto asked for a reconnect on 15 Sep; may already be connected — a two-minute check
+
+- id: workers-comp
+  name: Workers' Compensation renewal
+  group: insurance
+  cadence: annual
+  due: "10-07"
+  start_days: 30
+  owner: ED
+  state: current
+  evidence: Renewal packet from Wellstone 14 Aug 2026 (The Hartford)
+  if_slips: Uninsured payroll; statutory penalties
+  note: Confirm carrier in force after 7 Oct (Liberty Mutual bills monthly on the 7th); officer exclusions
+
+- id: workers-comp-audit
+  name: Workers' Comp premium audit — staff-time form
+  group: insurance
+  cadence: annual
+  due: "~12"
+  start_days: 30
+  owner: ED
+  state: unverified
+  evidence: null
+  if_slips: Estimated audit at the carrier's number; possible cancellation
+  note: Arrives after the term ends; actual payroll by classification for the expired term
+
+- id: personal-property
+  name: Declaration of Personal Property (New Haven)
+  group: tax
+  cadence: annual
+  due: "11-01"
+  start_days: 31
+  owner: ED
+  state: unverified
+  evidence: 2025 zero-asset filing, per the assessor
+  if_slips: Penalty assessment on an estimated value
+  note: Assessor account UID 017402
+
+- id: form-990
+  name: IRS Form 990
+  group: tax
+  cadence: annual
+  due: "11-15"
+  start_days: 75
+  owner: ED + CPA
+  state: at-risk
+  evidence: 8868 accepted 28 Apr 2026 · 2024 return filed late, fined
+  if_slips: Daily penalty; charity renewal blocked
+  note: Extended from May 15 by Form 8868; ZZSCPA prepares, Treasurer signs; 2025 review still open
+
+- id: charity-renewal
+  name: CT Charitable Solicitation renewal
+  group: tax
+  cadence: annual
+  due: "11-30"
+  start_days: 14
+  owner: ED
+  state: at-risk
+  evidence: Certificate 15 Dec 2025 · lapsed Dec 2024
+  if_slips: Cannot solicit in CT or apply for state and municipal grants
+  note: CHR.0067264 · $50 · requires the 990 filed first · notices go to admin@
+
+- id: q-reimbursement
+  name: Quarterly staff reimbursement form
+  group: money
+  cadence: quarterly
+  due: quarter-end
+  start_days: 16
+  owner: Staff → ED
+  state: current
+  evidence: Submissions arrive by email
+  if_slips: Staff under-reimbursed; health-benefit substantiation thins
+  note: Webform 26999 · health, commuter, other · receipts to personal Drive folder first
+
+- id: gusto-mailing
+  name: Gusto tax-form mailing order
+  group: money
+  cadence: annual
+  due: "01-23"
+  start_days: 18
+  owner: ED
+  state: current
+  evidence: 2025 forms distributed via Gusto
+  if_slips: Distribution becomes manual
+  note: Precedes the IRS date; confirm the exact day from Gusto's January email
+
+- id: form-1099
+  name: Contractor 1099-NEC issuance
+  group: money
+  cadence: annual
+  due: "01-31"
+  start_days: 61
+  owner: ED
+  state: at-risk
+  evidence: null
+  if_slips: Missed forms for anyone over $600 in aggregate
+  note: 2026 split across Gusto (to ~May) and Melio/Xero (from ~July) — totals must be added
+
+- id: gl-umbrella
+  name: General Liability & Commercial Umbrella renewal
+  group: insurance
+  cadence: annual
+  due: "~02"
+  start_days: 45
+  owner: ED
+  state: current
+  evidence: Renewal packet Jan 2026, sent to governance committee
+  if_slips: Lease default on the certificate-of-insurance clause
+  note: PHLY · issue COI naming 770 Chapel Street LLC
+
+- id: sots-annual-report
+  name: CT Secretary of the State Annual Report
+  group: tax
+  cadence: annual
+  due: "03-22"
+  start_days: 21
+  owner: ED
+  state: current
+  evidence: Filing 0013848474, 26 Mar 2026 (four days late)
+  if_slips: Administrative dissolution, eventually
+  note: ALEI 1066239 · $50 · the old calendar said 26 March and produced two late filings
+
+- id: d-and-o
+  name: Directors & Officers renewal
+  group: insurance
+  cadence: annual
+  due: "~04"
+  start_days: 45
+  owner: ED
+  state: current
+  evidence: Policy received 22 May 2026, sent to board
+  if_slips: Board exposure; recruiting harder
+  note: Management liability
+
+- id: cpa-review
+  name: CPA financial review
+  group: tax
+  cadence: annual
+  due: "06-30"
+  start_days: 107
+  owner: ED + Treasurer
+  state: at-risk
+  evidence: 2025 request list 1 Jul 2026 · still open
+  if_slips: 990 slips; charity renewal cannot attest
+  note: ZZSCPA · request list late April, draft mid-June · feeds the 990 and the charity attestation
+
+- id: form-8868
+  name: IRS Form 8868 extension
+  group: tax
+  cadence: annual
+  due: "05-15"
+  start_days: 30
+  owner: ED + CPA
+  state: current
+  evidence: IRS acknowledgment 28 Apr 2026
+  if_slips: 990 due May 15 with no slack — this is how the 2024 fine happened
+  note: The control that prevents the 990 penalty
+
+- id: cultural-district
+  name: CT Cultural District annual report
+  group: tax
+  cadence: annual
+  due: "~06"
+  start_days: 21
+  owner: ED
+  state: unverified
+  evidence: null
+  if_slips: Unknown
+  note: Confirm this is MakeHaven's to file; three reminders in June 2026 unread
+
+- id: board-coi
+  name: Board conflict-of-interest disclosures
+  group: insurance
+  cadence: annual
+  due: "~07"
+  start_days: 30
+  owner: President / ED
+  state: unverified
+  evidence: null
+  if_slips: 990 Part VI answer weakens
+  note: makehaven.org/conflict-interest-policy; also on onboarding
+
+- id: m3-quadrennial
+  name: Quadrennial Tax Exempt Application (M-3)
+  group: tax
+  cadence: every-4-years
+  due: "2025-11-01"
+  start_days: 61
+  owner: ED
+  state: unresolved
+  evidence: null
+  if_slips: Property tax assessed — already happened
+  note: Assessor's Nov 2025 question never answered; next cycle 1 Nov 2029
+
+- id: lease-review
+  name: Facility lease review
+  group: money
+  cadence: ongoing
+  due: null
+  start_days: 0
+  owner: ED
+  state: changing
+  evidence: Counsel engaged Jun 2026
+  if_slips: —
+  note: 770 Chapel Street LLC · negotiation live with MacDermid Reynolds & Glissman
