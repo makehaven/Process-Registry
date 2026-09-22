@@ -20,7 +20,9 @@ says plainly that it has none.
 - **Due** — the statutory or contractual date. Where the old calendar carried a
   *target* date that differed from the real one, the real one is here and the
   discrepancy is called out.
-- **Lead** — how early work must start for the date to be met.
+- **Start work** — the day the working period opens. Most obligations have a
+  window of preparation and then a hard date; the calendar carries both, so a
+  reminder arrives when there is still time to act, not when the date lands.
 - **Evidence** — the artefact that proves the last cycle closed. "None found"
   means exactly that: the mailbox sweep found no confirmation, which is not the
   same as it not having happened.
@@ -34,26 +36,27 @@ already landed.
 
 ## At a glance
 
-| Due | Item | Cadence | Owner | State |
-|---|---|---|---|---|
-| 1st & 15th | Contractor payment approval & pay run | Semimonthly | ED | current |
-| Sep 28 | Reconnect Xero to Gusto | One-off | ED | **due-soon** |
-| Oct 7 | Workers' Compensation renewal | Annual | ED | due-soon |
-| Nov 1 | Declaration of Personal Property (New Haven) | Annual | ED | unverified |
-| Nov 15 | IRS Form 990 (extended) | Annual | ED + CPA | at-risk |
-| Nov 30 | CT Charitable Solicitation renewal | Annual | ED | at-risk |
-| Dec 31 | Q4 staff reimbursement form | Quarterly | Staff → ED | current |
-| Jan 23 | Gusto form mailing order (precedes the IRS date) | Annual | ED | current |
-| Jan 31 | Contractor 1099-NEC issuance | Annual | ED | **at-risk** |
-| Feb | General Liability & Umbrella renewal → COI to landlord | Annual | ED | current |
-| Mar 22 | CT Secretary of the State Annual Report | Annual | ED | **date corrected** |
-| Apr | Directors & Officers renewal | Annual | ED | current |
-| Apr–Jun | CPA financial review | Annual | ED + Treasurer | at-risk |
-| May 15 | IRS Form 8868 extension | Annual | ED + CPA | current |
-| Jun | CT Cultural District annual report | Annual | ED | unverified |
-| Jul | Board conflict-of-interest disclosures | Annual | President / ED | unverified |
-| Nov 1, 2029 | Quadrennial Tax Exempt Application (M-3) | Every 4 years | ED | **unresolved** |
-| Annual | Facility lease review | Annual | ED | changing |
+| Start work | Hard due | Item | Cadence | Owner | State |
+|---|---|---|---|---|---|
+| same day | 1st & 15th | Contractor payment approval & pay run | Semimonthly | ED | current |
+| now | Sep 28 | Check Xero↔Gusto connection (Gusto says reconnect) | One-off | ED | due-soon |
+| Sep 7 | Oct 7 | Workers' Compensation renewal | Annual | ED | due-soon |
+| on receipt | ~30 days after | Workers' Comp premium audit — staff-time form | Annual, after term ends | ED | unverified |
+| Oct 1 | Nov 1 | Declaration of Personal Property (New Haven) | Annual | ED | unverified |
+| Sep 1 | Nov 15 | IRS Form 990 (extended) | Annual | ED + CPA | at-risk |
+| Nov 16 | Nov 30 | CT Charitable Solicitation renewal | Annual | ED | at-risk |
+| Dec 15 | Dec 31 | Q4 staff reimbursement form | Quarterly | Staff → ED | current |
+| Dec 1 | Jan 31 | Contractor 1099-NEC issuance | Annual | ED | **at-risk** |
+| Jan 5 | Jan 23 | Gusto form mailing order (precedes the IRS date) | Annual | ED | current |
+| Jan 1 | Feb | General Liability & Umbrella renewal → COI to landlord | Annual | ED | current |
+| Mar 1 | Mar 22 | CT Secretary of the State Annual Report | Annual | ED | **date corrected** |
+| Mar 1 | Apr | Directors & Officers renewal | Annual | ED | current |
+| Mar 15 | Apr–Jun | CPA financial review | Annual | ED + Treasurer | at-risk |
+| Apr 15 | May 15 | IRS Form 8868 extension | Annual | ED + CPA | current |
+| on receipt | Jun | CT Cultural District annual report | Annual | ED | unverified |
+| Jun 15 | Jul | Board conflict-of-interest disclosures | Annual | President / ED | unverified |
+| Sep 1, 2029 | Nov 1, 2029 | Quadrennial Tax Exempt Application (M-3) | Every 4 years | ED | **unresolved** |
+| ongoing | Annual | Facility lease review | Annual | ED | changing |
 
 ---
 
@@ -81,11 +84,13 @@ software does part of the job and it is not obvious which part.
   Cebik and Ashley Zdeb have both scheduled contractor payments, and Ashley has
   added a delivery method for a payee. Whether that is intended is a control
   question for the finance committee, not a bug.
-- **⚠️ Live dependency, due 28 September 2026:** Gusto is asking MakeHaven to
-  **reconnect Xero to Gusto**. That sync carries wages, taxes, deductions,
-  reimbursements and contractor payments into the ledger. If it lapses, the Xero
-  side of the 1099 reconciliation above loses its payroll half. The notice is
-  unread.
+- **Check by 28 September 2026:** Gusto emailed on 15 September asking
+  MakeHaven to **reconnect Xero to Gusto**. JR's understanding is that the two
+  are already connected, and that may be right — but the notice usually means
+  the authorisation token lapsed and the sync has quietly stopped. It is a
+  two-minute check in Gusto's integrations settings. That sync carries wages,
+  taxes, reimbursements and contractor payments into the ledger, which is the
+  payroll half of the 1099 reconciliation.
 - **Consequence of slipping:** contractors are not paid. Reputational and, past
   a point, a wage-claim exposure for anyone misclassified.
 - **Downstream:** this feeds the 1099 obligation below. Melio and Xero issue
@@ -152,6 +157,8 @@ software does part of the job and it is not obvious which part.
 - **Due: 30 November.** ⚠️ The renewal calendar said "annually, per the state
   portal schedule". The date is fixed and it is 30 November.
 - **Registration:** CHR.0067264. Fee $50. `elicense.ct.gov`, user ID `MakeHaven`.
+  The one-time Fast Track PIN is in the renewal notice emailed to
+  `admin@makehaven.org` on 10 July 2026; it is deliberately not recorded here.
 - **Dependency that makes this tight:** renewal requires the current year's 990
   to be **already filed with the IRS**. The 990 is on extension to 15 November.
   That is fifteen days of slack between the two, every year the extension is used.
@@ -251,9 +258,26 @@ Broker for all three: **Wellstone Insurance** — Kathleen Daleb,
 - **On renewal:** review projected payroll, and confirm uncompensated board
   members and officers are excluded via signed CT Workers' Compensation
   Commission forms, or they attract unnecessary premium.
-- **Open question:** Liberty Mutual is withdrawing a payment on 7 October 2026.
-  The calendar lists only PHLY, The Hartford and the D&O carrier. Identify what
-  that policy is and add it here.
+- **Liberty Mutual, resolved as far as mail allows:** it withdraws a premium
+  on the **7th of every month**, and sent renewal documents to
+  `admin@makehaven.org` on 8 August 2026. A monthly installment on the 7th
+  matches this policy's term, so Liberty Mutual is most likely the **current**
+  Workers' Comp carrier and The Hartford quote from Wellstone is the renewal.
+  Confirm with the broker which one is in force after 7 October, and whether
+  the Liberty Mutual auto-pay needs to be stopped.
+
+### Workers' Compensation premium audit — the annual staff-time form
+- **Cadence:** once a year, after the policy term ends. The carrier sends a
+  payroll audit form asking for actual wages by classification for the expired
+  term; the premium is then trued up against the estimate.
+- **When:** typically within a couple of months after 7 October. Due roughly
+  30 days after it arrives. No copy of the form was found in the mailbox
+  sweep; this row exists because JR does it every year.
+- **Prepare:** Gusto payroll summary for the term, contractor payments (some
+  carriers count uninsured contractors as payroll), and the officer exclusion
+  forms.
+- **Consequence:** an estimated audit at the carrier's number, usually higher,
+  and possible cancellation if ignored.
 
 ### General Liability & Commercial Umbrella
 - **Renews:** February (Feb–Feb term). Carrier **Philadelphia Insurance (PHLY)**.
