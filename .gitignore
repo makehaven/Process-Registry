@@ -1,6 +1,8 @@
-# Only index.html is generated — build/build.py writes it from data/inventory.md.
+# Generated pages: build/build.py writes index.html from data/inventory.md and
+# build/obligations.py writes obligations/ from data/obligations.yaml.
 # The rest of public/ is source: the participation client and its config.
 public/index.html
+public/obligations/
 data/feedback-digest.md
 __pycache__/
 *.pyc
