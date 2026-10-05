@@ -43,6 +43,23 @@ service cloud.firestore {
       return v is string && v.size() > 0 && v.size() <= maxLen;
     }
 
+    // ---- ▲ on What's next board items ---------------------------------------
+    // Same shape as process votes: "<uid>__<nid>" makes one mark per person per
+    // item structural. Presence is the vote; removing it is a delete. The board
+    // item itself lives in Drupal (feedback_ledger node <nid>).
+    match /itemVotes/{voteId} {
+      allow read: if signedIn();
+
+      allow create, update: if isSelf(request.resource.data.uid)
+        && request.resource.data.nid is int
+        && voteId == request.auth.uid + '__' + string(request.resource.data.nid)
+        && request.resource.data.title is string
+        && request.resource.data.title.size() <= 200
+        && request.resource.data.keys().hasOnly(['nid', 'title', 'uid', 'name', 'updatedAt']);
+
+      allow delete: if isSelf(resource.data.uid);
+    }
+
     // ---- votes on the Next ranking ----------------------------------------
     // Document id is "<uid>__<processId>", which is what makes one-person-one-
     // vote structural rather than a thing the client promises. A second vote

@@ -17,6 +17,7 @@ import {
   DRUPAL_BASE_URL, OAUTH_CLIENT_ID, OAUTH_SCOPE, FIREBASE_APP_ID,
   FIREBASE_CONFIG, VOTE_CAP,
 } from "./registry-config.js";
+import { renderBoard, itemsByProcess } from "./board.js";
 
 const SDK = "https://www.gstatic.com/firebasejs/12.11.0";
 
@@ -144,6 +145,9 @@ const state = {
   answers: new Map(),  // qid -> [answer docs]
   panelPid: "",
   ready: false,
+  feed: null,                // /api/work-board payload (What's next tab)
+  itemVotes: new Map(),      // board item nid -> ▲ count from the registry
+  myItemVotes: new Set(),    // nids this person has ▲'d here
 };
 
 async function loadFirebase() {
@@ -529,6 +533,7 @@ function openPanel(pid) {
   $("fbpanel").hidden = false;
   $("fbpill").setAttribute("aria-expanded", "true");
   renderThread(state.panelPid);
+  paintProcessWork(state.panelPid);
   paintQuestionCount();
   setTimeout(() => $("fbtext").focus(), 40);
 }
@@ -946,6 +951,134 @@ async function submitComment() {
   }
 }
 
+
+/* --------------------------------------------------------- What's next board */
+/* Drupal holds the items; board.js ranks them. Members-only for the same reason
+ * the rest of participation is: it is read with the signed-in member's token,
+ * and the Drupal route refuses anonymous requests. */
+
+async function drupalGet(path) {
+  let token = localStorage.getItem(LS.access);
+  const get = (bearer) => fetch(`${DRUPAL_BASE_URL}${path}`, {
+    headers: { Authorization: `Bearer ${bearer}`, Accept: "application/json" },
+  });
+  let res = await get(token);
+  if (res.status === 401) {
+    token = await refreshAccessToken();
+    if (!token) throw new Error("Your MakeHaven sign-in expired — sign in again.");
+    res = await get(token);
+  }
+  if (!res.ok) throw new Error(`makehaven.org answered ${res.status}`);
+  return res.json();
+}
+
+/** ▲ on board items: one document per person per item, like process votes. */
+async function loadItemVotes() {
+  const { db, api } = await loadFirebase();
+  const snap = await api.getDocs(api.collection(db, "itemVotes"));
+  const tally = new Map();
+  const mine = new Set();
+  snap.forEach((d) => {
+    const v = d.data();
+    if (!v || !v.nid) return;
+    tally.set(v.nid, (tally.get(v.nid) || 0) + 1);
+    if (state.profile && v.uid === state.profile.uid) mine.add(v.nid);
+  });
+  state.itemVotes = tally;
+  state.myItemVotes = mine;
+}
+
+async function toggleItemVote(nid) {
+  const { db, api } = await loadFirebase();
+  const p = state.profile;
+  const ref = api.doc(db, "itemVotes", `${p.uid}__${nid}`);
+  if (state.myItemVotes.has(nid)) {
+    await api.deleteDoc(ref);
+    state.myItemVotes.delete(nid);
+    state.itemVotes.set(nid, Math.max(0, (state.itemVotes.get(nid) || 1) - 1));
+  } else {
+    const item = (state.feed?.items || []).find((x) => x.nid === nid);
+    await api.setDoc(ref, {
+      nid,
+      title: item ? item.title.slice(0, 200) : String(nid),
+      uid: p.uid,
+      name: p.name,
+      updatedAt: new Date().toISOString(),
+    });
+    state.myItemVotes.add(nid);
+    state.itemVotes.set(nid, (state.itemVotes.get(nid) || 0) + 1);
+  }
+}
+
+function paintBoard() {
+  const root = $("wb-root");
+  if (!root || !state.feed) return;
+  renderBoard(root, {
+    feed: state.feed,
+    processes: state.processes,
+    itemVotes: state.itemVotes,
+    myVotes: state.myItemVotes,
+    toggleVote: toggleItemVote,
+    rerender: paintBoard,
+  });
+}
+
+function paintBoardMessage(text, withSignIn) {
+  const root = $("wb-root");
+  if (!root) return;
+  root.textContent = "";
+  const p = document.createElement("p");
+  p.className = "wb-empty";
+  p.textContent = text;
+  if (withSignIn) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "wb-signin";
+    b.textContent = "Sign in";
+    b.addEventListener("click", () => login());
+    p.append(" ", b);
+  }
+  root.appendChild(p);
+}
+
+async function loadBoard() {
+  try {
+    state.feed = await drupalGet("/api/work-board");
+  } catch (e) {
+    console.error(e);
+    paintBoardMessage(`The board could not load — ${e.message}.`, false);
+    return;
+  }
+  try { await loadItemVotes(); } catch (e) { console.error(e); }
+  paintBoard();
+}
+
+/** Open board items for a process, shown at the top of its comment panel. */
+function paintProcessWork(pid) {
+  const thread = $("fbthread");
+  if (!thread) return;
+  document.getElementById("fbwork")?.remove();
+  const items = pid && state.feed ? itemsByProcess(state.feed).get(pid) || [] : [];
+  if (!items.length) return;
+  const box = document.createElement("div");
+  box.id = "fbwork";
+  box.className = "fbwork";
+  const h = document.createElement("b");
+  h.textContent = `Open work on this process (${items.length})`;
+  box.appendChild(h);
+  const ul = document.createElement("ul");
+  for (const it of items) {
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.href = it.url; a.target = "_blank"; a.rel = "noopener";
+    a.textContent = it.title;
+    li.append(a, ` — ${it.status_label}`);
+    ul.appendChild(li);
+  }
+  box.appendChild(ul);
+  thread.parentNode.insertBefore(box, thread);
+}
+
 /* ---------------------------------------------------------------------- boot */
 
 async function boot() {
@@ -957,6 +1090,7 @@ async function boot() {
   // of what the registry does not know, and hiding them behind a login would
   // make the tab look empty to exactly the person who has not signed in yet.
   renderQuestionsTab();
+  paintBoardMessage("Sign in with your MakeHaven account to see what is being worked on and what comes next.", Boolean(OAUTH_CLIENT_ID));
 
   // No consumer configured yet: leave the page exactly as built rather than
   // offering a sign-in button that cannot work.
@@ -976,7 +1110,7 @@ async function boot() {
     setAuthBar("in");
     dock.hidden = false;
     document.body.classList.add("signed-in");
-    await Promise.all([loadVotes(), loadComments(), loadAnswers()]);
+    await Promise.all([loadVotes(), loadComments(), loadAnswers(), loadBoard()]);
     applyVotes();
     renderQuestionsTab();   // now with who answered what, and the progress bar
   } catch (e) {

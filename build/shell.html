@@ -38,6 +38,40 @@
     --s-stable-bg:#1e3129; --s-watch-bg:#33280f; --s-changing-bg:#1c2b3a;
     --s-optimizable-bg:#2c2333; --s-broken-bg:#38201f; --s-undefined-bg:#2a2725; --s-unknown-bg:#232120; --s-planned-bg:#20262f;
   }
+
+  /* What's next board (public/board.js) */
+  .wb-root { margin-top:10px; }
+  .wb-lane { margin:28px 0 8px; }
+  .wb-lane h2 { display:inline; font-size:1.05rem; }
+  .wb-lane h2 .c { color:var(--ink-3); font-weight:500; font-variant-numeric:tabular-nums; }
+  .wb-lane summary { cursor:pointer; padding:4px 0; }
+  .wb-lead { color:var(--ink-2); font-size:13.5px; margin:6px 0 10px; max-width:75ch; }
+  .wb-lead a, .panel#p-whatsnext .lead a { color:var(--crimson); }
+  .wb-list { list-style:none; padding:0; margin:0; }
+  .wb-row .wb-why { display:block; margin-top:4px; font-size:12.5px; color:var(--ink-3); }
+  .wb-row .wb-pin { display:inline-block; margin-left:8px; font-size:11.5px; font-weight:650;
+                    color:var(--s-changing); background:var(--s-changing-bg); padding:1px 7px; border-radius:3px; }
+  .wb-row .wb-meta { display:flex; flex-wrap:wrap; gap:4px 12px; align-items:baseline; margin-top:5px; font-size:12.5px; }
+  .wb-row .wb-meta .grp { margin-top:0; }
+  .wb-row .wb-meta a { color:var(--crimson); }
+  .wb-row .wb-status { font-weight:650; color:var(--ink-2); }
+  .wb-vote { display:block; margin-top:8px; font:inherit; font-size:11.5px; font-weight:650; cursor:pointer;
+             color:var(--ink-2); background:var(--surface); border:1px solid var(--rule-2); border-radius:4px; padding:3px 8px; white-space:nowrap; }
+  .wb-vote:hover { border-color:var(--crimson); color:var(--crimson); }
+  .wb-vote.on { color:#fff; background:var(--crimson); border-color:var(--crimson); }
+  .wb-vote:disabled { opacity:.6; cursor:wait; }
+  .wb-empty { color:var(--ink-2); padding:18px 0; }
+  .wb-signin { font:inherit; font-weight:650; cursor:pointer; color:#fff; background:var(--crimson);
+               border:0; border-radius:4px; padding:5px 12px; }
+  .wb-foot { margin-top:26px; font-size:12.5px; color:var(--ink-3); }
+  .wb-foot a { color:var(--crimson); }
+  .fbwork { margin:0 0 12px; padding:10px 12px; background:var(--sunken); border-radius:6px; font-size:13px; }
+  .fbwork ul { margin:6px 0 0; padding-left:18px; }
+  .fbwork a { color:var(--crimson); }
+  @media (max-width: 640px) {
+    .wb-row { grid-template-columns:26px 1fr !important; }
+    .wb-row .score { grid-column:2; text-align:left; }
+  }
   * { box-sizing: border-box; }
   body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans);
          font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased; }
@@ -743,6 +777,7 @@
 <nav class="tabbar">
   <div class="wrap" role="tablist" aria-label="Registry sections">
     <button role="tab" id="t-overview" aria-controls="p-overview" aria-selected="true">Overview</button>
+    <button role="tab" id="t-whatsnext" aria-controls="p-whatsnext" aria-selected="false" tabindex="-1">What&rsquo;s next<span class="c" id="wbtab-count"></span></button>
     <button role="tab" id="t-flux" aria-controls="p-flux" aria-selected="false" tabindex="-1">What&rsquo;s moving<span class="c">{{CHANGELOAD}}</span></button>
     <button role="tab" id="t-next" aria-controls="p-next" aria-selected="false" tabindex="-1">Opportunities<span class="c">{{NRANK}}</span></button>
     <button role="tab" id="t-inventory" aria-controls="p-inventory" aria-selected="false" tabindex="-1">Inventory<span class="c">{{N}}</span></button>
@@ -815,6 +850,14 @@
       {{DEGRADED}} of them are actually broken.
     </p>
   </section>
+</div>
+
+<div class="panel" id="p-whatsnext" role="tabpanel" aria-labelledby="t-whatsnext" hidden>
+
+  <p class="lead"><strong>Everything MakeHaven has decided to work on, in the order we expect to get to it</strong> &mdash; website fixes, equipment members wished for, and changes to how we run things. It is ranked from what people tell us: how many reported it, the &#9650; marks, wish votes, whether it blocks members, money or safety, and how long it has waited. Staff can pin something to the top, and the pin says why.</p>
+  <p class="wb-lead">This is the committed list. The <a href="#next" data-goto="t-next">Opportunities</a> tab is different: it ranks <em>processes</em> that could be improved, before anyone has decided to.</p>
+
+  <div id="wb-root" class="wb-root" aria-live="polite"><p class="wb-empty">Loading&hellip;</p></div>
 </div>
 
 <div class="panel" id="p-flux" role="tabpanel" aria-labelledby="t-flux" hidden>
