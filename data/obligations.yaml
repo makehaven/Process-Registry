@@ -14,6 +14,11 @@
 #               An annual value of "~MM" means "sometime that month, exact day
 #               set by the sender" and renders on the 15th.
 #   start_days  how many days before `due` the working window opens
+#   lead_days   latest start: days before `due` that work must begin to finish
+#               on time, counting the work AND the wait on others. Optional; an
+#               item without it is read as starting when its window opens
+#   waits_on    who or what the item waits on once started (sets the lead time)
+#   depends_on  id of an obligation that must be finished first
 #   owner       who does it
 #   state       current | due-soon | at-risk | unresolved | unverified | changing
 #               (due-soon is computed from dates; the others are set here)
@@ -63,13 +68,15 @@
   name: Workers' Comp premium audit — staff-time form
   group: insurance
   cadence: annual
-  due: "~12"
+  due: "11-06"
   start_days: 30
+  lead_days: 21
+  waits_on: Contractor certificates of insurance; Gusto payroll by class
   owner: ED
   state: unverified
   evidence: null
   if_slips: Estimated audit at the carrier's number; possible cancellation
-  note: Arrives after the term ends; actual payroll by classification for the expired term
+  note: Liberty Mutual eReport, due about 30 days after the 7 Oct term end (2026 request sent 7 Oct, due 6 Nov); actual payroll by classification
 
 - id: personal-property
   name: Declaration of Personal Property (New Haven)
@@ -77,6 +84,8 @@
   cadence: annual
   due: "11-01"
   start_days: 31
+  lead_days: 10
+  waits_on: Access code on the city's paper letter
   owner: ED
   state: unverified
   evidence: 2025 zero-asset filing, per the assessor
@@ -89,6 +98,8 @@
   cadence: annual
   due: "11-15"
   start_days: 75
+  lead_days: 45
+  waits_on: CPA prepares; Treasurer signs
   owner: ED + CPA
   state: at-risk
   evidence: 8868 accepted 28 Apr 2026 · 2024 return filed late, fined
@@ -101,11 +112,27 @@
   cadence: annual
   due: "11-30"
   start_days: 14
+  lead_days: 14
+  depends_on: form-990
   owner: ED
   state: at-risk
   evidence: Certificate 15 Dec 2025 · lapsed Dec 2024
   if_slips: Cannot solicit in CT or apply for state and municipal grants
   note: CHR.0067264 · $50 · requires the 990 filed first · notices go to admin@
+
+- id: sam-registration
+  name: SAM.gov entity registration renewal
+  group: tax
+  cadence: annual
+  due: "12-12"
+  start_days: 60
+  lead_days: 45
+  waits_on: Federal entity validation after submission (often weeks)
+  owner: ED
+  state: unverified
+  evidence: null
+  if_slips: Registration inactive; cannot receive federal awards or federal partner payments
+  note: UEI SQK8NNLGBAG7 · renew at sam.gov · notices go to admin@ · ignore paid "renewal service" emails
 
 - id: q-reimbursement
   name: Quarterly staff reimbursement form
@@ -125,6 +152,8 @@
   cadence: annual
   due: "01-23"
   start_days: 18
+  lead_days: 14
+  depends_on: form-1099
   owner: ED
   state: current
   evidence: 2025 forms distributed via Gusto
@@ -137,6 +166,8 @@
   cadence: annual
   due: "01-31"
   start_days: 61
+  lead_days: 60
+  waits_on: Contractor W-9s
   owner: ED
   state: at-risk
   evidence: null
@@ -185,6 +216,8 @@
   cadence: annual
   due: "06-30"
   start_days: 107
+  lead_days: 90
+  waits_on: CPA
   owner: ED + Treasurer
   state: at-risk
   evidence: 2025 request list 1 Jul 2026 · still open
@@ -242,9 +275,11 @@
 - id: lease-review
   name: Facility lease review
   group: money
-  cadence: ongoing
-  due: null
-  start_days: 0
+  cadence: once
+  due: "2026-12-31"
+  start_days: 120
+  lead_days: 70
+  waits_on: Counsel redline; landlord review rounds; board approval
   owner: ED
   state: changing
   evidence: Counsel engaged Jun 2026
