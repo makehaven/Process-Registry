@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Prototype of the Phase 2 renderer: seed-inventory.md -> one self-contained page."""
-import re, sys, html, json, collections, pathlib
+import re, sys, html, json, collections, pathlib, datetime
 
 SRC = pathlib.Path(__file__).resolve().parents[1] / "data" / "inventory.md"
 TPL = pathlib.Path(__file__).with_name("shell.html")
@@ -968,6 +968,24 @@ manifest = json.dumps(
       "group": r["group"], "state": r["state"]}
      for r in sorted(rows, key=lambda r: (r["group"], r["name"]))],
     ensure_ascii=False, separators=(",", ":"))
+
+# ---- machine-readable feed --------------------------------------------------
+# The website's Monday staff briefing reads this (makerspace_dashboard
+# StaffBriefingService) to say which processes changed state that week and
+# what is broken now. Only what that needs, so the page stays the source of
+# detail: state per process, state counts, and dated transitions from git.
+feed = {
+    "generated": datetime.date.today().isoformat(),
+    "counts": {st: sum(1 for r in rows if r["state"] == st) for st in STATES},
+    "processes": [
+        {"pid": r["pid"], "name": re.sub(r"[*`]", "", r["name"]).strip(),
+         "group": r["group"], "state": r["state"], "impact": r["i"]}
+        for r in sorted(rows, key=lambda r: (r["group"], r["name"]))],
+    "transitions": [
+        {"name": re.sub(r"[*`]", "", n).strip(), "from": o, "to": s_, "date": d}
+        for (n, o, s_, d) in state_transitions(60)],
+}
+(OUT.parent / "registry.json").write_text(json.dumps(feed, ensure_ascii=False, indent=1))
 
 # ---- question manifest ------------------------------------------------------
 # The question rounds are what took this registry from guesses to a map, and

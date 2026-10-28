@@ -2,6 +2,7 @@
 # build/obligations.py writes obligations/ from data/obligations.yaml.
 # The rest of public/ is source: the participation client and its config.
 public/index.html
+public/registry.json
 public/obligations/
 data/feedback-digest.md
 __pycache__/
