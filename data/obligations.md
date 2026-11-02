@@ -56,7 +56,7 @@ already landed.
 | Apr 15 | May 15 | IRS Form 8868 extension | Annual | ED + CPA | current |
 | on receipt | Jun | CT Cultural District annual report | Annual | ED | unverified |
 | Jun 15 | Jul | Board conflict-of-interest disclosures | Annual | President / ED | unverified |
-| Sep 1, 2029 | Nov 1, 2029 | Quadrennial Tax Exempt Application (M-3) | Every 4 years | ED | changing (filed late 1 Nov 2026) |
+| Sep 1, 2029 | Nov 1, 2029 | Quadrennial Tax Exempt Application (M-3) | Every 4 years | ED | current (filed late 1 Nov 2026, receipt confirmed) |
 | ongoing | Annual | Facility lease review | Annual | ED | changing |
 
 ---
@@ -198,8 +198,11 @@ software does part of the job and it is not obvious which part.
   also asked the city to cancel the unpaid 2025 second half ($782.86).
   The signed copy and attachments are in the Drive folder "Property Tax Exemption
   Application 2026".
-- **Still open:** the city's confirmation of receipt (keep it as proof of filing)
-  and its answer on the 2025 bill. If the bill is not cancelled, pay it by 1 Feb
+- **2 Nov 2026:** Ingrid Lavado-Ponce confirmed the forms were received. The 2025
+  bill can't be cancelled by the assessor, which has no statutory authority after a missed
+  deadline. The only route is the city's Tax Abatement Committee, reached through Legislative
+  Services (Board of Alders).
+- **Still open:** the 2025 bill. If the bill is not cancelled, pay it by 1 Feb
   2027. The first half was already paid in July 2026, and recovering it would need
   a special act.
 - **Next cycle:** due **1 Nov 2029**. The New Haven form is under Assessor → Forms &
