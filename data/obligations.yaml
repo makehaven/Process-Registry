@@ -8,9 +8,10 @@
 #   id          stable slug
 #   name        what a successor would call it
 #   group       tax | insurance | money   (one timeline lane each)
-#   cadence     annual | semimonthly | quarterly | once | every-4-years | ongoing
+#   cadence     annual | monthly | semimonthly | quarterly | once | every-4-years | ongoing
 #   due         annual: "MM-DD"  once: "YYYY-MM-DD"  every-4-years: "YYYY-MM-DD" (last)
-#               semimonthly: "1,15"  quarterly: "quarter-end"  ongoing: null
+#               monthly: day of month, e.g. 10   semimonthly: "1,15"
+#               quarterly: "quarter-end"  ongoing: null
 #               An annual value of "~MM" means "sometime that month, exact day
 #               set by the sender" and renders on the 15th.
 #   start_days  how many days before `due` the working window opens
@@ -39,6 +40,18 @@
   evidence: Payments scheduled 15 & 18 Sep 2026
   if_slips: Contractors unpaid
   note: Site consolidates timesheet drafts → one Xero bill per contractor → approve → pay in Melio
+
+- id: paypal-donations-civicrm
+  name: Monthly PayPal donations recorded in CiviCRM
+  group: money
+  cadence: monthly
+  due: 10
+  start_days: 9
+  owner: ED
+  state: current
+  evidence: Jan–Oct 2026 reconciled 2 Nov 2026 (176 missing payments recorded; Xero already had them)
+  if_slips: Donor records and year-end giving letters understate PayPal monthly donors; staff fall back to guessed yearly totals
+  note: Part of the monthly close. Download last month's PayPal activity (payments@) → scripts/finance/paypal-donations-reconcile.py → --apply
 
 - id: gusto-xero-check
   name: Check Xero ↔ Gusto connection

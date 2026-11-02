@@ -39,6 +39,7 @@ already landed.
 | Start work | Hard due | Item | Cadence | Owner | State |
 |---|---|---|---|---|---|
 | same day | 1st & 15th | Contractor payment approval & pay run | Semimonthly | ED | current |
+| 1st | 10th | Monthly PayPal donations recorded in CiviCRM (part of the monthly close) | Monthly | ED | current |
 | now | Sep 28 | Check Xero↔Gusto connection (Gusto says reconnect) | One-off | ED | due-soon |
 | Sep 7 | Oct 7 | Workers' Compensation renewal | Annual | ED | due-soon |
 | on receipt | ~30 days after | Workers' Comp premium audit — staff-time form | Annual, after term ends | ED | unverified |
@@ -316,6 +317,42 @@ Broker for all three: **Wellstone Insurance** — Kathleen Daleb,
 ---
 
 ## 4. Governance and financial
+
+### Monthly PayPal donations recorded in CiviCRM
+- **Cadence:** monthly, during the monthly close: window opens on the 1st, done by the 10th, for the month just ended.
+- **Why it exists:** monthly PayPal donations are meant to reach CiviCRM on
+  their own (PayPal's IPN notices), and many do not. The subscriptions set up
+  in 2023 have never reported a payment, and the newer ones lost three months
+  in spring 2026. Xero is not affected: the PayPal bank feed carries every
+  payment and the bookkeeper reconciles it. Only CiviCRM's donor records go
+  short, which is what year-end giving letters, the monthly-donor roster
+  (`/admin/people/monthly-donors`) and donor history are built from.
+- **Before 2026:** staff typed one yearly total per subscription each December
+  (12 × the monthly amount, no fee, not linked to the donor's monthly series).
+  Those totals were estimates; at least one was too low because the donor had
+  raised their gift. From 2026 each payment is recorded on its own date.
+- **Steps (about 10 minutes):**
+  1. Log in to PayPal as payments@ → Activity → Reports → Activity download →
+     *Balance affecting*, CSV, last month's dates.
+  2. Dry run, read-only against the live site:
+     `scripts/finance/paypal-donations-reconcile.py <file.csv>` (in the
+     makehaven-website repo). It lists, per subscription, payments PayPal took
+     that CiviCRM lacks, and anything for a person to look at: a new
+     subscription with no known donor, a series amount that no longer matches
+     the charge, a series marked cancelled that PayPal still charges, a
+     subscription that did not pay this month, and memberships still billed
+     through PayPal (never recorded by this script).
+  3. `… <file.csv> --apply` records the missing payments: Completed, Donation,
+     the PayPal date, transaction ID and fee, on the donor's monthly series (a
+     new series if none exists). No receipt or email is sent.
+  4. Rerun the dry run: it should report 0 missing.
+- **Done means:** the dry run reports 0 missing for the month, and any
+  "for a person to look at" lines have an answer.
+- **Fix that would retire this step:** make PayPal's notices for the 2023
+  subscriptions reach the site (check PayPal → Notifications → IPN history for
+  where they are sent), or have the site pull PayPal's transaction list on a
+  schedule. Keep running the monthly check until a month passes in which the
+  dry run finds nothing missing without `--apply` having been run.
 
 ### CPA financial review
 - **Window:** April–June. Request list late April, draft mid-June.

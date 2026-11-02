@@ -55,6 +55,14 @@ def quarter_end_next(base: dt.date) -> dt.date:
     return dt.date(base.year + 1, 3, 31)
 
 
+def monthly_next(day: int, base: dt.date) -> dt.date:
+    cand = dt.date(base.year, base.month, min(day, 28))
+    if cand >= base:
+        return cand
+    nm = (cand.replace(day=28) + dt.timedelta(days=4)).replace(day=min(day, 28))
+    return nm
+
+
 def semimonthly_dates(start: dt.date, end: dt.date):
     d = dt.date(start.year, start.month, 1)
     while d <= end:
@@ -88,6 +96,8 @@ def resolve(item: dict, base: dt.date) -> dict:
         nxt = next(semimonthly_dates(base, base + dt.timedelta(days=40)))
     elif cad == "quarterly":
         nxt = quarter_end_next(base)
+    elif cad == "monthly":
+        nxt = monthly_next(int(due), base)
     start = (nxt - dt.timedelta(days=int(item.get("start_days", 0)))) if nxt else None
     out = dict(item)
     out.update(next_due=nxt, start=start, approx=approx, overdue_since=since)
@@ -99,7 +109,7 @@ def derived_state(it: dict, base: dt.date) -> str:
         return "risk"
     if it["state"] == "at-risk":
         return "risk"
-    if it["next_due"] and (it["next_due"] - base).days <= SOON_DAYS and it["cadence"] != "semimonthly":
+    if it["next_due"] and (it["next_due"] - base).days <= SOON_DAYS and it["cadence"] not in ("semimonthly", "monthly"):
         return "soon"
     return {"current": "ok", "unverified": "none", "changing": "info"}.get(it["state"], "none")
 
@@ -107,6 +117,10 @@ def derived_state(it: dict, base: dt.date) -> str:
 # ---------------------------------------------------------------- rendering helpers
 
 E = html.escape
+
+
+def ordinal(n: int) -> str:
+    return f"{n}{'th' if 10 <= n % 100 <= 20 else {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')}"
 
 
 def fmt(d: dt.date | None, approx=False) -> str:
@@ -187,7 +201,7 @@ def timeline(items: list[dict], base: dt.date) -> str:
         y = lane_y[key]
         lane_items = []
         for it in items:
-            if it["group"] != key or it["cadence"] in ("semimonthly", "ongoing"):
+            if it["group"] != key or it["cadence"] in ("semimonthly", "monthly", "ongoing"):
                 continue
             if it["overdue_since"]:
                 lane_items.append((x0, it, True))
@@ -244,7 +258,7 @@ def render(items: list[dict], base: dt.date) -> str:
 
     overdue = [i for i in items if i["overdue_since"] or i["state"] == "unresolved"]
     soon = [i for i in items if i["next_due"] and 0 <= (i["next_due"] - base).days <= SOON_DAYS
-            and i["cadence"] != "semimonthly"]
+            and i["cadence"] not in ("semimonthly", "monthly")]
     noev = [i for i in items if not i.get("evidence")]
 
     def names(xs, n=4):
@@ -260,6 +274,7 @@ def render(items: list[dict], base: dt.date) -> str:
         for it in lane:
             k = derived_state(it, base)
             due_txt = ("1st &amp; 15th" if it["cadence"] == "semimonthly" else
+                       f"monthly, by the {ordinal(int(it['due']))}" if it["cadence"] == "monthly" else
                        "ongoing" if it["cadence"] == "ongoing" else
                        E(fmt(it["overdue_since"] or it["next_due"], it["approx"])))
             sub = E(rel(it["overdue_since"] or it["next_due"], base)) if it["next_due"] else ""
