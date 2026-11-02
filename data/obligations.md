@@ -42,11 +42,12 @@ already landed.
 | now | Sep 28 | Check Xero↔Gusto connection (Gusto says reconnect) | One-off | ED | due-soon |
 | Sep 7 | Oct 7 | Workers' Compensation renewal | Annual | ED | due-soon |
 | on receipt | ~30 days after | Workers' Comp premium audit — staff-time form | Annual, after term ends | ED | unverified |
-| Oct 1 | Nov 1 | Declaration of Personal Property (New Haven) | Annual | ED | unverified |
+| Oct 1 | Nov 1 | Declaration of Personal Property (New Haven) | Annual | ED | current |
 | Sep 1 | Nov 15 | IRS Form 990 (extended) | Annual | ED + CPA | at-risk |
 | Nov 16 | Nov 30 | CT Charitable Solicitation renewal | Annual | ED | at-risk |
 | Dec 15 | Dec 31 | Q4 staff reimbursement form | Quarterly | Staff → ED | current |
 | Dec 1 | Jan 31 | Contractor 1099-NEC issuance | Annual | ED | **at-risk** |
+| Jan 2 | Feb 1, 2027 | New Haven 2025 tax bill, second half ($782.86) — unless cancelled | One-off | ED | changing |
 | Jan 5 | Jan 23 | Gusto form mailing order (precedes the IRS date) | Annual | ED | current |
 | Jan 1 | Feb | General Liability & Umbrella renewal → COI to landlord | Annual | ED | current |
 | Mar 1 | Mar 22 | CT Secretary of the State Annual Report | Annual | ED | **date corrected** |
@@ -55,7 +56,7 @@ already landed.
 | Apr 15 | May 15 | IRS Form 8868 extension | Annual | ED + CPA | current |
 | on receipt | Jun | CT Cultural District annual report | Annual | ED | unverified |
 | Jun 15 | Jul | Board conflict-of-interest disclosures | Annual | President / ED | unverified |
-| Sep 1, 2029 | Nov 1, 2029 | Quadrennial Tax Exempt Application (M-3) | Every 4 years | ED | **unresolved** |
+| Sep 1, 2029 | Nov 1, 2029 | Quadrennial Tax Exempt Application (M-3) | Every 4 years | ED | changing (filed late 1 Nov 2026) |
 | ongoing | Annual | Facility lease review | Annual | ED | changing |
 
 ---
@@ -172,7 +173,7 @@ software does part of the job and it is not obvious which part.
 - **Evidence:** certificate issued 15 December 2025 for the current term.
 - **Watch:** every notice goes to `admin@makehaven.org`, not to JR directly.
 
-### Quadrennial Tax Exempt Application (M-3) — **unresolved**
+### Quadrennial Tax Exempt Application (M-3) — filed late, awaiting the city
 - **Cadence:** every four years. Last cycle 2025. Next 2029.
 - **Due:** 1 November of the quadrennial year, to the town assessor, under
   CGS 12-81(7)(10)(11) and 12-87a.
@@ -188,6 +189,22 @@ software does part of the job and it is not obvious which part.
 - **Next action:** contact the assessor about a late filing or appeal before
   treating the bill as settled. This obligation was absent from the renewal
   calendar entirely.
+- **Update 1 Nov 2026:** filed. The 2026 Declaration of Personal Property was
+  filed online on 29 Oct 2026. The New Haven "Tax Exempt Return" (CAAO M-3) went in as an
+  Initial Application under §12-81(7). JR signed it as Executive Director and it was
+  notarized on 30 Oct. It was emailed to assessor@newhavenct.gov, with
+  Ingrid Lavado-Ponce copied, on 1 Nov 2026, along with the IRS letter, certificate,
+  bylaws, 2024 990, 2024 review, schedule of assets and a supplement. The email
+  also asked the city to cancel the unpaid 2025 second half ($782.86).
+  The signed copy and attachments are in the Drive folder "Property Tax Exemption
+  Application 2026".
+- **Still open:** the city's confirmation of receipt (keep it as proof of filing)
+  and its answer on the 2025 bill. If the bill is not cancelled, pay it by 1 Feb
+  2027. The first half was already paid in July 2026, and recovering it would need
+  a special act.
+- **Next cycle:** due **1 Nov 2029**. The New Haven form is under Assessor → Forms &
+  Applications on newhavenct.gov. Note that the generic M-3 PDF online is
+  Rocky Hill's.
 - **What it needs when filed:** the assessor's letter, the IRS 501(c)
   determination letter, current bylaws or charter, an itemised list of property
   owned or leased in New Haven, a signed front page of the most recent 990, and

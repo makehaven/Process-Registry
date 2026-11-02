@@ -87,10 +87,10 @@
   lead_days: 10
   waits_on: Access code on the city's paper letter
   owner: ED
-  state: unverified
-  evidence: 2025 zero-asset filing, per the assessor
+  state: current
+  evidence: 2026 declaration filed online 29 Oct 2026 (pp.assessorform.com)
   if_slips: Penalty assessment on an estimated value
-  note: Assessor account UID 017402
+  note: Assessor account UID 017402; online filing via pp.assessorform.com with the code from the city's letter
 
 - id: form-990
   name: IRS Form 990
@@ -267,10 +267,22 @@
   due: "2025-11-01"
   start_days: 61
   owner: ED
-  state: unresolved
+  state: changing
+  evidence: Late initial application (signed, notarized) emailed to the assessor 1 Nov 2026; awaiting receipt
+  if_slips: Property tax assessed — happened for 2025
+  note: 2025 cycle missed; filed late 1 Nov 2026 for the 2026 list. Next cycle due 1 Nov 2029
+
+- id: nh-2025-tax-bill
+  name: New Haven 2025 personal property tax bill — second half
+  group: tax
+  cadence: once
+  due: "2027-02-01"
+  start_days: 30
+  owner: ED
+  state: changing
   evidence: null
-  if_slips: Property tax assessed — already happened
-  note: Assessor's Nov 2025 question never answered; next cycle 1 Nov 2029
+  if_slips: Delinquent interest from 2 Feb 2027
+  note: Bill 2025 02 0054461, $782.86 due 1 Jan 2027. Asked the assessor 1 Nov 2026 to cancel it; pay by 1 Feb if they don't
 
 - id: lease-review
   name: Facility lease review
