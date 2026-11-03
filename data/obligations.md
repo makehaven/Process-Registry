@@ -48,7 +48,7 @@ already landed.
 | Nov 16 | Nov 30 | CT Charitable Solicitation renewal | Annual | ED | at-risk |
 | Dec 15 | Dec 31 | Q4 staff reimbursement form | Quarterly | Staff → ED | current |
 | Dec 1 | Jan 31 | Contractor 1099-NEC issuance | Annual | ED | **at-risk** |
-| Jan 2 | Feb 1, 2027 | New Haven 2025 tax bill, second half ($782.86) — unless cancelled | One-off | ED | changing |
+| Jan 2 | Feb 1, 2027 | New Haven 2025 tax bill, second half ($782.86) | One-off | ED | scheduled 2 Nov |
 | Jan 5 | Jan 23 | Gusto form mailing order (precedes the IRS date) | Annual | ED | current |
 | Jan 1 | Feb | General Liability & Umbrella renewal → COI to landlord | Annual | ED | current |
 | Mar 1 | Mar 22 | CT Secretary of the State Annual Report | Annual | ED | **date corrected** |
@@ -203,7 +203,8 @@ software does part of the job and it is not obvious which part.
   bill can't be cancelled by the assessor, which has no statutory authority after a missed
   deadline. The only route is the city's Tax Abatement Committee, reached through Legislative
   Services (Board of Alders).
-- **Still open:** the 2025 bill. If the bill is not cancelled, pay it by 1 Feb
+- **2025 bill:** decided not to seek abatement. The second half ($782.86) was scheduled
+  through Webster Bank bill pay on 2 Nov 2026. Confirm it cleared on the city's side. If the bill is not cancelled, pay it by 1 Feb
   2027. The first half was already paid in July 2026, and recovering it would need
   a special act.
 - **Next cycle:** due **1 Nov 2029**. The New Haven form is under Assessor → Forms &

@@ -292,10 +292,10 @@
   due: "2027-02-01"
   start_days: 30
   owner: ED
-  state: changing
-  evidence: null
+  state: current
+  evidence: Payment scheduled via Webster Bank bill pay 2 Nov 2026; confirm it cleared
   if_slips: Delinquent interest from 2 Feb 2027
-  note: Bill 2025 02 0054461, $782.86 due 1 Jan 2027. Assessor can't cancel it (2 Nov 2026); only route is the Tax Abatement Committee via Legislative Services. Otherwise pay by 1 Feb
+  note: Bill 2025 02 0054461, $782.86 due 1 Jan 2027. Assessor can't cancel it (2 Nov 2026); only route is the Tax Abatement Committee via Legislative Services. Decided to pay instead (2 Nov 2026)
 
 - id: lease-review
   name: Facility lease review
