@@ -53,6 +53,18 @@
   if_slips: Donor records and year-end giving letters understate PayPal monthly donors; staff fall back to guessed yearly totals
   note: Part of the monthly close. Download last month's PayPal activity (payments@) → scripts/finance/paypal-donations-reconcile.py → --apply
 
+- id: giving-summaries-check
+  name: Check and approve donors' yearly giving summaries
+  group: money
+  cadence: annual
+  due: "01-15"
+  start_days: 4
+  owner: Kate
+  state: current
+  evidence: Built 5 Nov 2026, not yet deployed; first send January 2027
+  if_slips: Donors have no summary of the year's gifts for their taxes
+  note: Opens 11 Jan, after the December PayPal close. Compare totals with Xero at /admin/people/giving-statements, then approve. No hand-entered yearly totals in December; they double count.
+
 - id: gusto-xero-check
   name: Check Xero ↔ Gusto connection
   group: money
