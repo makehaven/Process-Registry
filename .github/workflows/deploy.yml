@@ -34,3 +34,8 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           projectId: makehaven-process-registry
           channelId: live
+          # Pinned 2026-11-17: firebase-tools 15.34.1+ first asks Service Usage whether
+          # Hosting is enabled, and the deploy service account lacks
+          # serviceusage.services.get, so every deploy from 10-22 to 11-09 failed 403.
+          # Unpin after granting the account roles/serviceusage.serviceUsageConsumer.
+          firebaseToolsVersion: 15.34.0
